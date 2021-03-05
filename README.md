@@ -16,13 +16,13 @@ Obviously you need to have Python installed, but other than that there should be
 Premade Packages:
   Blacked:
     
-    (TODO: add link)
-  Male Yiff:
+    https://www.dropbox.com/s/fxibxo4joi9j7z1/blacked-resources.zip?dl=0
+  Yiff:
     
-    (TODO: add link)
+    https://www.dropbox.com/s/t9sc6nr9jwhjn7s/yiff-resources.zip?dl=0
   Censored:
     
-    (TODO: add link)
+    https://www.dropbox.com/s/c0cpx79tf8g9pp8/censored-resources.zip?dl=0
 
 **Packages**
   Packages must be structured as follows:
