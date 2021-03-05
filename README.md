@@ -11,10 +11,13 @@ Obviously you need to have Python installed, but other than that there should be
 
 Premade Packages:
   Blacked:
+    
     (TODO: add link)
   Male Yiff:
+    
     (TODO: add link)
   Censored:
+    
     (TODO: add link)
 
 **Packages**
@@ -32,17 +35,18 @@ Premade Packages:
         wallpaper.png
         web.json
    
-The web.json file should contain two sets:
-  ->urls - set of urls
-  ->args - corresponding set of arguments; even if a url should take no argument, there must be a "" in this
-    -> args are separated by commas within their strings, eg "arg1,arg2,arg3"
-      ->Ensure that urls and args are aligned; if the first URL can take the args "a,b" the first args value should be "a,b"
-          ->Args will be selected randomly and appended to the end of the url
-            ->eg, "https://www.google.com/" with args "penis,cock,ass" cound randomly return one of 
-              ->https://www.google.com/penis  https://www.google.com/cock  https://www.google.com/ass
+  The web.json file should contain two sets:
+  
+    {"urls":["url1", "url2", ...], "args":["arg1,arg2,arg3", "", "arg1,arg2", ...]}
+    ->urls - set of urls
+    ->args - corresponding set of arguments; even if a url should take no argument, there must be a "" in this
+      ->args are separated by commas within their strings, eg "arg1,arg2,arg3"
+      ->ensure that urls and args are aligned; if the first URL can take the args "a,b" the first args value should be "a,b"
+      ->args will be selected randomly and appended to the end of the url
+        ->eg, "https://www.google.com/" with args "penis,cock,ass" cound randomly return one of 
+        ->https://www.google.com/penis  https://www.google.com/cock  https://www.google.com/ass
 
 If resources are not properly structured, the application could crash or exhibit strange behavior.
-
 
 **Questions**
 
