@@ -14,15 +14,18 @@ I more or less went into this wanting to make my own version of Elsavirus/Doppel
 Obviously you need to have Python installed, but other than that there should be no dependencies that aren't natively packaged with the language itself.
 
 Premade Packages:
+
   Blacked:
-    
-    https://www.dropbox.com/s/fxibxo4joi9j7z1/blacked-resources.zip?dl=0
+  
+  https://www.dropbox.com/s/fxibxo4joi9j7z1/blacked-resources.zip?dl=0
+  
   Yiff:
-    
-    https://www.dropbox.com/s/t9sc6nr9jwhjn7s/yiff-resources.zip?dl=0
+  
+  https://www.dropbox.com/s/t9sc6nr9jwhjn7s/yiff-resources.zip?dl=0
+  
   Censored:
-    
-    https://www.dropbox.com/s/c0cpx79tf8g9pp8/censored-resources.zip?dl=0
+  
+  https://www.dropbox.com/s/c0cpx79tf8g9pp8/censored-resources.zip?dl=0
 
 **Packages**
   Packages must be structured as follows:
