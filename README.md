@@ -58,10 +58,10 @@ If resources are not properly structured, the application could crash or exhibit
 
 **Questions**
 
-  "What about screenrape/writing prompts/Discord 'currently playing' integration?"
+Q:  "What about screenrape/writing prompts/Discord 'currently playing' integration?"
   
-   I'll probably get around to adding them eventually; personally I wasn't the biggest fan of the writing prompts but since there are actual settings for Edgeware they'll probably end up being toggleable options in the future.
+   A: I'll probably get around to adding them eventually; personally I wasn't the biggest fan of the writing prompts but since there are actual settings for Edgeware they'll probably end up being toggleable options in the future.
 
-  "What new features are planned?
+Q:  "What new features are planned?
   
-   Nothing really, I just intended for this to be a silly fetishware program for use by people whose interests are similar to mine. I'll probably update it here and there but new features aren't a priority.
+   A: Nothing really, I just intended for this to be a silly fetishware program for use by people whose interests are similar to mine. I'll probably update it here and there but new features aren't a priority.
