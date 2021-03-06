@@ -1,5 +1,7 @@
 # Edgeware
-Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
+**First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
+
+Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
 
