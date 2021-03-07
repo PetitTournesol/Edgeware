@@ -1,0 +1,1 @@
+{"moods":["angry", "sad", "happy"], "minLen":2, "maxLen":5, "freqList":[10, 30, 70], "angry":["i am angry.", "i am mad."], "sad":["boohoo.", "i am big gay sad.", "fuck."], "happy":["i am happy.", "i am gay."]}
