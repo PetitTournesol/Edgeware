@@ -1,29 +1,41 @@
 import tkinter as tk
+import json
 from tkinter import *
 import os
 
-DEFAULT_CONFIG = '250;0;0;25;15;0;1'
+varNames = ['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
+defaultVars = ['1.1.0', '250', '0', '0', '15', '40', '0', '0', '500', '0']
+
 PATH = os.path.abspath(os.getcwd())
-if not os.path.exists(PATH + '/config.cfg'):
-    with open(PATH + '/config.cfg', 'w') as f:
-        f.write(DEFAULT_CONFIG)
+
+settingJsonObj = {}
+for var in varNames:
+    settingJsonObj[var] = defaultVars[varNames.index(var)]
+
+if not os.path.exists(PATH + '\\config.cfg'):
+    with open(PATH + '\\config.cfg', 'w') as f:
+        f.write(json.dumps(settingJsonObj))
+
+with open(PATH + '\\config.cfg', 'r') as f:
+    settingJsonObj = json.loads(f.readline())
 
 root = tk.Tk()
 root.title('EdgeWare Config')
 root.resizable(False,False)
-root.geometry('260x300')
-root.iconbitmap(os.path.abspath(os.getcwd()) + '/resource/icon.ico')
+root.geometry('260x400')
+root.iconbitmap(os.path.abspath(os.getcwd()) + '\\resource\\icon.ico')
 
-def configWindow(delay, fill, replace, webMod, popupMod, server, slow):
-    delayVar = IntVar(root, value=delay, name='delay')
-    fillVar = IntVar(root, value=fill, name='fill')
-    replaceVar = IntVar(root, value=replace, name='replace')
-    webModVar = IntVar(root, value=webMod, name='webMod')
-    popupModVar = IntVar(root, value=popupMod, name='popupMod')
-    serverVar = IntVar(root, value=server, name='server')
-    slowVar = IntVar(root, value=slow, name='slow')
+def configWindow(delay, fill, replace, webMod, popupMod, audioMod, promptMod, slow):
+    delayVar = IntVar(root, value=settingJsonObj['delay'], name='delay')
+    fillVar = IntVar(root, value=settingJsonObj['fill'], name='fill')
+    replaceVar = IntVar(root, value=settingJsonObj['replace'], name='replace')
+    webModVar = IntVar(root, value=settingJsonObj['webMod'], name='webMod')
+    audModVar = IntVar(root, value=settingJsonObj['audioMod'], name='audioMod')
+    promptModVar = IntVar(root, value=settingJsonObj['promptMod'], name='promptMod')
+    popupModVar = IntVar(root, value=settingJsonObj['popupMod'], name='popupMod')
+    slowVar = IntVar(root, value=settingJsonObj['slowMode'], name='slow')
 
-    timerSlider = Scale(root, label='Timer Delay (ms)', from_=100, to=2000, orient=HORIZONTAL, variable=delayVar)
+    timerSlider = Scale(root, label='Timer Delay (ms)', from_=50, to=2000, orient=HORIZONTAL, variable=delayVar)
     timerSlider.set(delay)
     timerSlider.pack()
     webSlider = Scale(root, label='Website Freq', from_=0, to=100, orient=HORIZONTAL, variable=webModVar)
@@ -32,22 +44,32 @@ def configWindow(delay, fill, replace, webMod, popupMod, server, slow):
     popupSlider = Scale(root, label='Popup Freq', from_=0, to=100, orient=HORIZONTAL, variable=popupModVar)
     popupSlider.set(popupMod)
     popupSlider.pack()
+    audioSlider = Scale(root, label='Audio Freq', from_=0, to=100, orient=HORIZONTAL, variable=audModVar)
+    audioSlider.set(audioMod)
+    audioSlider.pack()
+    promptSlider = Scale(root, label='Prompt Freq', from_=0, to=100, orient=HORIZONTAL, variable=promptModVar)
+    promptSlider.set(promptMod)
+    promptSlider.pack()
     isFill = Checkbutton(root, text='Fill Drive', variable=fillVar)
     isFill.pack()
     slowBox = Checkbutton(root, text='Slow Fill', variable=slowVar)
     slowBox.pack()
     isReplace = Checkbutton(root, text='Replace Images', variable=replaceVar)
     isReplace.pack()
-    saveButton = Button(root, text='Save Config', command= lambda: save(delayVar.get(), fillVar.get(), replaceVar.get(), webModVar.get(), popupModVar.get(), serverVar.get(), slowVar.get()))
+    saveButton = Button(root, text='Save Config', command= lambda: save(delayVar.get(), fillVar.get(), replaceVar.get(), webModVar.get(), popupModVar.get(), audModVar.get(), promptModVar.get(), slowVar.get())) 
     saveButton.pack()
     root.mainloop()
 
-def save(delay, fill, replace, webMod, popupMod, server, slow):
+#['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
+def save(delay, fill, replace, webMod, popupMod, audioMod, promptMod, slow):
+    val = [settingJsonObj['version'], delay, fill, replace, webMod, popupMod, audioMod, promptMod, 500, slow]
+    for v in varNames:
+        settingJsonObj[v] = val[varNames.index(v)]
     with open('config.cfg', 'w') as f:
-        f.write(str(delay) + ';' + str(int(fill)) + ';' + str(int(replace)) + ';' + str(webMod) + ';' + str(popupMod) + ';0;' + str(int(slow)))
+        f.write(json.dumps(settingJsonObj))
     exit()
 
 with open('config.cfg', 'r') as f:
     vals = f.readline().split(';')
 
-configWindow(int(vals[0]), int(vals[1])==1, int(vals[2])==1, int(vals[3]), int(vals[4]), int(vals[5])==1, int(vals[6])==1)
+configWindow(int(settingJsonObj['delay']), int(settingJsonObj['fill'])==1, int(settingJsonObj['replace'])==1, int(settingJsonObj['webMod']), int(settingJsonObj['popupMod']), int(settingJsonObj['audioMod']), int(settingJsonObj['promptMod']), int(settingJsonObj['slowMode'])==1)

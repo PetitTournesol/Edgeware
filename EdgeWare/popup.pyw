@@ -1,16 +1,10 @@
-import io
 import os
-import urllib.request
-
 import random as rand
-import threading as thread
 import tkinter as tk
 
 from win32api import GetSystemMetrics
 from tkinter import *
 from PIL import ImageTk, Image
-from subprocess import call
-
 
 class WImg: 
     def __init__(self, scalefactor):
@@ -18,7 +12,6 @@ class WImg:
         image = Image.open(os.path.abspath(os.getcwd()) + '\\resource\\img\\' + arr[rand.randrange(len(arr))])
         newWid = int((image.width * (float(GetSystemMetrics(0)) / float(image.width)) * scalefactor))
         newHgt = int((image.height * (float(GetSystemMetrics(0)) / float(image.width))* scalefactor))
-        print(newWid, ',', newHgt)
         self.image = ImageTk.PhotoImage(image.resize((newWid, newHgt), Image.ANTIALIAS))
 
     def get(self):
