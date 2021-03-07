@@ -1,6 +1,16 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
+Version 1.1.0 Updates:
+
+    ->Updated config.cfg handling to use JSON for ease of use and ease of future updates.
+      ->If you have used previous versions, either start in a new folder or erase your old config.cfg file before starting config.pyw or start.pyw
+    ->Added ability to play audio in the background (AUDIO FILES IN /resource/aud/ MUST BE .WAV)
+    ->Added "panicbutton.bat" as an emergency panic button so that you don't need to scroll through Task Manager or shut off PC to turn off EdgeWare.
+      ->If you're in it for that thrill, feel free to just delete the batch file.
+    ->Implemented the "Type out this prompt" feature, and a new resource "prompt.json" in the resource folder.
+      ->An example prompt.json is provided in the new "example assets" folder.
+
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
