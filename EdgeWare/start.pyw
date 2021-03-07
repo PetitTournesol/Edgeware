@@ -95,9 +95,6 @@ def playAudio():
     winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
     isPlayingAudio = False
 
-def writingPrompt():
-    print('do write prompt thing idfk')
-
 #fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
 #   can only have 8 threads live at once to avoid 'memory leak'
