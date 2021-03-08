@@ -11,6 +11,8 @@ Version 1.1.0 Updates:
     ->Implemented the "Type out this prompt" feature, and a new resource "prompt.json" in the resource folder.
       ->An example prompt.json is provided in the new "example assets" folder.
 
+(Pillow library is included; it's unmodified, but if you don't want to use the provided one, feel free to use "pip install pillow" to download a fresh copy)
+
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
