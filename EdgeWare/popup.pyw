@@ -2,16 +2,15 @@ import os
 import random as rand
 import tkinter as tk
 
-from win32api import GetSystemMetrics
 from tkinter import *
 from PIL import ImageTk, Image
 
 class WImg: 
-    def __init__(self, scalefactor):
+    def __init__(self, scalefactor , wid):
         arr = os.listdir(os.path.abspath(os.getcwd()) + '\\resource\\img\\')
         image = Image.open(os.path.abspath(os.getcwd()) + '\\resource\\img\\' + arr[rand.randrange(len(arr))])
-        newWid = int((image.width * (float(GetSystemMetrics(0)) / float(image.width)) * scalefactor))
-        newHgt = int((image.height * (float(GetSystemMetrics(0)) / float(image.width))* scalefactor))
+        newWid = int((image.width * (float(wid) / float(image.width)) * scalefactor))
+        newHgt = int((image.height * (float(wid) / float(image.width))* scalefactor))
         self.image = ImageTk.PhotoImage(image.resize((newWid, newHgt), Image.ANTIALIAS))
 
     def get(self):
@@ -19,7 +18,7 @@ class WImg:
 
 def unborderedWindow():
     windowObj = Tk()
-    img = WImg(float(rand.randint(20, 28)) / 100.0).get()
+    img = WImg(float(rand.randint(20, 28)) / 100.0, windowObj.winfo_screenwidth()).get()
     label = tk.Label(windowObj, image=img)
     label.columnconfigure(0, weight=1)
     label.rowconfigure(0, weight=1)
