@@ -46,17 +46,16 @@ Premade Packages:
   Packages must be structured as follows:
   
     resources.zip
-      ->resource
-        ->aud
-          (Audio Files) (Optional)
-        ->img
-          (Image Files)
-        ->vid
-          (Video Files) (Optional)
-        icon.ico
-        wallpaper.png
-        web.json (Optional)
-        prompt.json (Optional)
+       ->aud
+         (Audio Files) (Optional)
+       ->img
+         (Image Files)
+       ->vid
+         (Video Files) (Optional)
+       icon.ico
+       wallpaper.png
+       web.json (Optional)
+       prompt.json (Optional)
    
   The web.json file should contain two sets:
   
