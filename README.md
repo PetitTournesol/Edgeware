@@ -55,7 +55,8 @@ Premade Packages:
           (Video Files) (Optional)
         icon.ico
         wallpaper.png
-        web.json
+        web.json (Optional)
+        prompt.json (Optional)
    
   The web.json file should contain two sets:
   
@@ -67,8 +68,18 @@ Premade Packages:
       ->args will be selected randomly and appended to the end of the url
         ->eg, "https://www.google.com/" with args "penis,cock,ass" cound randomly return one of 
         ->https://www.google.com/penis  https://www.google.com/cock  https://www.google.com/ass
-
-If resources are not properly structured, the application could crash or exhibit strange behavior.
+        
+  The prompt.json file should contain any number of sets:
+  
+    {"moods":["mood1", "mood2", "angryMood"], "freqList":[10, 40, 50], "minLen":2, "maxLen"=4, "mood1":["mood1 sentence 1.", "mood1 sentence 2."], "mood2":["mood2 only has 1 sentence."], "angryMood":["angryMood also has one sentence."]}
+        ->moods - names don't matter, as long as they're accounted for later in the set.
+        ->freqList - correspond to each value in moods, define the frequency of that mood being selected.
+        ->min/maxLen - minimum number of sentences that can be selected vs maximum.
+        ->mood name
+            ->can contain any number of mood related sentences.
+            ->will ONLY select from this set if that mood is selected.
+            
+If resources are present, but not properly structured, the application could crash or exhibit strange behavior.
 
 **Questions**
 
