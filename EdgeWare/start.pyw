@@ -13,7 +13,7 @@ import threading as thread
 PATH = os.path.abspath(os.getcwd())
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
-VERSION_CONST = '1.1.0'
+VERSION_CONST = '1.1.1'
 MAX_FILL_THREADS = 8
 IMG_REPLACE_THRESH = 500
 
@@ -21,10 +21,24 @@ liveFillThreads = 0
 isPlayingAudio = False
 replaceThreadLive = False
 
+hasPromptJson = False
+
 if not os.path.exists(PATH + '\\resource\\'):
     with zipfile.ZipFile(PATH + '\\resources.zip', 'r') as obj:
         obj.extractall(PATH + '\\resource\\')
-        
+
+try:
+    if not os.path.exists(PATH + '\\PIL\\'):
+        with zipfile.ZipFile(PATH + '\\PIL.zip', 'r') as obj:
+            obj.extractall(PATH + '\\')
+except:
+    print('motherfucker you better have pillow installed or this shit aint gonna WORK')
+    
+if os.path.exists(PATH + '\\resource\\prompt.json'):
+    hasPromptJson = True
+if os.path.exists(PATH + '\\resource\\web.json'):
+    hasWebJson = True
+
 webJsonDat = ''
 with open(PATH + '\\resource\\web.json', 'r') as webF:
     webJsonDat = json.loads(webF.read())
@@ -69,17 +83,14 @@ def doRoll(mod):
     return mod > rand.randint(0, 100)
 
 def annoyance():
-    global liveFillThreads
-    global replaceThreadLive
-    global isPlayingAudio
     while(True):
-        if(doRoll(int(settingJsonObj['webMod']))):
+        if(doRoll(int(settingJsonObj['webMod'])) and len(webJsonDat) > 0):
             webbrowser.open_new(urlSelect(rand.randrange(len(webJsonDat['urls']))))
-        if(doRoll(int(settingJsonObj['popupMod']))):
+        if(doRoll(int(settingJsonObj['popupMod'])) and len(IMAGES) > 0):
             os.startfile('popup.pyw')
-        if(doRoll(int(settingJsonObj['audioMod'])) and not isPlayingAudio):
+        if(doRoll(int(settingJsonObj['audioMod'])) and not isPlayingAudio and len(AUDIO) > 0):
             thread.Thread(target=playAudio).start()
-        if(doRoll(int(settingJsonObj['promptMod']))):
+        if(doRoll(int(settingJsonObj['promptMod'])) and hasPromptJson):
             subprocess.call('python prompt.pyw')
         if(int(settingJsonObj['fill'])==1 and liveFillThreads < MAX_FILL_THREADS):
             thread.Thread(target=fillDrive).start()
