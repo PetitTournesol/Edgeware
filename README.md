@@ -2,7 +2,11 @@
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
 FOR THOSE WHO DON'T CARE ABOUT GOING THROUGH THE CODE:
-    https://www.dropbox.com/s/4snjwtw1w6kmyds/edgeware_exe.zip?dl=0
+
+
+https://www.dropbox.com/s/4snjwtw1w6kmyds/edgeware_exe.zip?dl=0
+    
+    
 Zip contains the set of compiled scripts. It runs slower than the raw .pyw files, but it doesn't require any additional effort to install Pillow that the raw files require. (Also in my experience AVG flags a false positive on them when they try to run, that's pyinstaller's fault, and I don't know how to fix it :^) )
 
 Version 1.1.0 Updates:
