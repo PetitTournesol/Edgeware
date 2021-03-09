@@ -2,7 +2,7 @@
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
 
-Version 1.1.3 Updates:
+Version 1.1.4 Updates (1.1.3 included):
 
     ->Config file now updates automatically between versions, no need to create a new one every time.
     ->Prompts now properly wrap their text to fit the text box.
@@ -13,6 +13,9 @@ Version 1.1.3 Updates:
     ->Now runs config.pyw before the virus actually runs for the first time!
         ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
         
+    (1.1.4)
+        -> Bugfix for config not properly writing config.cfg properly.
+        -> Added defaultConfig.dat for consistency across future options updates.
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
