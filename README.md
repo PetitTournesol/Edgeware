@@ -4,14 +4,15 @@
 
 Version 1.1.4 Updates (1.1.3 included):
 
-    ->Config file now updates automatically between versions, no need to create a new one every time.
-    ->Prompts now properly wrap their text to fit the text box.
-    ->get-pip.pyw is now included with the download.
-    ->On first run, the program will attempt to install python package installer, and then install python image library using it
-        ->This is to ensure that the popups work correctly, as tkinter doesn't like to play nice with non-JPG images without PIL.
-    ->On subsequent runs it shouldn't attempt to reinstall.
-    ->Now runs config.pyw before the virus actually runs for the first time!
-        ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
+    (1.1.3)
+        ->Config file now updates automatically between versions, no need to create a new one every time.
+        ->Prompts now properly wrap their text to fit the text box.
+        ->get-pip.pyw is now included with the download.
+        ->On first run, the program will attempt to install python package installer, and then install python image library using it
+            ->This is to ensure that the popups work correctly, as tkinter doesn't like to play nice with non-JPG images without PIL.
+        ->On subsequent runs it shouldn't attempt to reinstall.
+        ->Now runs config.pyw before the virus actually runs for the first time!
+            ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
         
     (1.1.4)
         -> Bugfix for config not properly writing config.cfg properly.
