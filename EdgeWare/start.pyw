@@ -13,7 +13,6 @@ import threading as thread
 PATH = os.path.abspath(os.getcwd())
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
-VERSION_CONST = "1.1.3"
 MAX_FILL_THREADS = 8
 IMG_REPLACE_THRESH = 500
 
@@ -46,8 +45,11 @@ AUDIO = []
 for aud in os.listdir(PATH + '\\resource\\aud\\'):
     AUDIO.append(PATH + '\\resource\\aud\\' + aud)
 
-varNames = ["version", "delay", "fill", "replace", "webMod", "popupMod", "audioMod", "promptMod", "replaceThresh", "slowMode", "pip_installed", "is_configed"]
-defaultVars = [VERSION_CONST, "250", "0", "0", "15", "40", "0", "0", "500", "0", "0", "0"]
+with open(PATH + '\\configDefault.dat') as r:
+    obj = r.readlines()
+    varNames = obj[0].split(',')
+    varNames[len(varNames)-1] = varNames[len(varNames)-1].replace('\n', '')
+    defaultVars = obj[1].split(',')
 
 settingJsonObj = {}
 
@@ -61,16 +63,14 @@ if not os.path.exists(PATH + '\\config.cfg'):
 with open(PATH + '\\config.cfg', 'r') as f:
     settingJsonObj = json.loads(f.readline())
 
-if settingJsonObj['version'] != VERSION_CONST:
-    print('regenerating new version config.')
+if settingJsonObj['version'] != defaultVars[0]:
     jsonObj = {}
     for obj in varNames:
         try:
             jsonObj[obj] = settingJsonObj[obj]
         except:
             jsonObj[obj] = defaultVars[varNames.index(obj)]
-    jsonObj['version'] = VERSION_CONST
-    print(str(jsonObj).replace('\'', '"'))
+    jsonObj['version'] = defaultVars[0]
     jsonObj = json.loads(str(jsonObj).replace('\'', '"'))
     settingJsonObj = jsonObj
     with open(PATH + '\\config.cfg', 'w') as f:

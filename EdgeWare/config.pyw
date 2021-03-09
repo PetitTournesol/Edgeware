@@ -3,10 +3,14 @@ import json
 from tkinter import *
 import os
 
-varNames = ['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
-defaultVars = ['1.1.1', '250', '0', '0', '15', '40', '0', '0', '500', '0']
 
 PATH = os.path.abspath(os.getcwd())
+
+with open(PATH + '\\configDefault.dat') as r:
+    obj = r.readlines()
+    varNames = obj[0].split(',')
+    varNames[len(varNames)-1] = varNames[len(varNames)-1].replace('\n', '')
+    defaultVars = obj[1].split(',')
 
 settingJsonObj = {}
 for var in varNames:
@@ -18,6 +22,18 @@ if not os.path.exists(PATH + '\\config.cfg'):
 
 with open(PATH + '\\config.cfg', 'r') as f:
     settingJsonObj = json.loads(f.readline())
+
+if settingJsonObj['version'] != defaultVars[0]:
+    jsonObj = {}
+    for obj in varNames:
+        try:
+            jsonObj[obj] = settingJsonObj[obj]
+        except:
+            jsonObj[obj] = defaultVars[varNames.index(obj)]
+    jsonObj['version'] = defaultVars[0]
+    settingJsonObj = jsonObj
+    with open(PATH + '\\config.cfg', 'w') as f:
+        f.write(str(jsonObj).replace('\'', '"'))
 
 root = tk.Tk()
 root.title('EdgeWare Config')
@@ -62,7 +78,7 @@ def configWindow(delay, fill, replace, webMod, popupMod, audioMod, promptMod, sl
 
 #['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
 def save(delay, fill, replace, webMod, popupMod, audioMod, promptMod, slow):
-    val = [settingJsonObj['version'], delay, fill, replace, webMod, popupMod, audioMod, promptMod, 500, slow]
+    val = [defaultVars[0], delay, fill, replace, webMod, popupMod, audioMod, promptMod, 500, slow, 1, 1]
     for v in varNames:
         settingJsonObj[v] = val[varNames.index(v)]
     with open('config.cfg', 'w') as f:
