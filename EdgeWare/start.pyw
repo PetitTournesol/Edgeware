@@ -13,7 +13,7 @@ import threading as thread
 PATH = os.path.abspath(os.getcwd())
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
-VERSION_CONST = '1.1.1'
+VERSION_CONST = "1.1.3"
 MAX_FILL_THREADS = 8
 IMG_REPLACE_THRESH = 500
 
@@ -26,13 +26,6 @@ hasPromptJson = False
 if not os.path.exists(PATH + '\\resource\\'):
     with zipfile.ZipFile(PATH + '\\resources.zip', 'r') as obj:
         obj.extractall(PATH + '\\resource\\')
-
-try:
-    if not os.path.exists(PATH + '\\PIL\\'):
-        with zipfile.ZipFile(PATH + '\\PIL.zip', 'r') as obj:
-            obj.extractall(PATH + '\\')
-except:
-    print('motherfucker you better have pillow installed or this shit aint gonna WORK')
     
 if os.path.exists(PATH + '\\resource\\prompt.json'):
     hasPromptJson = True
@@ -53,8 +46,8 @@ AUDIO = []
 for aud in os.listdir(PATH + '\\resource\\aud\\'):
     AUDIO.append(PATH + '\\resource\\aud\\' + aud)
 
-varNames = ['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
-defaultVars = [VERSION_CONST, '250', '0', '0', '15', '40', '0', '0', '500', '0']
+varNames = ["version", "delay", "fill", "replace", "webMod", "popupMod", "audioMod", "promptMod", "replaceThresh", "slowMode", "pip_installed", "is_configed"]
+defaultVars = [VERSION_CONST, "250", "0", "0", "15", "40", "0", "0", "500", "0", "0", "0"]
 
 settingJsonObj = {}
 
@@ -67,6 +60,31 @@ if not os.path.exists(PATH + '\\config.cfg'):
 
 with open(PATH + '\\config.cfg', 'r') as f:
     settingJsonObj = json.loads(f.readline())
+
+if settingJsonObj['version'] != VERSION_CONST:
+    print('regenerating new version config.')
+    jsonObj = {}
+    for obj in varNames:
+        try:
+            jsonObj[obj] = settingJsonObj[obj]
+        except:
+            jsonObj[obj] = defaultVars[varNames.index(obj)]
+    jsonObj['version'] = VERSION_CONST
+    print(str(jsonObj).replace('\'', '"'))
+    jsonObj = json.loads(str(jsonObj).replace('\'', '"'))
+    settingJsonObj = jsonObj
+    with open(PATH + '\\config.cfg', 'w') as f:
+        f.write(str(jsonObj).replace('\'', '"'))
+
+if not int(settingJsonObj['pip_installed'])==1:
+    subprocess.call('python get-pip.pyw')
+    subprocess.call('pip install pillow')
+    settingJsonObj['pip_installed'] = 1
+    with open(PATH + '\\config.cfg', 'w') as f:
+        f.write(json.dumps(settingJsonObj))
+
+if not int(settingJsonObj['is_configed']) == 1:
+    subprocess.call('python config.pyw')
 
 #set wallpaper
 ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)

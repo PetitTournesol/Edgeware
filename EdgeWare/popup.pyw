@@ -32,8 +32,11 @@ def unborderedWindow():
     windowObj.frame = Frame(windowObj, borderwidth=2, relief=RAISED)
     windowObj.frame.pack_propagate(True)
     windowObj.wm_attributes('-topmost', 1)
-    subButton = Button(windowObj, text='I Submit <3', command=exit)
+    subButton = Button(windowObj, text='I Submit <3', command=quit)
     subButton.place(x=label.winfo_reqwidth() - 5 - subButton.winfo_reqwidth(), y=label.winfo_reqheight() - 5 - subButton.winfo_reqheight())
     windowObj.mainloop()
+
+def quit():
+    os.kill(os.getpid(), 9)
 
 unborderedWindow()

@@ -4,7 +4,7 @@ from tkinter import *
 import os
 
 varNames = ['version', 'delay', 'fill', 'replace', 'webMod', 'popupMod', 'audioMod', 'promptMod', 'replaceThresh', 'slowMode']
-defaultVars = ['1.1.0', '250', '0', '0', '15', '40', '0', '0', '500', '0']
+defaultVars = ['1.1.1', '250', '0', '0', '15', '40', '0', '0', '500', '0']
 
 PATH = os.path.abspath(os.getcwd())
 
@@ -67,7 +67,7 @@ def save(delay, fill, replace, webMod, popupMod, audioMod, promptMod, slow):
         settingJsonObj[v] = val[varNames.index(v)]
     with open('config.cfg', 'w') as f:
         f.write(json.dumps(settingJsonObj))
-    exit()
+    os.kill(os.getpid(), 9)
 
 with open('config.cfg', 'r') as f:
     vals = f.readline().split(';')

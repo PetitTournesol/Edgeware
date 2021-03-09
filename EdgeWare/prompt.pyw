@@ -39,7 +39,7 @@ def unborderedWindow():
     wid = windowObj.winfo_screenwidth() / 4
     hgt = windowObj.winfo_screenheight() / 2
 
-    textLabel = Label(windowObj, text=txt)
+    textLabel = Label(windowObj, text=txt, wraplength=wid)
     textLabel.pack()
 
     windowObj.geometry('%dx%d+%d+%d' % (wid, hgt, 2*wid - wid / 2, hgt - hgt / 2))
