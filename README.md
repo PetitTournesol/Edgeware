@@ -1,26 +1,18 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-FOR THOSE WHO DON'T CARE ABOUT GOING THROUGH THE CODE:
 
+Version 1.1.3 Updates:
 
-https://www.dropbox.com/s/4snjwtw1w6kmyds/edgeware_exe.zip?dl=0
-    
-    
-Zip contains the set of compiled scripts. It runs slower than the raw .pyw files, but it doesn't require any additional effort to install Pillow that the raw files require. (Also in my experience AVG flags a false positive on them when they try to run, that's pyinstaller's fault, and I don't know how to fix it :^) )
-
-Version 1.1.0 Updates:
-
-    ->Updated config.cfg handling to use JSON for ease of use and ease of future updates.
-      ->If you have used previous versions, either start in a new folder or erase your old config.cfg file before starting config.pyw or start.pyw
-    ->Added ability to play audio in the background (AUDIO FILES IN /resource/aud/ MUST BE .WAV)
-    ->Added "panicbutton.bat" as an emergency panic button so that you don't need to scroll through Task Manager or shut off PC to turn off EdgeWare.
-      ->If you're in it for that thrill, feel free to just delete the batch file.
-    ->Implemented the "Type out this prompt" feature, and a new resource "prompt.json" in the resource folder.
-      ->An example prompt.json is provided in the new "example assets" folder.
-
-(Pillow library is included; it's unmodified, but if you don't want to use the provided one, feel free to use "pip install pillow" to download a fresh copy)
-
+    ->Config file now updates automatically between versions, no need to create a new one every time.
+    ->Prompts now properly wrap their text to fit the text box.
+    ->get-pip.pyw is now included with the download.
+    ->On first run, the program will attempt to install python package installer, and then install python image library using it
+        ->This is to ensure that the popups work correctly, as tkinter doesn't like to play nice with non-JPG images without PIL.
+    ->On subsequent runs it shouldn't attempt to reinstall.
+    ->Now runs config.pyw before the virus actually runs for the first time!
+        ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
+        
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
