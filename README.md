@@ -51,7 +51,7 @@ Premade Packages:
        ->img
          (Image Files)
        ->vid
-         (Video Files) (Optional)
+         (Video Files) (Optional) (Currently unused)
        icon.ico
        wallpaper.png
        web.json (Optional)
