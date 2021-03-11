@@ -78,7 +78,10 @@ if settingJsonObj['version'] != defaultVars[0]:
 
 if not int(settingJsonObj['pip_installed'])==1:
     subprocess.call('python get-pip.pyw')
-    subprocess.call('pip install pillow')
+    try:
+        subprocess.call('py -m pip install pillow')
+    except:
+        subprocess.call('pip install pillow')
     settingJsonObj['pip_installed'] = 1
     with open(PATH + '\\config.cfg', 'w') as f:
         f.write(json.dumps(settingJsonObj))
