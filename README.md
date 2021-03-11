@@ -2,23 +2,12 @@
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
 
-Version 1.1.4 Updates (1.1.3 included):
+Version 1.1.5 Updates:
 
-    (1.1.3)
-        ->Config file now updates automatically between versions, no need to create a new one every time.
-        ->Prompts now properly wrap their text to fit the text box.
-        ->get-pip.pyw is now included with the download.
-        ->On first run, the program will attempt to install python package installer, and then install python image library using it
-            ->This is to ensure that the popups work correctly, as tkinter doesn't like to play nice with non-JPG images without PIL.
-        ->On subsequent runs it shouldn't attempt to reinstall.
-        ->Now runs config.pyw before the virus actually runs for the first time!
-            ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
+        ->No longer fails silently when previous common errors occur; now gives a popup error message informing the user that something has gone wrong.
+        ->Fixed a bug where files with multiple "." in the name wouldn't play well when used for fill drive and would result in ridiculous file extensions
+        ->Prompt now properly executes without a terminal when run as a subprocess of start.
         
-    (1.1.4)
-        TODO for 1.2.0: Lots and lots of error catching, expect program to no longer fail silently but instead scream to the heavens when something breaks.
-        -> Bugfix in startup, now properly uses "py -m pip install pillow" as default method of installing
-        -> Bugfix for config not properly writing config.cfg properly.
-        -> Added defaultConfig.dat for consistency across future options updates.
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
