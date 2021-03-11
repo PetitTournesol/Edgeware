@@ -15,6 +15,8 @@ Version 1.1.4 Updates (1.1.3 included):
             ->On subsequent runs it will jump directly into the actual application, so use config.pyw in the folder manually beyond that.
         
     (1.1.4)
+        TODO for 1.2.0: Lots and lots of error catching, expect program to no longer fail silently but instead scream to the heavens when something breaks.
+        -> Bugfix in startup, now properly uses "py -m pip install pillow" as default method of installing
         -> Bugfix for config not properly writing config.cfg properly.
         -> Added defaultConfig.dat for consistency across future options updates.
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
