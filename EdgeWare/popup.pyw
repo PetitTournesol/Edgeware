@@ -3,12 +3,14 @@ import random as rand
 import tkinter as tk
 
 from tkinter import *
-from PIL import ImageTk, Image
+from tkinter import messagebox
+from PIL import Image, ImageTk
 
 class WImg: 
     def __init__(self, scalefactor , wid):
         arr = os.listdir(os.path.abspath(os.getcwd()) + '\\resource\\img\\')
-        image = Image.open(os.path.abspath(os.getcwd()) + '\\resource\\img\\' + arr[rand.randrange(len(arr))])
+        item = arr[rand.randrange(len(arr))]
+        image = Image.open(os.path.abspath(os.getcwd()) + '\\resource\\img\\' + item)
         newWid = int((image.width * (float(wid) / float(image.width)) * scalefactor))
         newHgt = int((image.height * (float(wid) / float(image.width))* scalefactor))
         self.image = ImageTk.PhotoImage(image.resize((newWid, newHgt), Image.ANTIALIAS))
@@ -32,11 +34,14 @@ def unborderedWindow():
     windowObj.frame = Frame(windowObj, borderwidth=2, relief=RAISED)
     windowObj.frame.pack_propagate(True)
     windowObj.wm_attributes('-topmost', 1)
-    subButton = Button(windowObj, text='I Submit <3', command=quit)
+    subButton = Button(windowObj, text='I Submit <3', command=die)
     subButton.place(x=label.winfo_reqwidth() - 5 - subButton.winfo_reqwidth(), y=label.winfo_reqheight() - 5 - subButton.winfo_reqheight())
     windowObj.mainloop()
 
-def quit():
+def die():
     os.kill(os.getpid(), 9)
 
-unborderedWindow()
+try:
+    unborderedWindow()
+except:
+    messagebox.showerror('Popup Error', 'Could not show popup, usually due to Pillow not being installed or because of an unknown image type in the /img/ folder. Please either update to the latest version or install Pillow using PIP in order to use Edgeware.')

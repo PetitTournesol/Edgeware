@@ -31,7 +31,7 @@ def unborderedWindow():
     if(not hasData):
         exit()
     windowObj = Tk()
-    label = tk.Label(windowObj, text='\nType For Me~\n')
+    label = tk.Label(windowObj, text='\nType For Me, Slut~\n')
     label.pack()
     
     txt = buildText()

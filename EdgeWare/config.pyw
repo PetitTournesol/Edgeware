@@ -3,7 +3,6 @@ import json
 from tkinter import *
 import os
 
-
 PATH = os.path.abspath(os.getcwd())
 
 with open(PATH + '\\configDefault.dat') as r:
