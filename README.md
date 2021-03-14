@@ -1,13 +1,76 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-
-Version 1.1.5 Updates:
-
-        ->No longer fails silently when previous common errors occur; now gives a popup error message informing the user that something has gone wrong.
-        ->Fixed a bug where files with multiple "." in the name wouldn't play well when used for fill drive and would result in ridiculous file extensions
-        ->Prompt now properly executes without a terminal when run as a subprocess of start.
+Version 2.0.0 Updates [WIP]
         
+   [New Additions]
+   
+•**GIF support in popups** *Animated GIFs in the /resource/img/ folder now properly animate in their popups*
+        
+•**Hibernation Mode** *New operation mode; Edgeware will sit dormant for a random, configurable amount of time before shooting a lewd load all over your screen and returning to sleep to do it again later*
+
+•**Discord Integration** *Now shows in "Currently Playing" on Discord, this feature is toggleable and has different flavor text for every pack*
+
+•**Run On Startup** *Now has an option to start on computer startup*
+
+•**Shortcut Creation** *Now creates shortcuts for Edgeware, Config, and Panic Button on the Desktop*
+
+•**Resource Exporting** *Want to share your custom pack but not sure how to package it? Config menu now has a button to automatically export a properly configured zip with all of your resource folder!*
+
+•**Default Assets** *Now handles missing resources better, using items from the default_asset folder if a zip can't be found*
+
+•**2 New Image Packs** *Find the download links below*
+
+   [Updated Features]
+   
+•**Config Menu** *Config menu has been completely reworked, now including an Advanced Options section and an About section, also can now be started without running start.pyw first*
+
+•**resources.zip** *When importing resources, now selects the alphebetically earliers zip file in the Edgeware folder instead of requiring a specific zip name*
+
+•**Fill Naming** *Now uses hashed value when creating files for "fill drive" instead of os.time raw data*
+
+•**Oops, something broke** *Now has better error handling in cases of common issues like missing or misconfigured resources*
+
+•**Old Resources** *All 3 original resource packs have been updated with new content, as well as now containing both prompt.json and web.json*
+        
+   [Bugfixes]
+
+•**Settings** *Now properly applies settings on the first run instead of requiring a program restart*
+
+•**Filled Quick** *Now properly applies the fill_delay variable, which was previously inert due to a small conditional oversight*
+
+   [Premade Packages]
+
+**Blacked**
+
+*Standard Blacked hentai stuff, includes Porn Addict Brainwash Program: BBC Edition, and some volafile mp3s from /trash/ Blacked threads*
+
+~Link Here~
+  
+**Gay Yiff**
+
+*Includes lots and lots of steamy, hulking furry cocks*
+
+~Link Here~
+  
+**Censored**
+
+*For the people who get off to not getting off*
+
+~Link Here~
+
+**Hypno**
+
+*Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
+
+~Link Here~
+
+**Gooner**
+
+*Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg, fair warning, most things are fair game for this one, including furry, farts, cringe, ponies, etc.*
+
+~Link Here~
+
 Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
@@ -16,25 +79,11 @@ Much like Elsavirus and Doppelvirus, this program was written in brainlet level 
 The software features the popups, hard drive filling, porn library replacing, website opening features of its relatives.
 
 
-Edgeware *does* include some unique features to make it more widely applicable than just the previous respective target demographics of /beta/ participants and finsub followers. Namely the packaging system, which allows anyone to cater to their own particular interests or fetishes. Either place a properly assembled zip file named "resources.zip" in the same folder as the scripts so that the program can unpack it or manually extract the resources folder into the said directory.
+Edgeware *does* include some unique features to make it more widely applicable than just the previous respective target demographics of /beta/ participants and finsub followers. Namely its packaging system, which allows anyone to cater the experience to their own particular interests or fetishes. Either place a properly assembled zip file named "resources.zip" in the same folder as the scripts so that the program can unpack it or manually extract the resources folder into the said directory.
 
 I more or less went into this wanting to make my own version of Elsavirus/Doppelvirus for fun, but figured around halfway that it might be worthwhile to share it with others who might have similar tastes.
 
 Obviously you need to have Python installed, but other than that there should be no dependencies that aren't natively packaged with the language itself.
-
-Premade Packages:
-
-  Blacked:
-  
-  https://www.dropbox.com/s/fxibxo4joi9j7z1/blacked-resources.zip?dl=0
-  
-  Yiff:
-  
-  https://www.dropbox.com/s/t9sc6nr9jwhjn7s/yiff-resources.zip?dl=0
-  
-  Censored:
-  
-  https://www.dropbox.com/s/c0cpx79tf8g9pp8/censored-resources.zip?dl=0
 
 **Packages**
 
