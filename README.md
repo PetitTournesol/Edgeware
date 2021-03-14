@@ -74,7 +74,7 @@ https://www.dropbox.com/s/4x34yhoe6djhbma/censor-upd_resources.zip?dl=0
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
-(Still uploading)  (Dropbox is a bitch)
+https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=sharing  (Dropbox is a bitch)
 
 **Gooner**
 
