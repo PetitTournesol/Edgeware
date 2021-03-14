@@ -3,7 +3,7 @@
 
 Version 2.0.0 Updates [WIP]
         
-   [New Additions]
+   _**[New Additions]**_
    
 •**GIF support in popups** *Animated GIFs in the /resource/img/ folder now properly animate in their popups*
         
@@ -21,7 +21,7 @@ Version 2.0.0 Updates [WIP]
 
 •**2 New Image Packs** *Find the download links below*
 
-   [Updated Features]
+   _**[Updated Features]**_
    
 •**Config Menu** *Config menu has been completely reworked, now including an Advanced Options section and an About section, also can now be started without running start.pyw first*
 
@@ -33,13 +33,13 @@ Version 2.0.0 Updates [WIP]
 
 •**Old Resources** *All 3 original resource packs have been updated with new content, as well as now containing both prompt.json and web.json*
         
-   [Bugfixes]
+   _**[Bugfixes]**_
 
 •**Settings** *Now properly applies settings on the first run instead of requiring a program restart*
 
 •**Filled Quick** *Now properly applies the fill_delay variable, which was previously inert due to a small conditional oversight*
 
-   [Premade Packages]
+   _[Premade Packages]_
 
 **Blacked**
 
@@ -71,7 +71,7 @@ Version 2.0.0 Updates [WIP]
 
 ~Link Here~
 
-**What is Edgeware?**
+__**What is Edgeware?**__
 
 Edgeware is an Elsavirus inspired fetishware tool, built from the ground up to use interchangeable resource packages for easily customized user experience.
 
@@ -86,7 +86,7 @@ I more or less went into this wanting to make my own version of Elsavirus/Doppel
 
 Obviously you need to have Python installed, but other than that there should be no dependencies that aren't natively packaged with the language itself.
 
-**Packages**
+__**Packages**__
 
   Packages must be structured as follows:
   
