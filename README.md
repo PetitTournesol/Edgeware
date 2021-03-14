@@ -39,7 +39,7 @@ Version 2.0.0 Updates [WIP]
 
 •**Filled Quick** *Now properly applies the fill_delay variable, which was previously inert due to a small conditional oversight*
 
-   _[Premade Packages]_
+   _**[Premade Packages]**_
 
 **Blacked**
 
