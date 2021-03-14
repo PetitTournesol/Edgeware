@@ -62,7 +62,7 @@ https://www.dropbox.com/s/v2f5tdczgf39qn7/blacked-upd_resources.zip?dl=0
 
 *Includes lots and lots of steamy, hulking furry cocks*
 
-~Link Here~ (Still uploading)
+https://www.dropbox.com/s/nz8e9jvg4lh0bs8/yiff-upd_resources.zip?dl=0
   
 **Censored**
 
@@ -74,7 +74,7 @@ https://www.dropbox.com/s/4x34yhoe6djhbma/censor-upd_resources.zip?dl=0
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
-~Link Here~ (Still uploading)
+https://drive.google.com/file/d/1SAzTbwJtSFUAiQRjfGNyahIO7IZImlFZ/view?usp=sharing  (Dropbox is a bitch)
 
 **Gooner**
 
