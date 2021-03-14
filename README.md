@@ -17,7 +17,7 @@ Version 2.0.0 Updates [WIP]
 
 •**Resource Exporting** *Want to share your custom pack but not sure how to package it? Config menu now has a button to automatically export a properly configured zip with all of your resource folder!*
 
-•**Default Assets** *Now handles missing resources better, using items from the default_asset folder if a zip can't be found*
+•**Default Assets** *Now handles missing resources better, using items from the default_asset folder if a zip can't be found; in other words, if you just want to create your own pack from the ground up, running start without a zip file in the Edgeware folder will generate an empty resource zip template*
 
 •**2 New Image Packs** *Find the download links below*
 
