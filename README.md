@@ -56,31 +56,31 @@ Finally, double click to run start.pyw. If it's your first time running the prog
 
 *Standard Blacked hentai stuff, includes Porn Addict Brainwash Program: BBC Edition, and some volafile mp3s from /trash/ Blacked threads*
 
-~Link Here~
+https://www.dropbox.com/s/v2f5tdczgf39qn7/blacked-upd_resources.zip?dl=0
   
 **Gay Yiff**
 
 *Includes lots and lots of steamy, hulking furry cocks*
 
-~Link Here~
+~Link Here~ (Still uploading)
   
 **Censored**
 
 *For the people who get off to not getting off*
 
-~Link Here~
+https://www.dropbox.com/s/4x34yhoe6djhbma/censor-upd_resources.zip?dl=0
 
 **Hypno**
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
-~Link Here~
+~Link Here~ (Still uploading)
 
 **Gooner**
 
-*Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg, fair warning, most things are fair game for this one, including furry, farts, cringe, ponies, etc.*
+*Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg. Fair warning, most things are fair game for this one, including furry, farts, cringe, ponies, etc.*
 
-~Link Here~
+https://www.dropbox.com/s/6mx6sz4q5ewdl63/goon_new-resources.zip?dl=0
 
 __**What is Edgeware?**__
 
