@@ -1,7 +1,7 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.0.0 Updates [WIP]
+Version 2.0.0 Updates
         
    _**[New Additions]**_
    
@@ -74,7 +74,7 @@ https://www.dropbox.com/s/4x34yhoe6djhbma/censor-upd_resources.zip?dl=0
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
-https://drive.google.com/file/d/1SAzTbwJtSFUAiQRjfGNyahIO7IZImlFZ/view?usp=sharing  (Dropbox is a bitch)
+(Still uploading)  (Dropbox is a bitch)
 
 **Gooner**
 
