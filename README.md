@@ -43,7 +43,8 @@ _**[How to Use]**_
 
 Start by downloading this repository as a zip, and then extracting it somewhere on your computer.
 
-*If not using a premade package, skip this step.* Download one of the premade packages listed below. Once it's downloaded (if using a premade package), place it into the Edgeware folder inside Edgeware-main. 
+(*If not using a premade package, skip this step.* )
+Download one of the premade packages listed below. Once it's downloaded (if using a premade package), place it into the Edgeware folder inside Edgeware-main. 
 
 Ensure that you have a recent installation of Python 3 (3.9+ is preferred).
 
