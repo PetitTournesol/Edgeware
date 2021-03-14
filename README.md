@@ -71,13 +71,14 @@ Version 2.0.0 Updates [WIP]
 
 ~Link Here~
 
-Edgeware is an Elsavirus inspired fetish tool, built from the ground up to use interchangeable packages for better user experience.
+**What is Edgeware?**
+
+Edgeware is an Elsavirus inspired fetishware tool, built from the ground up to use interchangeable resource packages for easily customized user experience.
 
 Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
 
 
-The software features the popups, hard drive filling, porn library replacing, website opening features of its relatives.
-
+The software features the popups, hard drive filling, porn library replacing, website opening features of its predecesors.
 
 Edgeware *does* include some unique features to make it more widely applicable than just the previous respective target demographics of /beta/ participants and finsub followers. Namely its packaging system, which allows anyone to cater the experience to their own particular interests or fetishes. Either place a properly assembled zip file named "resources.zip" in the same folder as the scripts so that the program can unpack it or manually extract the resources folder into the said directory.
 
@@ -89,7 +90,7 @@ Obviously you need to have Python installed, but other than that there should be
 
   Packages must be structured as follows:
   
-    resources.zip
+    (name).zip
        ->aud
          (Audio Files) (Optional)
        ->img
@@ -124,12 +125,4 @@ Obviously you need to have Python installed, but other than that there should be
             
 If resources are present, but not properly structured, the application could crash or exhibit strange behavior.
 
-**Questions**
-
-Q:  "What about screenrape/writing prompts/Discord 'currently playing' integration?"
-  
-   A: I'll probably get around to adding them eventually; personally I wasn't the biggest fan of the writing prompts but since there are actual settings for Edgeware they'll probably end up being toggleable options in the future.
-
-Q:  "What new features are planned?
-  
-   A: Nothing really, I just intended for this to be a silly fetishware program for use by people whose interests are similar to mine. I'll probably update it here and there but new features aren't a priority.
+*(If you like my work and would like to help me pay for food, please feel free to donate; Cashapp is $PetitTournesol)*
