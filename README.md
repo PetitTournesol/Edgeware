@@ -53,20 +53,18 @@ Finally, double click to run start.pyw. If it's your first time running the prog
 
    _**[Premade Packages]**_
 
-(Dropbox links dead due to "excessive traffic," waiting on Drive uploads to replace links)
-
 **Blacked**
 
 *Standard Blacked hentai stuff, includes Porn Addict Brainwash Program: BBC Edition, and some volafile mp3s from /trash/ Blacked threads*
 
-https://www.dropbox.com/s/v2f5tdczgf39qn7/blacked-upd_resources.zip?dl=0
-  
+https://drive.google.com/file/d/1BHLrCO5cvm9YCF_EeWGYS8AmAsPxUZPJ/view?usp=sharing
+
 **Gay Yiff**
 
 *Includes lots and lots of steamy, hulking furry cocks*
 
-https://www.dropbox.com/s/nz8e9jvg4lh0bs8/yiff-upd_resources.zip?dl=0
-  
+https://drive.google.com/file/d/1b2gOJBLy-nD5p1cOM8xTDPh7LGsf1g58/view?usp=sharing
+
 **Censored**
 
 *For the people who get off to not getting off*
