@@ -53,6 +53,8 @@ Finally, double click to run start.pyw. If it's your first time running the prog
 
    _**[Premade Packages]**_
 
+(Dropbox links dead due to "excessive traffic," waiting on Drive uploads to replace links)
+
 **Blacked**
 
 *Standard Blacked hentai stuff, includes Porn Addict Brainwash Program: BBC Edition, and some volafile mp3s from /trash/ Blacked threads*
