@@ -71,19 +71,19 @@ https://www.dropbox.com/s/nz8e9jvg4lh0bs8/yiff-upd_resources.zip?dl=0
 
 *For the people who get off to not getting off*
 
-https://www.dropbox.com/s/4x34yhoe6djhbma/censor-upd_resources.zip?dl=0
+https://drive.google.com/file/d/1phBN4JhoyOg3yAMomGgIKVTryYc8dv4Q/view?usp=sharing
 
 **Hypno**
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
-https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=sharing  (Dropbox is a bitch)
+https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=sharing
 
 **Gooner**
 
 *Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg. Fair warning, most things are fair game for this one, including furry, farts, cringe, ponies, etc.*
 
-https://www.dropbox.com/s/6mx6sz4q5ewdl63/goon_new-resources.zip?dl=0
+https://drive.google.com/file/d/1GhJQ7OtL9hblQJ4NTLP3Nz23AKcUqdz-/view?usp=sharing
 
 __**What is Edgeware?**__
 
