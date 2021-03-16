@@ -5,7 +5,7 @@ Version 2.0.0 Updates
         
    _**[New Additions]**_
    
-•**GIF support in popups** *Animated GIFs in the /resource/img/ folder now properly animate in their popups*
+•**GIF support in popups** *Animated GIFs in the /resource/img/ folder now properly animate in popups*
         
 •**Hibernation Mode** *New operation mode; Edgeware will sit dormant for a random, configurable amount of time before shooting a lewd load all over your screen and returning to sleep to do it again later*
 
