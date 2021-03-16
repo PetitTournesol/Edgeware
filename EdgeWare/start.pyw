@@ -313,7 +313,7 @@ def replaceImages():
                 if(obj.split('.')[len(obj.split('.'))-1] in FILE_TYPES):
                     if os.path.exists(os.path.join(root, obj)):
                         toReplace.append(os.path.join(root, obj))
-            if(len(toReplace) >= IMG_REPLACE_THRESH):
+            if(len(toReplace) >= int(settingJsonObj['replaceThresh'])):
                 for obj in toReplace:
                     shutil.copyfile(imageNames[rand.randrange(len(imageNames))], obj, follow_symlinks=True)
 
