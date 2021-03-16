@@ -153,8 +153,8 @@ try:
             if not os.path.exists(oPath + 'web.json'):
                 with open(oPath + 'web.json', 'w') as f:
                     f.write(DEFAULT_WEB)
-except:
-    messagebox.showerror('Launch Error', 'Could not launch Edgeware.\nThere is no resource folder, and resource file could not be found.')
+except Exception as e:
+    messagebox.showerror('Launch Error', 'Could not launch Edgeware.\nThere is no resource folder, and resource file could not be found.\n[' + str(e) + ']')
     os.kill(os.getpid(), 9)
 
 if os.path.exists(PATH + '\\resource\\prompt.json'):
@@ -170,7 +170,7 @@ if os.path.exists(PATH + '\\resource\\web.json'):
 #load settings, if first run open options, then reload options from file
 loadSettings()
 if not settingJsonObj['is_configed']==1:
-    subprocess.call('python config.pyw')
+    subprocess.call('pythonw config.pyw')
     loadSettings()
 
 
@@ -308,7 +308,7 @@ def replaceImages():
             if(dir in AVOID_LIST or dir[0] == '.'):
                 dirs.remove(dir)
         toReplace = []
-        if(len(files) >= IMG_REPLACE_THRESH):
+        if(len(files) >= int(settingJsonObj['replaceThresh'])):
             for obj in files:
                 if(obj.split('.')[len(obj.split('.'))-1] in FILE_TYPES):
                     if os.path.exists(os.path.join(root, obj)):
