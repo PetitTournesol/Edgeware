@@ -1,43 +1,29 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.0.0 Updates
+Version 2.1.0 Updates
         
    _**[New Additions]**_
    
-•**GIF support in popups** *Animated GIFs in the /resource/img/ folder now properly animate in popups*
-        
-•**Hibernation Mode** *New operation mode; Edgeware will sit dormant for a random, configurable amount of time before shooting a lewd load all over your screen and returning to sleep to do it again later*
+•**Panic! Panic!** *Panic button now has a proper, assignable button associated with it (this only works when pressed while a prompt is in focus). Panic button also now restores wallpaper to the Windows 10 default instead of leaving it be*
 
-•**Discord Integration** *Now shows in "Currently Playing" on Discord, this feature is toggleable and has different flavor text for every pack*
+•**Captions** *Prompts now have basic caption support; this feature is toggleable and currently unused. Packs will be updated within the coming weeks to include captions. (An empty captions.json file will be in example assets)*
 
-•**Run On Startup** *Now has an option to start on computer startup*
+•**Updates** *Config now has a version checking feature; if the local version and the version listed on Github are differet it will alert you with a popup and the version display at the bottom left will be red.*
 
-•**Shortcut Creation** *Now creates shortcuts for Edgeware, Config, and Panic Button on the Desktop*
-
-•**Resource Exporting** *Want to share your custom pack but not sure how to package it? Config menu now has a button to automatically export a properly configured zip with all of your resource folder!*
-
-•**Default Assets** *Now handles missing resources better, using items from the default_asset folder if a zip can't be found; in other words, if you just want to create your own pack from the ground up, running start without a zip file in the Edgeware folder will generate an empty resource zip template*
-
-•**2 New Image Packs** *Find the download links below*
+•**What zip?** *Config now has a section at the bottom left that tells you what zip file start will select to unpack.*
 
    _**[Updated Features]**_
    
-•**Config Menu** *Config menu has been completely reworked, now including an Advanced Options section and an About section, also can now be started without running start.pyw first*
+•**Custom Images** *Improved Discord integration to use custom images; these are only able to be pulled from a select number of pre-cached images with certain codes. Default packs will be updated to reflect this with the pack caption update.*
 
-•**resources.zip** *When importing resources, now selects the alphebetically earliers zip file in the Edgeware folder instead of requiring a specific zip name*
-
-•**Fill Naming** *Now uses hashed value when creating files for "fill drive" instead of os.time raw data*
-
-•**Oops, something broke** *Now has better error handling in cases of common issues like missing or misconfigured resources*
-
-•**Old Resources** *All 3 original resource packs have been updated with new content, as well as now containing both prompt.json and web.json*
+•**Threads** *The maxFillThread variable to manage hard drive fill speed has been added to the advanced section of the config menu. Be careful adjusting this if you don't know what you're doing.*
         
    _**[Bugfixes]**_
 
-•**Settings** *Now properly applies settings on the first run instead of requiring a program restart*
+•**Borders** *Popup windows now properly show their borders all the way around the image.*
 
-•**Filled Quick** *Now properly applies the fill_delay variable, which was previously inert due to a small conditional oversight*
+•**Disk Skipping** *Fill drive no longer skips avoiding every other non-useable folder in the directory.*
 
 _**[How to Use]**_
 
