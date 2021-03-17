@@ -1,11 +1,10 @@
-import json, os
+import json, os, urllib.request, shutil, webbrowser, zipfile
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog
 from tkinter import *
 
-import zipfile
-
 PATH = os.path.abspath(os.getcwd()) + '\\'
 
+#text for the about tab
 ANNOYANCE_TEXT = 'The "Annoyance" section consists of the 5 main configurable settings of Edgeware:\nDelay\nPopup Frequency\nWebsite Frequency\nAudio Frequency\nPromptFrequency\n\nEach is fairly self explanatory, but will still be expounded upon in this section. Delay is the forced time delay between each tick of the "clock" for Edgeware. The longer it is, the slower things will happen. Popup frequency is the percent chance that a randomly selected popup will appear on any given tick of the clock, and similarly for the rest, website being the probability of opening a website, audio for playing a file from /resource/aud/, and prompt for a typing prompt to pop up.\n\nThese values can be set by adjusting the bars, or by clicking the button beneath each respective slider, which will allow you to type in an explicit number instead of searching for it on the scrollbar.\n\nIn order to disable any feature, lower its probability to 0, to ensure that you\'ll be getting as much of any feature as possible, turn it up to 100.'
 DRIVE_TEXT = 'The "Drive" portion of Edgeware has two features, fill drive and replace images.\n\n"Fill Drive" does exactly what it says: it attempts to fill your hard drive with as much porn from /resource/img/ as possible. It does, however, have some restrictions. It will (should) not place ANY images into folders that start with a ".", are named "EdgeWare", or that are named "Appdata".\nIt will also ONLY place images into your User folder and its subfolders; no more picking images out of system files for hours, just disentangling all of your stuff from them.\nFill drive has one modifier, which is its own forced delay. Because it runs with between 1 and 8 threads at any given time, when unchecked it can fill your drive VERY quickly. To ensure that you get that nice slow fill, you can adjust the delay between each folder sweep it performs.\n\n"Replace Images" is more complicated. Its searching is the exact same as fill drive, but instead of throwing images everywhere, it will seek out folders with large numbers of images (more than the threshold value) and when it finds one, it will replace ALL of the images with porn from /resource/img/. REMEMBER THAT IF YOU CARE ABOUT YOUR PHOTOS, AND THEY\'RE IN A FOLDER WITH MORE IMAGES THAN YOUR CHOSEN THRESHOLD VALUE, EITHER BACK THEM UP IN A ZIP OR SOMETHING OR DO. NOT. USE. THIS SETTING. I AM NOT RESPONSIBLE FOR YOUR OWN DECISION TO RUIN YOUR PHOTOS.'
 STARTUP_TEXT = 'Start on launch does exactly what it says it does and nothing more: it allows Edgeware to start itself whenever you start up and log into your PC.\n\nPlease note that the method used does NOT edit registry or schedule any tasks. The "lazy startup" method was used for both convenience of implementation and convenience of cleaning.\n\nIf you forget to turn off the "start on logon" setting before uninstalling, you will need to manually go to your Startup folder and remove "edgeware.bat".'
@@ -13,11 +12,24 @@ HIBERNATE_TEXT = 'The Hibernate feature is an entirely different mode for Edgewa
 ADVANCED_TEXT = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
+#google is a bitch so this is temporarily shelved
+#DOWNLOAD_STRINGS = ['Blacked', 'Yiff', 'Censor', 'Hypno', 'Goon']
+#DOWNLOAD_LINKS   = ['1BHLrCO5cvm9YCF_EeWGYS8AmAsPxUZPJ',
+#                    '1b2gOJBLy-nD5p1cOM8xTDPh7LGsf1g5',
+#                    '',
+#                    '',
+#                    '5pzl&id=1GhJQ7OtL9hblQJ4NTLP3Nz23AKcUqdz-']
+#URL_BASE = 'https://docs.google.com/uc?export=download&confirm='
+
+UPDCHECK_URL = 'https://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
+local_version = '[?]'
 with open(PATH + 'configDefault.dat') as r:
     obj = r.readlines()
     varNames = obj[0].split(',')
     varNames[len(varNames)-1] = varNames[len(varNames)-1].replace('\n', '')
     defaultVars = obj[1].split(',')
+
+local_version = defaultVars[0]
 
 settingJsonObj = {}
 for var in varNames:
@@ -46,14 +58,19 @@ if settingJsonObj['version'] != defaultVars[0]:
 
 def spawnWindow():
     global settingJsonObj, defaultJsonObj
+    webv = getLiveVersion()
+
     #window things
     root = Tk()
     root.title('Edgeware Config')
     root.resizable(False, False)
-    root.geometry('600x500')
+    root.geometry('618x500')
     root.iconbitmap(PATH + 'default_assets\\config_icon.ico')
     root.wm_attributes('-topmost', 1)
     fail_loop = 0
+
+    if local_version != webv:
+        messagebox.showwarning('Update Available', 'Local version and web version are not the same.\nThis likely means a newer version is available.')
 
     #painful control variables ._.
     while(True and fail_loop < 2):
@@ -73,12 +90,17 @@ def spawnWindow():
             hibernateMaxVar = IntVar(root, value=(settingJsonObj['hibernateMax']))
             wakeupActivityVar = IntVar(root, value=(settingJsonObj['wakeupActivity']))
             discordVar = BooleanVar(root, value=(int(settingJsonObj['showDiscord'])==1))
+            startFlairVar = BooleanVar(root, value=(int(settingJsonObj['showLoadingFlair'])==1))
+            captionVar = BooleanVar(root, value=(int(settingJsonObj['showCaptions'])==1))
+            panicButtonVar = IntVar(root, value=settingJsonObj['panicButton'])
+            panicVar = BooleanVar(root, value=(int(settingJsonObj['panicDisabled'])==1))
+            #zipDropVar = StringVar(root, value=DOWNLOAD_STRINGS[0])
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar]
-            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord']
+            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar, startFlairVar, captionVar, panicButtonVar, panicVar]
+            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled']
             break;
-        except:
-            messagebox.showwarning('Settings Warning', 'File "config.cfg" appears corrupted.\nFile will be restored to default.')
+        except Exception as e:
+            messagebox.showwarning('Settings Warning', 'File "config.cfg" appears corrupted.\nFile will be restored to default.\n[' + str(e) + ']')
             jObj = {}
             for var in varNames:
                 jObj[var] = defaultVars[varNames.index(var)]
@@ -116,6 +138,7 @@ def spawnWindow():
     tabMaster.add(tabGeneral, text='General')
     #==========={IN HERE IS GENERAL TAB ITEM INITS}===========#
     #init
+
         #delay row
     delayScale = Scale(tabGeneral, label='Timer Delay (ms)', from_=10, to=60000, orient='horizontal', variable=delayVar)
     delayManual = Button(tabGeneral, text='Manual delay...', command=lambda: assign(delayVar, simpledialog.askinteger('Manual Delay', prompt='[10-60000]: ')))
@@ -148,6 +171,16 @@ def spawnWindow():
     hibernateMaxButton = Button(tabGeneral, text='Manual max...', command=lambda: assign(hibernateMaxVar, simpledialog.askinteger('Manual Maximum Sleep (sec)', prompt='[2-14400]: ')))
     hibernateMaxScale = Scale(tabGeneral, label='Max Sleep (sec)', variable=hibernateMaxVar, orient='horizontal', from_=2, to=14400)
     h_activityScale = Scale(tabGeneral, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
+    toggleFlairButton = Checkbutton(tabGeneral, text='Show Loading Flair', variable=startFlairVar)
+    toggleCaptionsButton = Checkbutton(tabGeneral, text='Popup Captions', variable=captionVar)
+    #zipDropdown = OptionMenu(tabGeneral, zipDropVar, *DOWNLOAD_STRINGS)
+    zipLabel = Label(tabGeneral, text='Current Zip:\n' + pickZip(), background='lightgray')
+    #zipDownloadButton = Button(tabGeneral, text='Download Zip', command=lambda: downloadZip(zipDropVar.get(), zipLabel))
+    local_verLabel = Label(tabGeneral, text='Local Version:\n' + defaultVars[0])
+    web_verLabel = Label(tabGeneral, text='GitHub Version:\n' + webv, bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
+    openGitButton = Button(tabGeneral, text='Open Github', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
+    setPanicButtonButton = Button(tabGeneral, text='Set Panic Button\n' + str(panicButtonVar.get()), command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
+    panicDisableButton = Checkbutton(tabGeneral, text='Disable Panic Hotkey', variable=panicVar)
 
     hibernate_group.append(h_activityScale)
     hibernate_group.append(hibernateMinButton)
@@ -176,24 +209,37 @@ def spawnWindow():
     promptScale.grid(column=4, row=1)
     promptManual.grid(column=4, row=2)
 
-    fillBox.grid(column=0, row=4)
+    fillBox.grid(column=0, row=4, sticky='w')
     fillDelay.grid(column=1, row=4)
-    replaceBox.grid(column=2, row=4)
+    replaceBox.grid(column=2, row=4, sticky='w')
     replaceThreshScale.grid(column=3, row=4)
 
-    exportResourcesButton.grid(column=0, row=7)
-    toggleStartupButton.grid(column=1, row=7)
-    toggleDiscordButton.grid(column=1, row=8)
+    exportResourcesButton.grid(column=1, row=13)
+    panicDisableButton.grid(column=1, row=11, sticky='w')
+    setPanicButtonButton.grid(column=1, row=12)
+    toggleStartupButton.grid(column=1, row=7, sticky='w')
+    toggleDiscordButton.grid(column=1, row=8, sticky='w')
 
-    toggleHibernateButton.grid(column=2,row=8,padx=5,pady=2)
+    toggleCaptionsButton.grid(column=0, row=7, sticky='w')
+    toggleHibernateButton.grid(column=2,row=8,padx=5,pady=2, sticky='w')
     h_activityScale.grid(column=2, row=7)
     hibernateMinScale.grid(column=3,row=7,padx=5,pady=2)
     hibernateMaxScale.grid(column=4,row=7,padx=5,pady=2)
     hibernateMinButton.grid(column=3,row=8,padx=5,pady=2)
     hibernateMaxButton.grid(column=4,row=8,padx=5,pady=2)
+    
+    #zipDownloadButton.grid(column=0, row=10) #not using for now until can find consistent direct download
+    #zipDropdown.grid(column=0, row=9)
+    zipLabel.grid(column=0, row=10)
+    toggleFlairButton.grid(column=0,row=8, sticky='w')
+    local_verLabel.grid(column=0, row=11)
+    web_verLabel.grid(column=0, row=12)
+    openGitButton.grid(column=0, row=13)
 
     Label(tabGeneral).grid(column=4, row=9)
-    saveExitButton.grid(column=4, row=10)
+    Label(tabGeneral).grid(column=4, row=10)
+    Label(tabGeneral).grid(column=4, row=11)
+    saveExitButton.grid(column=4, row=13)
     #==========={HERE ENDS  GENERAL TAB ITEM INITS}===========#
     tabMaster.add(tabAdvanced, text='Advanced')
     #==========={IN HERE IS ADVANCED TAB ITEM INITS}===========#
@@ -237,10 +283,19 @@ def spawnWindow():
     toggleAssociateSettings(replaceVar.get(), replace_group)
     toggleAssociateSettings(hibernateVar.get(), hibernate_group)
     
-    tabInfoExpound.pack(expand=1, fill='both')
     tabMaster.pack(expand=1, fill='both')
+    tabInfoExpound.pack(expand=1, fill='both')
 
     root.mainloop()
+
+def pickZip():
+    #selecting zip
+    for obj in os.listdir(PATH + '\\'):
+        try:
+            if obj.split('.')[len(obj.split('.'))-1].lower() == 'zip':
+                return obj.split('.')[0]
+        except:
+            print('{} is not a zip file.'.format(obj))
 
 def exportResource():
     try:
@@ -276,6 +331,20 @@ def write_save(varList, nameList):
         file.write(json.dumps(temp))
     os.kill(os.getpid(), 9)
 
+#def downloadZip(str, lblObj):
+#    url = URL_BASE + DOWNLOAD_LINKS[DOWNLOAD_STRINGS.index(str)]
+#    print('downloading zip from:', url)
+#    with urllib.request.urlopen(url) as file, open(PATH + str + '.zip', 'wb') as out:
+#        shutil.copyfileobj(file, out)
+
+def getLiveVersion():
+    try:
+        with open(urllib.request.urlretrieve(UPDCHECK_URL)[0], 'r') as liveDCfg:
+            return(liveDCfg.read().split('\n')[1].split(',')[0])
+    except:
+        return 'Could not check version.'
+    
+
 def updateText(objList, var, var_Label):
     try:
         for obj in objList:
@@ -306,11 +375,30 @@ def toggleStartupBat(boolean):
             os.remove(os.path.expanduser('~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\edgeware.bat'))
     except:
         print('uwu')
-    
+
 def assign(obj, var):
     try:
         obj.set(var)
     except:
         print('Should silently fail; did user quit out of input without submitting?')
 
-spawnWindow()
+def getKeyboardInput(button, var):
+    child = Tk()
+    child.resizable(False,False)
+    child.title('Key Listener')
+    child.wm_attributes('-topmost', 1)
+    child.geometry('250x250')
+    child.focus_force()
+    Label(child, text='Press any key or exit').pack(expand=1, fill='both')
+    child.bind('<KeyPress>', lambda key: assignKey(child, button, var, key))
+    child.mainloop()
+
+def assignKey(parent, button, var, key):
+    button.configure(text='Set Panic Button\n<' + key.keysym + '>')
+    var.set(str(key.keycode))
+    parent.destroy()
+
+try:
+    spawnWindow()
+except Exception as e:
+    messagebox.showerror('Could not start', 'Could not start config.\n[' + str(e) + ']')

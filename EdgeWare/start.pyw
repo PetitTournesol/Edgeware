@@ -6,9 +6,13 @@ DESKTOP_PATH = os.path.join(os.environ['USERPROFILE'], 'Desktop')
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
 RESOURCE_PATHS = ['\\resource\\', '\\resource\\aud', '\\resource\\img\\', '\\resource\\vid\\']
-MAX_FILL_THREADS = 8
-IMG_REPLACE_THRESH = 500
 
+liveFillThreads = 0 #count of live threads for hard drive filling
+isPlayingAudio = False #audio thread flag
+replaceThreadLive = False #replace thread flag
+hasPromptJson = False #can use prompts flag
+
+#default data for generating working default asset resource folder
 DEFAULT_WEB = '{"urls":["https://duckduckgo.com/"], "args":["?q=why+are+you+gay"]}'
 DEFAULT_PROMPT = '{"moods":["no moods"], "freqList":[100], "minLen":0, "maxLen":1, "no moods":["no prompts"]}'
 DEFAULT_DISCORD = 'Playing with myself~'
@@ -39,12 +43,6 @@ def make_shortcut(tList):
         os.remove(PATH + '\\tmp.bat')
     except:
         print('failed')
-    
-liveFillThreads = 0 #count of live threads for hard drive filling
-isPlayingAudio = False #audio thread flag
-replaceThreadLive = False #replace thread flag
-
-hasPromptJson = False #can use prompts flag
 
 #for checking directories/files
 def fileExists(dir):
@@ -53,12 +51,20 @@ def fileExists(dir):
 def desktopExists(obj):
     return os.path.exists(os.path.join(DESKTOP_PATH, obj))
 
+def pipPackage(packageName, settingName):
+    try:
+        subprocess.call('py -m pip install ' + packageName)
+    except:
+        subprocess.call('pip install ' + packageName)
+    settingJsonObj[settingName] = 1
+    with open(PATH + '\\config.cfg', 'w') as f:
+        f.write(json.dumps(settingJsonObj))
 
 def loadSettings():
     global settingJsonObj
     settingJsonObj = {}
 
-    #creating objects to check vs used config for version updates
+    #creating objects to check vs live config for version updates
     with open(PATH + '\\configDefault.dat') as r:
         obj = r.readlines()
         varNames = obj[0].split(',')
@@ -68,7 +74,7 @@ def loadSettings():
     for var in varNames:
         settingJsonObj[var] = defaultVars[varNames.index(var)]
 
-    #checking if config file exists
+    #checking if config file exists and then writing the default config settings to a new file if it doesn't
     if not os.path.exists(PATH + '\\config.cfg'):
         with open(PATH + '\\config.cfg', 'w') as f:
             f.write(json.dumps(settingJsonObj))
@@ -99,26 +105,13 @@ def loadSettings():
         with open(PATH + '\\config.cfg', 'w') as f:
             f.write(json.dumps(settingJsonObj))
 
-    #check pillow installed flag, if not installed attempt to install with pip
+    #check pillow installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pil_installed'])==1:
-        try:
-            subprocess.call('py -m pip install pillow')
-        except:
-            subprocess.call('pip install pillow')
-        settingJsonObj['pil_installed'] = 1
-        with open(PATH + '\\config.cfg', 'w') as f:
-            f.write(json.dumps(settingJsonObj))
+        pipPackage('pillow', 'pil_installed')
             
-    #check pypresence installed flag, if not installed attempt to install with pip
+    #check pypresence installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pypres_installed'])==1:
-        try:
-            subprocess.call('py -m pip install pypresence')
-        except:
-            subprocess.call('pip install pypresence')
-        settingJsonObj['pypres_installed'] = 1
-        with open(PATH + '\\config.cfg', 'w') as f:
-            f.write(json.dumps(settingJsonObj))
-
+        pipPackage('pypresence', 'pypres_installed')
 
 #start init portion, check resources, config, etc.
 try:
@@ -154,7 +147,7 @@ try:
                 with open(oPath + 'web.json', 'w') as f:
                     f.write(DEFAULT_WEB)
 except Exception as e:
-    messagebox.showerror('Launch Error', 'Could not launch Edgeware.\nThere is no resource folder, and resource file could not be found.\n[' + str(e) + ']')
+    messagebox.showerror('Launch Error', 'Could not launch Edgeware.\n[' + str(e) + ']')
     os.kill(os.getpid(), 9)
 
 if os.path.exists(PATH + '\\resource\\prompt.json'):
@@ -172,7 +165,6 @@ loadSettings()
 if not settingJsonObj['is_configed']==1:
     subprocess.call('pythonw config.pyw')
     loadSettings()
-
 
 IMAGES = []
 for img in os.listdir(PATH + '\\resource\\img\\'):
@@ -197,7 +189,10 @@ if not desktopExists('Edgeware.lnk'):
 if not desktopExists('Config.lnk'):
     make_shortcut(shortcutScript_gen(PATH, 'config', 'config.pyw', 'Config'))
 if not desktopExists('Panic.lnk'):
-    make_shortcut(shortcutScript_gen(PATH, 'panic', 'panicbutton.bat', 'Panic'))
+    make_shortcut(shortcutScript_gen(PATH, 'panic', 'panic.pyw', 'Panic'))
+
+if int(settingJsonObj['showLoadingFlair'])==1:
+    subprocess.call('pythonw startup_flair.pyw')
 
 #set wallpaper
 if not int(settingJsonObj['hibernateMode'])==1:
@@ -232,7 +227,7 @@ def doRoll(mod):
 def annoyance():
     while(True):
         rollForInitiative()
-        if(int(settingJsonObj['fill'])==1 and liveFillThreads < MAX_FILL_THREADS):
+        if(int(settingJsonObj['fill'])==1 and liveFillThreads <= int(settingJsonObj['maxFillThreads'])):
             thread.Thread(target=fillDrive).start()
         if(int(settingJsonObj['replace'])==1 and not replaceThreadLive):
             thread.Thread(target=replaceImages).start()
@@ -243,23 +238,23 @@ def rollForInitiative():
     if(doRoll(int(settingJsonObj['webMod'])) and len(webJsonDat) > 0):
         try:
             webbrowser.open_new(urlSelect(rand.randrange(len(webJsonDat['urls']))))
-        except:
-            messagebox.showerror('Web Error', 'Failed to open website, is web.json properly set up? If unable to fix errors, set prob to 0.')
+        except Exception as e:
+            messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
     if(doRoll(int(settingJsonObj['popupMod'])) and len(IMAGES) > 0):
         try:
             os.startfile('popup.pyw')
-        except:
-            messagebox.showerror('Popup Error', 'Failed to start popup; is Pillow installed? If unable to fix errors, set prob to 0.')
+        except Exception as e:
+            messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
     if(doRoll(int(settingJsonObj['audioMod'])) and not isPlayingAudio and len(AUDIO) > 0):
         try:
             thread.Thread(target=playAudio).start()
         except:
-            messagebox.showerror('Audio Error', 'Failed to play audio; are all files in /aud/ .wav? If unable to fix errors, set prob to 0.')
+            messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
     if(doRoll(int(settingJsonObj['promptMod'])) and hasPromptJson):
         try:
             subprocess.call('pythonw prompt.pyw')
         except:
-            messagebox.showerror('Prompt Error', 'Could not start prompt subprocess, pythonw error? If unable to fix errors, set prob to 0.')
+            messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
 
 
 #if audio is not playing, selects and plays random audio file from /aud/ folder
@@ -281,41 +276,48 @@ def fillDrive():
     images = []
     imageNames = []
     for img in os.listdir(PATH + '\\resource\\img\\'):
-        images.append(open(os.path.join(PATH, 'resource\\img', img), 'rb').read())
-        imageNames.append(img)
+        if not img.split('.')[len(img.split('.'))-1] == 'ini':
+            images.append(open(os.path.join(PATH, 'resource\\img', img), 'rb').read())
+            imageNames.append(img)
     for root, dirs, files in os.walk(docPath):
-        for dir in dirs:
-            if(dir in AVOID_LIST or dir[0] == '.'):
-                dirs.remove(dir)
+        #tossing out directories that should be avoided
+        for obj in list(dirs):
+            if(obj in AVOID_LIST or obj[0] == '.'):
+                dirs.remove(obj)
         for i in range(rand.randint(3, 6)):
             index = rand.randint(0, len(images)-1)
             tObj = str(time.time() * rand.randint(10000, 69420)).encode(encoding='ascii',errors='ignore')
             pth = os.path.join(root, hashlib.md5(tObj).hexdigest() + '.' + str.split(imageNames[index], '.')[len(str.split(imageNames[index], '.')) - 1].lower())
             shutil.copyfile(os.path.join(PATH, 'resource\\img', imageNames[index]), pth)
-            time.sleep(float(settingJsonObj['delay']) / 2000)
+        time.sleep(float(settingJsonObj['delay']) / 1000)
     liveFillThreads -= 1
 
-#seeks out folders with 500+ images (uses IMG_REPLACE_THRESH as limit) and replaces all images with /resource/img/ files 
+#seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files 
 def replaceImages():
     global replaceThreadLive
     replaceThreadLive = True
     docPath = os.path.expanduser('~\\')
     imageNames = []
     for img in os.listdir(PATH + '\\resource\\img\\'):
-        imageNames.append(PATH + '\\resource\\img\\' + img)
+        if not img.split('.')[len(img.split('.'))-1] == 'ini':
+            imageNames.append(PATH + '\\resource\\img\\' + img)
     for root, dirs, files in os.walk(docPath):
-        for dir in dirs:
-            if(dir in AVOID_LIST or dir[0] == '.'):
-                dirs.remove(dir)
+        for obj in list(dirs):
+            if(obj in AVOID_LIST or obj[0] == '.'):
+                dirs.remove(obj)
         toReplace = []
+        #ignore any folders with fewer items than the replace threshold
         if(len(files) >= int(settingJsonObj['replaceThresh'])):
+            #if folder has enough items, check how many of them are images
             for obj in files:
                 if(obj.split('.')[len(obj.split('.'))-1] in FILE_TYPES):
                     if os.path.exists(os.path.join(root, obj)):
                         toReplace.append(os.path.join(root, obj))
+            #if has enough images, finally do replacing
             if(len(toReplace) >= int(settingJsonObj['replaceThresh'])):
                 for obj in toReplace:
                     shutil.copyfile(imageNames[rand.randrange(len(imageNames))], obj, follow_symlinks=True)
+    #never turns off threadlive variable because it should only need to do this once
 
 #let's goooooooooooooooooooooooooooooooooooooooo           
 main()

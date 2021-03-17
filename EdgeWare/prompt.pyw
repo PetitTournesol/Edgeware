@@ -60,4 +60,7 @@ def checkpass(a, b):
     if(a == b):
         exit()
 
-unborderedWindow()
+try:
+    unborderedWindow()
+except Exception as e:
+    messagebox.showerror('Prompt Error', 'Could not create prompt window.\n[' + str(e) + ']')
