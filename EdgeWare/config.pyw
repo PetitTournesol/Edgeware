@@ -296,6 +296,7 @@ def pickZip():
                 return obj.split('.')[0]
         except:
             print('{} is not a zip file.'.format(obj))
+    return '[No Zip Found]'
 
 def exportResource():
     try:
