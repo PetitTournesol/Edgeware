@@ -174,7 +174,7 @@ def spawnWindow():
     toggleFlairButton = Checkbutton(tabGeneral, text='Show Loading Flair', variable=startFlairVar)
     toggleCaptionsButton = Checkbutton(tabGeneral, text='Popup Captions', variable=captionVar)
     #zipDropdown = OptionMenu(tabGeneral, zipDropVar, *DOWNLOAD_STRINGS)
-    zipLabel = Label(tabGeneral, text='Current Zip:\n' + pickZip(), background='lightgray')
+    zipLabel = Label(tabGeneral, text='Current Zip:\n' + pickZip(), background='lightgray', wraplength=100)
     #zipDownloadButton = Button(tabGeneral, text='Download Zip', command=lambda: downloadZip(zipDropVar.get(), zipLabel))
     local_verLabel = Label(tabGeneral, text='Local Version:\n' + defaultVars[0])
     web_verLabel = Label(tabGeneral, text='GitHub Version:\n' + webv, bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
