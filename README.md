@@ -1,8 +1,26 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.1.0 Updates
-        
+Version 2.1.1 Updates
+
+**(2.1.1)**
+
+   _**[New Additions]**_
+   
+•**Import** *Config now has a manual resource zip import button*
+
+•**Alerts** *Added additional alert dialogs*
+
+   _**[Updated Features]**_
+
+•**Multi monitors** *Popups now appear on all monitors, instead of just the main monitor*
+
+   _**[Bugfixes]**_
+   
+•**Paths** *Updated path fetch functions, should now avoid System32 Permission Denied errors due to incorrect path fetching*
+
+**(2.1.0)**
+
    _**[New Additions]**_
    
 •**Panic! Panic!** *Panic button now has a proper, assignable button associated with it (this only works when pressed while a prompt is in focus). Panic button also now restores wallpaper to the Windows 10 default instead of leaving it be*
