@@ -1,7 +1,7 @@
-import ctypes, hashlib, os, subprocess, time, webbrowser, zipfile, shutil, json, winsound, random as rand, threading as thread
+import pathlib, ctypes, hashlib, os, subprocess, time, webbrowser, zipfile, shutil, json, winsound, random as rand, threading as thread
 from tkinter import messagebox
 
-PATH = os.path.abspath(os.getcwd())
+PATH = str(pathlib.Path(__file__).parent.absolute())
 DESKTOP_PATH = os.path.join(os.environ['USERPROFILE'], 'Desktop')
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
@@ -14,7 +14,7 @@ hasPromptJson = False #can use prompts flag
 
 #default data for generating working default asset resource folder
 DEFAULT_WEB = '{"urls":["https://duckduckgo.com/"], "args":["?q=why+are+you+gay"]}'
-DEFAULT_PROMPT = '{"moods":["no moods"], "freqList":[100], "minLen":0, "maxLen":1, "no moods":["no prompts"]}'
+DEFAULT_PROMPT = '{"moods":["no moods"], "freqList":[100], "minLen":1, "maxLen":1, "no moods":["no prompts"]}'
 DEFAULT_DISCORD = 'Playing with myself~'
 
 settingJsonObj = {}
@@ -163,6 +163,7 @@ if os.path.exists(PATH + '\\resource\\web.json'):
 #load settings, if first run open options, then reload options from file
 loadSettings()
 if not settingJsonObj['is_configed']==1:
+    messagebox.showinfo('First Time Config', 'Configure settings for the first time; by default all annoyance features are disabled!\n[Config will not run from start again. Run config.pyw to configure after this.]')
     subprocess.call('pythonw config.pyw')
     loadSettings()
 

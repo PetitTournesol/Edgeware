@@ -1,8 +1,8 @@
-import time, os, threading as thread
+import time, os, threading as thread, pathlib
 from tkinter import *
 from PIL import Image, ImageTk
 
-PATH = os.path.abspath(os.getcwd())
+PATH = str(pathlib.Path(__file__).parent.absolute())
 scalar = 0.6
 
 def doAnimation():

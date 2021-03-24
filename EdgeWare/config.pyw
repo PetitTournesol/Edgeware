@@ -1,8 +1,8 @@
-import json, os, urllib.request, shutil, webbrowser, zipfile
+import json, os, urllib.request, shutil, webbrowser, zipfile, pathlib
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog
 from tkinter import *
 
-PATH = os.path.abspath(os.getcwd()) + '\\'
+PATH = str(pathlib.Path(__file__).parent.absolute()) + '\\'
 
 #text for the about tab
 ANNOYANCE_TEXT = 'The "Annoyance" section consists of the 5 main configurable settings of Edgeware:\nDelay\nPopup Frequency\nWebsite Frequency\nAudio Frequency\nPromptFrequency\n\nEach is fairly self explanatory, but will still be expounded upon in this section. Delay is the forced time delay between each tick of the "clock" for Edgeware. The longer it is, the slower things will happen. Popup frequency is the percent chance that a randomly selected popup will appear on any given tick of the clock, and similarly for the rest, website being the probability of opening a website, audio for playing a file from /resource/aud/, and prompt for a typing prompt to pop up.\n\nThese values can be set by adjusting the bars, or by clicking the button beneath each respective slider, which will allow you to type in an explicit number instead of searching for it on the scrollbar.\n\nIn order to disable any feature, lower its probability to 0, to ensure that you\'ll be getting as much of any feature as possible, turn it up to 100.'
@@ -63,14 +63,11 @@ def spawnWindow():
     #window things
     root = Tk()
     root.title('Edgeware Config')
-    root.resizable(False, False)
-    root.geometry('618x500')
+    #root.resizable(False, False)
+    root.geometry('618x510')
     root.iconbitmap(PATH + 'default_assets\\config_icon.ico')
-    root.wm_attributes('-topmost', 1)
+    #root.wm_attributes('-topmost', 1)
     fail_loop = 0
-
-    if local_version != webv:
-        messagebox.showwarning('Update Available', 'Local version and web version are not the same.\nThis likely means a newer version is available.')
 
     #painful control variables ._.
     while(True and fail_loop < 2):
@@ -98,7 +95,7 @@ def spawnWindow():
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar, startFlairVar, captionVar, panicButtonVar, panicVar]
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled']
-            break;
+            break
         except Exception as e:
             messagebox.showwarning('Settings Warning', 'File "config.cfg" appears corrupted.\nFile will be restored to default.\n[' + str(e) + ']')
             jObj = {}
@@ -163,6 +160,7 @@ def spawnWindow():
 
         #other row
     exportResourcesButton = Button(tabGeneral, text='Export resource', command=exportResource)
+    importResourcesButton = Button(tabGeneral, text='Import resources', command=importResource)
     toggleStartupButton = Checkbutton(tabGeneral, text='Launch on Startup', variable=startLoginVar)
     toggleDiscordButton = Checkbutton(tabGeneral, text='Show on Discord', variable=discordVar)
     toggleHibernateButton = Checkbutton(tabGeneral, text='Hibernate Mode', variable=hibernateVar, command=lambda: toggleAssociateSettings(hibernateVar.get(), hibernate_group))
@@ -215,6 +213,7 @@ def spawnWindow():
     replaceThreshScale.grid(column=3, row=4)
 
     exportResourcesButton.grid(column=1, row=13)
+    importResourcesButton.grid(column=2, row=13)
     panicDisableButton.grid(column=1, row=11, sticky='w')
     setPanicButtonButton.grid(column=1, row=12)
     toggleStartupButton.grid(column=1, row=7, sticky='w')
@@ -286,6 +285,11 @@ def spawnWindow():
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')
 
+    if not settingJsonObj['is_configed'] == 1: 
+        messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0.\n[This alert will only appear on the first run of config]')
+    if local_version != webv:
+        messagebox.showwarning('Update Available', 'Local version and web version are not the same.\nThis likely means a newer version is available.')
+
     root.mainloop()
 
 def pickZip():
@@ -314,6 +318,44 @@ def exportResource():
                 beyondRoot = True
     except:
         messagebox.showerror('Write Error', 'Failed to export resource to zip file.')
+
+def importResource():
+    try:
+        openLocation = filedialog.askopenfile('r', defaultextension ='.zip')
+        if openLocation == '':
+            return False
+        resp = confirmBox()
+        print(resp)
+        if not resp:
+            return False
+        if os.path.exists(PATH + 'resource\\'):
+            shutil.rmtree(PATH + 'resource\\')
+        with zipfile.ZipFile(openLocation.name, 'r') as zip:
+            zip.extractall(PATH + 'resource\\')
+        messagebox.showinfo('Done', 'Resource importing completed.')
+            
+    except Exception as e:
+        messagebox.showerror('Read Error', 'Failed to import resources from file.\n[' + str(e) + ']')
+
+def confirmBox() -> bool:
+    allow = False
+    root = Tk()
+    def complete(state):
+        nonlocal allow
+        allow=state
+        root.quit()
+    root.geometry('220x120')
+    root.resizable(False, False)
+    root.wm_attributes('-toolwindow', 1)
+    root.focus_force()
+    root.title('Confirm')
+    Label(root, text='Current resource folder will be deleted and overwritten. Is this okay?', wraplength=212).pack(fill='x')
+    Label(root).pack()
+    Button(root, text='Continue', command=lambda: complete(True)).pack()
+    Button(root, text='Cancel', command=lambda: complete(False)).pack()
+    root.mainloop()
+    root.destroy()
+    return allow
 
 #helper funcs for lambdas =======================================================
 

@@ -1,14 +1,10 @@
-import os
-import json
-import random as rand
-import tkinter as tk
-
+import os, pathlib, json, random as rand, tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 
 hasData = False
 textData = {}
-PATH = os.path.abspath(os.getcwd())
+PATH = str(pathlib.Path(__file__).parent.absolute())
 if(os.path.exists(PATH + '\\resource\\prompt.json')):
     hasData = True
     with open(PATH + '\\resource\\prompt.json', 'r') as f:

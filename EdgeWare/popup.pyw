@@ -1,10 +1,59 @@
-import os, random as rand, tkinter as tk, threading as thread, time, json
+import os, random as rand, tkinter as tk, threading as thread, time, json, ctypes, pathlib
 from tkinter import *
 from tkinter import messagebox
 from itertools import count, cycle
 from PIL import Image, ImageTk
 
-#TODO: FIX SCALING AGAIN
+#Start Imported Code
+#Code from: https://code.activestate.com/recipes/460509-get-the-actual-and-usable-sizes-of-all-the-monitor/
+user = ctypes.windll.user32
+
+class RECT(ctypes.Structure): #rect class for containing monitor info
+    _fields_ = [
+        ('left', ctypes.c_long),
+        ('top', ctypes.c_long),
+        ('right', ctypes.c_long),
+        ('bottom', ctypes.c_long)
+        ]
+    def dump(self):
+        return map(int, (self.left, self.top, self.right, self.bottom))
+
+class MONITORINFO(ctypes.Structure): #unneeded for this, but i don't want to rework the entire thing because i'm stupid
+    _fields_ = [
+        ('cbSize', ctypes.c_ulong),
+        ('rcMonitor', RECT),
+        ('rcWork', RECT),
+        ('dwFlags', ctypes.c_ulong)
+        ]
+
+def get_monitors():
+    retval = []
+    CBFUNC = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.POINTER(RECT), ctypes.c_double)
+    def cb(hMonitor, hdcMonitor, lprcMonitor, dwData):
+        r = lprcMonitor.contents
+        data = [hMonitor]
+        data.append(r.dump())
+        retval.append(data)
+        return 1
+    cbfunc = CBFUNC(cb)
+    temp = user.EnumDisplayMonitors(0, 0, cbfunc, 0)
+    return retval
+
+def monitor_areas(): #all that matters from this is list(mapObj[monitor index][1])[k]; this is the list of monitor dimensions
+    retval = []
+    monitors = get_monitors()
+    for hMonitor, extents in monitors:
+        data = [hMonitor]
+        mi = MONITORINFO()
+        mi.cbSize = ctypes.sizeof(MONITORINFO)
+        mi.rcMonitor = RECT()
+        mi.rcWork = RECT()
+        res = user.GetMonitorInfoA(hMonitor, ctypes.byref(mi))
+        data.append(mi.rcMonitor.dump())
+        data.append(mi.rcWork.dump())
+        retval.append(data)
+    return retval
+#End Imported Code
 
 allow_scream = True
 show_captions = False
@@ -12,7 +61,7 @@ has_captions = False
 panic_disabled = False
 panic_key = ''
 captions = json.loads('{}')
-PATH = os.path.abspath(os.getcwd())
+PATH = str(pathlib.Path(__file__).parent.absolute())
 
 with open(PATH + '\\config.cfg', 'r') as cfg:
     jsonObj = json.loads(cfg.read())
@@ -55,6 +104,8 @@ def unborderedWindow():
     gif_bool = item.split('.')[len(item.split('.')) - 1].lower() == 'gif'
     scalefactor = float(rand.randint(25, 28)) / 100.0
     border_wid_const = 5
+    monitor_data = monitor_areas()
+    data_list = list(monitor_data[rand.randrange(0, len(monitor_data))][1])
 
     #window start
     root = Tk()
@@ -63,27 +114,27 @@ def unborderedWindow():
     root.overrideredirect(1)
     root.frame = Frame(root, borderwidth=border_wid_const, relief=RAISED)
     root.wm_attributes('-topmost', 1)
-    canv = Canvas(root, bg='black')
+    #canv = Canvas(root, bg='black')
     
     screenWid = root.winfo_screenwidth()
-    screenHgt = root.winfo_screenheight()
 
-    scalefactor = float(rand.randint(20, 28)) / 100.0
+    scalefactor = float(rand.randint(25, 28)) / 100.0
     newWid = int((image.width * (float(screenWid) / float(image.width)) * scalefactor))
     newHgt = int((image.height * (float(screenWid) / float(image.width))* scalefactor))
     image_ = ImageTk.PhotoImage(image.resize((newWid - border_wid_const+1, newHgt - border_wid_const+1), Image.ANTIALIAS))
 
     #different handling for gifs vs other images
     if(not gif_bool):
-        label = Label(canv, image=image_, bg='black')
+        label = Label(root, image=image_, bg='black')
         label.grid(row=0, column=0)
     else:
         label = GImg(root)
         label.load(path=os.path.abspath(os.getcwd()) + '\\resource\\img\\' + item)
         label.pack()
 
-    locX = rand.randint(0, max(screenWid - (label.winfo_reqwidth() if not gif_bool else image.width + 50), 0))
-    locY = rand.randint(0, max(screenHgt - (label.winfo_reqheight() if not gif_bool else image.height + 50), 0))
+    locX = rand.randint(data_list[0], data_list[2] - (label.winfo_reqwidth() if not gif_bool else image.width + 50))
+    locY = rand.randint(data_list[1], max(data_list[3] - (label.winfo_reqheight() if not gif_bool else image.height + 50), 0))
+
     root.geometry('%dx%d+%d+%d' % ((newWid if not gif_bool else image.width), (newHgt if not gif_bool else image.height), locX, locY))
     
     if(gif_bool):
@@ -94,7 +145,7 @@ def unborderedWindow():
         captionLabel.place(x=5, y=5)
     subButton = Button(root, text='I Submit <3', command=die)
     subButton.place(x=label.winfo_reqwidth() - 5 - subButton.winfo_reqwidth(), y=label.winfo_reqheight() - 5 - subButton.winfo_reqheight())
-    canv.pack()
+    #canv.pack()
     if allow_scream:
         thread.Thread(target=lambda: scream(root)).start()
     root.mainloop()
@@ -114,8 +165,6 @@ def selectCaption(strObj):
     return captions['default'][rand.randrange(0, len(captions['default']))]
 
 def panic(key):
-    print(key.keycode)
-    print(panic_key)
     if not panic_disabled and key.keycode == panic_key:
         os.startfile('panic.pyw')
 

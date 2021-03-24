@@ -1,7 +1,7 @@
-import time, os
+import time, os, pathlib
 from pypresence import presence
 
-status_path = os.path.join(os.path.abspath(os.getcwd()), 'resource', 'discord.dat')
+status_path = os.path.join(str(pathlib.Path(__file__).parent.absolute()), 'resource', 'discord.dat')
 textObj = ['[No discord.dat resource]', 'default']
 
 IMGID_CONSTS = ['furcock_img', 'blacked_img', 'censored_img', 'goon_img', 'hypno_img']
