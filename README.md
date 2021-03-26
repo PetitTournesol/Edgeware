@@ -1,7 +1,19 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.1.1 Updates
+Version 2.1.2 Updates
+
+**(2.1.1)**
+
+   _**[New Additions]**_
+   
+•**Promlt** *Prompts now allow for a configurable number of acceptable typo letters*
+
+   _**[Updated Features]**_
+
+•**Popup Scaling** *Popup scaling has been updated; should not longer allow images to be wider or taller than the screen*
+
+•**GIF Scaling** *Gifs are now resized by the same rules as other images instead of receiving no size changes*
 
 **(2.1.1)**
 
