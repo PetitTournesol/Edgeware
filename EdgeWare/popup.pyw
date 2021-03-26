@@ -78,16 +78,16 @@ except:
     print('no captions.json')
 
 class GImg(tk.Label):
-    def load(self, path, delay=75):
+    def load(self, path, rWid, rHgt, delay=75):
         self.image = Image.open(path)
         self.frames = []
         self.delay = delay
         try:
             for i in count(1):
-                self.frames.append(ImageTk.PhotoImage(self.image.copy()))
+                self.frames.append(ImageTk.PhotoImage(self.image.resize((rWid, rHgt), Image.BOX).copy()))
                 self.image.seek(i)
         except:
-            print('Done register frames.')
+            print('Done register frames. (' + str(len(self.frames)) + ')')
         self.frames_ = cycle(self.frames)
     def nextFrame(self):
         if self.frames_:
@@ -105,7 +105,14 @@ def unborderedWindow():
     scalefactor = float(rand.randint(25, 28)) / 100.0
     border_wid_const = 5
     monitor_data = monitor_areas()
-    data_list = list(monitor_data[rand.randrange(0, len(monitor_data))][1])
+
+    aspect_WH = image.width / image.height
+    aspect_HW = image.height / image.width
+    ogSize = image.width*image.height
+
+    data_list = list(monitor_data[rand.randrange(0, len(monitor_data))][2])
+    screenWid = data_list[2]-data_list[0]
+    screenHgt = data_list[3] - data_list[1]
 
     #window start
     root = Tk()
@@ -114,28 +121,38 @@ def unborderedWindow():
     root.overrideredirect(1)
     root.frame = Frame(root, borderwidth=border_wid_const, relief=RAISED)
     root.wm_attributes('-topmost', 1)
-    #canv = Canvas(root, bg='black')
+
+    #super ugly method of downscaling, but I'm an idiot so as long as it works, I don't really care
+        #scalefactor uses scaling of 40-55% if image is > 640000 pixels, otherwises scales by 80-110% scaling applied
+        #   this is to ensure that already small images are not downsized by a large amount
+    scalefactor = float(rand.randint(40, 55)) / 100.0 if ogSize > (800*800) else float(rand.randint(80, 110)) / 100.0
+        #calculates new width&height from the minimum aspect ratio between width/height and height/width, then takes the
+        #   minimum between the new formula and the old
+    newWid = min(int(image.width*min(aspect_WH, aspect_HW)*scalefactor), int((image.width * (float(screenWid) / float(image.width)) * scalefactor)))
+    newHgt = min(int(image.height*min(aspect_WH, aspect_HW)*scalefactor), int((image.height * (float(screenWid) / float(image.width))* scalefactor)))
+    rImg = image.resize((newWid - border_wid_const+1, newHgt - border_wid_const+1), Image.ANTIALIAS)
+        #could potentially get stuck with ungodly massive images, but just don't use 500x10e50 dim images
+        #   if image is STILL too large for screen after above changes, forcibly downscales it by 75% repeatedly until it fits
+    while(rImg.height > screenHgt or rImg.width > screenWid):
+        rImg = rImg.resize((int(rImg.width*0.75), int(rImg.height*0.75)), Image.ANTIALIAS)
+        newWid = int(newWid*0.75)
+        newHgt = int(newHgt*0.75)
+
+    image_ = ImageTk.PhotoImage(rImg)
     
-    screenWid = root.winfo_screenwidth()
-
-    scalefactor = float(rand.randint(25, 28)) / 100.0
-    newWid = int((image.width * (float(screenWid) / float(image.width)) * scalefactor))
-    newHgt = int((image.height * (float(screenWid) / float(image.width))* scalefactor))
-    image_ = ImageTk.PhotoImage(image.resize((newWid - border_wid_const+1, newHgt - border_wid_const+1), Image.ANTIALIAS))
-
-    #different handling for gifs vs other images
+    #different handling for gifs vs normal images
     if(not gif_bool):
         label = Label(root, image=image_, bg='black')
         label.grid(row=0, column=0)
     else:
         label = GImg(root)
-        label.load(path=os.path.abspath(os.getcwd()) + '\\resource\\img\\' + item)
+        label.load(path=os.path.abspath(os.getcwd()) + '\\resource\\img\\' + item, rWid = newWid, rHgt = newHgt)
         label.pack()
 
-    locX = rand.randint(data_list[0], data_list[2] - (label.winfo_reqwidth() if not gif_bool else image.width + 50))
-    locY = rand.randint(data_list[1], max(data_list[3] - (label.winfo_reqheight() if not gif_bool else image.height + 50), 0))
+    locX = rand.randint(data_list[0], data_list[2] - (newWid + 50))
+    locY = rand.randint(data_list[1], max(data_list[3] - (newHgt + 50), 0))
 
-    root.geometry('%dx%d+%d+%d' % ((newWid if not gif_bool else image.width), (newHgt if not gif_bool else image.height), locX, locY))
+    root.geometry('%dx%d+%d+%d' % ((rImg.width), (rImg.height), locX, locY))
     
     if(gif_bool):
         label.nextFrame()
@@ -144,10 +161,10 @@ def unborderedWindow():
         captionLabel = Label(root, text=selectCaption(item), wraplength=label.winfo_reqwidth() - border_wid_const - 10)
         captionLabel.place(x=5, y=5)
     subButton = Button(root, text='I Submit <3', command=die)
-    subButton.place(x=label.winfo_reqwidth() - 5 - subButton.winfo_reqwidth(), y=label.winfo_reqheight() - 5 - subButton.winfo_reqheight())
-    #canv.pack()
-    if allow_scream:
-        thread.Thread(target=lambda: scream(root)).start()
+    subButton.place(x=newWid - 5 - subButton.winfo_reqwidth(), y=newHgt - 5 - subButton.winfo_reqheight())
+    #disabled for performance
+    #if allow_scream:
+    #    thread.Thread(target=lambda: scream(root)).start()
     root.mainloop()
 
 def scream(root):
@@ -168,7 +185,7 @@ def panic(key):
     if not panic_disabled and key.keycode == panic_key:
         os.startfile('panic.pyw')
 
-try:
-    unborderedWindow()
-except Exception as e:
-    messagebox.showerror('Popup Error', 'Could not show popup, usually due to Pillow not being installed or because of an unknown image type in the /img/ folder. Please either update to the latest version or install Pillow using PIP in order to use Edgeware.\n[' + str(e) + ']')
+#try:
+unborderedWindow()
+#except Exception as e:
+#    messagebox.showerror('Popup Error', 'Could not show popup, usually due to Pillow not being installed or because of an unknown image type in the /img/ folder. Please either update to the latest version or install Pillow using PIP in order to use Edgeware.\n[' + str(e) + ']')

@@ -64,7 +64,7 @@ def spawnWindow():
     root = Tk()
     root.title('Edgeware Config')
     #root.resizable(False, False)
-    root.geometry('618x510')
+    root.geometry('625x530')
     root.iconbitmap(PATH + 'default_assets\\config_icon.ico')
     #root.wm_attributes('-topmost', 1)
     fail_loop = 0
@@ -91,10 +91,11 @@ def spawnWindow():
             captionVar = BooleanVar(root, value=(int(settingJsonObj['showCaptions'])==1))
             panicButtonVar = IntVar(root, value=settingJsonObj['panicButton'])
             panicVar = BooleanVar(root, value=(int(settingJsonObj['panicDisabled'])==1))
+            promptMistakeVar = IntVar(root, value=int(settingJsonObj['promptMistakes']))
             #zipDropVar = StringVar(root, value=DOWNLOAD_STRINGS[0])
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar, startFlairVar, captionVar, panicButtonVar, panicVar]
-            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled']
+            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, promptMistakeVar]
+            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled', 'promptMistakes']
             break
         except Exception as e:
             messagebox.showwarning('Settings Warning', 'File "config.cfg" appears corrupted.\nFile will be restored to default.\n[' + str(e) + ']')
@@ -135,7 +136,6 @@ def spawnWindow():
     tabMaster.add(tabGeneral, text='General')
     #==========={IN HERE IS GENERAL TAB ITEM INITS}===========#
     #init
-
         #delay row
     delayScale = Scale(tabGeneral, label='Timer Delay (ms)', from_=10, to=60000, orient='horizontal', variable=delayVar)
     delayManual = Button(tabGeneral, text='Manual delay...', command=lambda: assign(delayVar, simpledialog.askinteger('Manual Delay', prompt='[10-60000]: ')))
@@ -147,6 +147,8 @@ def spawnWindow():
     audioManual = Button(tabGeneral, text='Manual audio...', command=lambda: assign(audioVar, simpledialog.askinteger('Manual Audio', prompt='[0-100]: ')))
     promptScale = Scale(tabGeneral, label='Prompt Freq (%)', from_=0, to=100, orient='horizontal', variable=promptVar)
     promptManual = Button(tabGeneral, text='Manual prompt...', command=lambda: assign(promptVar, simpledialog.askinteger('Manual Prompt', prompt='[0-100]: ')))
+    mistakeScale = Scale(tabGeneral, label='Prompt Mistakes', from_=0, to=150, orient='horizontal', variable=promptMistakeVar)
+    mistakeManual = Button(tabGeneral, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-50]: ')))
         #drive row
     fillBox = Checkbutton(tabGeneral, text='Fill Drive', variable=fillVar, command=lambda: toggleAssociateSettings(fillVar.get(), fill_group))
     fillDelay = Scale(tabGeneral, label='Fill Delay (ms)', from_=0, to=250, orient='horizontal', variable=fillDelayVar)
@@ -160,7 +162,7 @@ def spawnWindow():
 
         #other row
     exportResourcesButton = Button(tabGeneral, text='Export resource', command=exportResource)
-    importResourcesButton = Button(tabGeneral, text='Import resources', command=importResource)
+    importResourcesButton = Button(tabGeneral, text='Import resources', command=lambda: importResource(root))
     toggleStartupButton = Checkbutton(tabGeneral, text='Launch on Startup', variable=startLoginVar)
     toggleDiscordButton = Checkbutton(tabGeneral, text='Show on Discord', variable=discordVar)
     toggleHibernateButton = Checkbutton(tabGeneral, text='Hibernate Mode', variable=hibernateVar, command=lambda: toggleAssociateSettings(hibernateVar.get(), hibernate_group))
@@ -206,6 +208,9 @@ def spawnWindow():
 
     promptScale.grid(column=4, row=1)
     promptManual.grid(column=4, row=2)
+
+    mistakeScale.grid(column=4, row=3)
+    mistakeManual.grid(column=4, row=4)
 
     fillBox.grid(column=0, row=4, sticky='w')
     fillDelay.grid(column=1, row=4)
@@ -319,27 +324,25 @@ def exportResource():
     except:
         messagebox.showerror('Write Error', 'Failed to export resource to zip file.')
 
-def importResource():
+def importResource(parent):
     try:
         openLocation = filedialog.askopenfile('r', defaultextension ='.zip')
-        if openLocation == '':
-            return False
-        resp = confirmBox()
-        print(resp)
-        if not resp:
+        if openLocation == None:
             return False
         if os.path.exists(PATH + 'resource\\'):
+            resp = confirmBox(parent)
+            if not resp:
+                return False
             shutil.rmtree(PATH + 'resource\\')
         with zipfile.ZipFile(openLocation.name, 'r') as zip:
             zip.extractall(PATH + 'resource\\')
         messagebox.showinfo('Done', 'Resource importing completed.')
-            
     except Exception as e:
         messagebox.showerror('Read Error', 'Failed to import resources from file.\n[' + str(e) + ']')
 
-def confirmBox() -> bool:
+def confirmBox(parent) -> bool:
     allow = False
-    root = Tk()
+    root = Toplevel(parent)
     def complete(state):
         nonlocal allow
         allow=state
@@ -354,7 +357,10 @@ def confirmBox() -> bool:
     Button(root, text='Continue', command=lambda: complete(True)).pack()
     Button(root, text='Cancel', command=lambda: complete(False)).pack()
     root.mainloop()
-    root.destroy()
+    try:
+        root.destroy()
+    except:
+        False
     return allow
 
 #helper funcs for lambdas =======================================================

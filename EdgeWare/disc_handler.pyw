@@ -4,7 +4,7 @@ from pypresence import presence
 status_path = os.path.join(str(pathlib.Path(__file__).parent.absolute()), 'resource', 'discord.dat')
 textObj = ['[No discord.dat resource]', 'default']
 
-IMGID_CONSTS = ['furcock_img', 'blacked_img', 'censored_img', 'goon_img', 'hypno_img']
+IMGID_CONSTS = ['furcock_img', 'blacked_img', 'censored_img', 'goon_img', 'hypno_img', 'futa_img']
 
 txt = ''
 
