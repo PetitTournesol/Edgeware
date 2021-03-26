@@ -99,6 +99,19 @@ https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=shari
 
 https://drive.google.com/file/d/1GhJQ7OtL9hblQJ4NTLP3Nz23AKcUqdz-/view?usp=sharing
 
+**Elsa**
+
+*More or less all of the original assets and resources from the original Elsavirus. It's not a 1:1 experience, but if you liked the Elsa theming and original writing, it's all still there.*
+
+https://drive.google.com/file/d/1QLJI52zM9HrJP_ozNxLaUSSEVUoDpjJP/view?usp=sharing
+
+**Futanari**
+
+*Futa themed pack, includes some generic moaning and plap plap audio. This and the Elsa pack are the first to make use of the caption feature, older packs will be updated with new resources and caption assets in the coming weeks.*
+
+https://drive.google.com/file/d/12L9lKiOzKgBlDaoPudNhkYgZH-3khUeh/view?usp=sharing
+
+
 __**What is Edgeware?**__
 
 Edgeware is an Elsavirus inspired fetishware tool, built from the ground up to use interchangeable resource packages for easily customized user experience.
