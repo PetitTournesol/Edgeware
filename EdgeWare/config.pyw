@@ -3,6 +3,7 @@ from tkinter import Tk, ttk, simpledialog, messagebox, filedialog
 from tkinter import *
 
 PATH = str(pathlib.Path(__file__).parent.absolute()) + '\\'
+os.chdir(PATH)
 
 #text for the about tab
 ANNOYANCE_TEXT = 'The "Annoyance" section consists of the 5 main configurable settings of Edgeware:\nDelay\nPopup Frequency\nWebsite Frequency\nAudio Frequency\nPromptFrequency\n\nEach is fairly self explanatory, but will still be expounded upon in this section. Delay is the forced time delay between each tick of the "clock" for Edgeware. The longer it is, the slower things will happen. Popup frequency is the percent chance that a randomly selected popup will appear on any given tick of the clock, and similarly for the rest, website being the probability of opening a website, audio for playing a file from /resource/aud/, and prompt for a typing prompt to pop up.\n\nThese values can be set by adjusting the bars, or by clicking the button beneath each respective slider, which will allow you to type in an explicit number instead of searching for it on the scrollbar.\n\nIn order to disable any feature, lower its probability to 0, to ensure that you\'ll be getting as much of any feature as possible, turn it up to 100.'
@@ -292,8 +293,8 @@ def spawnWindow():
 
     if not settingJsonObj['is_configed'] == 1: 
         messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0.\n[This alert will only appear on the first run of config]')
-    if local_version != webv:
-        messagebox.showwarning('Update Available', 'Local version and web version are not the same.\nThis likely means a newer version is available.')
+    if local_version.split('_')[0] != webv.split('_')[0]:
+        messagebox.showwarning('Update Available', 'Core local version and web version are not the same.\nPlease visit the Github and download the newer files.')
 
     root.mainloop()
 

@@ -6,6 +6,7 @@ hasData = False
 textData = {}
 maxMistakes = 3
 PATH = str(pathlib.Path(__file__).parent.absolute())
+os.chdir(PATH)
 
 with open(PATH + '\\config.cfg') as settings:
     maxMistakes = int(json.loads(settings.read())['promptMistakes'])
@@ -68,7 +69,6 @@ def checkText(a, b):
     for i in range(min(len(a), len(b))):
         if a[i] != b[i]:
             mistakes += 1
-    print(mistakes, ':', maxMistakes)
     return mistakes <= maxMistakes
 
 try:

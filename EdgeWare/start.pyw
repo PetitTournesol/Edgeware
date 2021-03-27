@@ -2,6 +2,7 @@ import pathlib, ctypes, hashlib, os, subprocess, time, webbrowser, zipfile, shut
 from tkinter import messagebox
 
 PATH = str(pathlib.Path(__file__).parent.absolute())
+os.chdir(PATH)
 DESKTOP_PATH = os.path.join(os.environ['USERPROFILE'], 'Desktop')
 AVOID_LIST = ['EdgeWare', 'AppData']
 FILE_TYPES = ['png', 'jpg', 'jpeg']
