@@ -64,10 +64,8 @@ def spawnWindow():
     #window things
     root = Tk()
     root.title('Edgeware Config')
-    #root.resizable(False, False)
-    root.geometry('625x530')
+    root.geometry('740x570')
     root.iconbitmap(PATH + 'default_assets\\config_icon.ico')
-    #root.wm_attributes('-topmost', 1)
     fail_loop = 0
 
     #painful control variables ._.
@@ -90,13 +88,24 @@ def spawnWindow():
             discordVar = BooleanVar(root, value=(int(settingJsonObj['showDiscord'])==1))
             startFlairVar = BooleanVar(root, value=(int(settingJsonObj['showLoadingFlair'])==1))
             captionVar = BooleanVar(root, value=(int(settingJsonObj['showCaptions'])==1))
-            panicButtonVar = IntVar(root, value=settingJsonObj['panicButton'])
+            panicButtonVar = StringVar(root, value=settingJsonObj['panicButton'])
             panicVar = BooleanVar(root, value=(int(settingJsonObj['panicDisabled'])==1))
             promptMistakeVar = IntVar(root, value=int(settingJsonObj['promptMistakes']))
+            mitosisVar = BooleanVar(root, value=(int(settingJsonObj['mitosisMode'])==1))
+            onlyVidVar = BooleanVar(root, value=(int(settingJsonObj['onlyVid'])==1))
+            popupWebVar = BooleanVar(root, value=(int(settingJsonObj['webPopup'])==1))
             #zipDropVar = StringVar(root, value=DOWNLOAD_STRINGS[0])
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, promptMistakeVar]
-            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled', 'promptMistakes']
+            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, 
+                            fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, 
+                            hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, 
+                            discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
+                            promptMistakeVar, mitosisVar, onlyVidVar, popupWebVar]
+            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 
+                            'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 
+                            'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 
+                            'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
+                            'promptMistakes', 'mitosisMode', 'onlyVid', 'webPopup']
             break
         except Exception as e:
             messagebox.showwarning('Settings Warning', 'File "config.cfg" appears corrupted.\nFile will be restored to default.\n[' + str(e) + ']')
@@ -115,6 +124,7 @@ def spawnWindow():
     hibernate_group = []
     fill_group = []
     replace_group = []
+    mitosis_group = []
 
     #tab display code start
     tabMaster = ttk.Notebook(root)          #tab manager
@@ -142,14 +152,24 @@ def spawnWindow():
     delayManual = Button(tabGeneral, text='Manual delay...', command=lambda: assign(delayVar, simpledialog.askinteger('Manual Delay', prompt='[10-60000]: ')))
     popupScale = Scale(tabGeneral, label='Popup Freq (%)', from_=0, to=100, orient='horizontal', variable=popupVar)
     popupManual = Button(tabGeneral, text='Manual popup...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Popup', prompt='[0-100]: ')))
+    
+    mitosis_group.append(popupScale)
+    mitosis_group.append(popupManual)
+
+    mitosisToggle = Checkbutton(tabGeneral, text='Mitosis Mode', variable=mitosisVar, command=lambda: toggleAssociateSettings(not mitosisVar.get(), mitosis_group))
+    popupWebToggle= Checkbutton(tabGeneral, text='Popup close\nopens web\npage', variable=popupWebVar)
+
     webScale = Scale(tabGeneral, label='Website Freq (%)', from_=0, to=100, orient='horizontal', variable=webVar)
     webManual = Button(tabGeneral, text='Manual web...', command=lambda: assign(webVar, simpledialog.askinteger('Manual Web', prompt='[0-100]: ')))
+
+    onlyVidToggle = Checkbutton(tabGeneral, text='Only Vids', variable=onlyVidVar)
+    
     audioScale = Scale(tabGeneral, label='Audio Freq (%)', from_=0, to=100, orient='horizontal', variable=audioVar)
     audioManual = Button(tabGeneral, text='Manual audio...', command=lambda: assign(audioVar, simpledialog.askinteger('Manual Audio', prompt='[0-100]: ')))
     promptScale = Scale(tabGeneral, label='Prompt Freq (%)', from_=0, to=100, orient='horizontal', variable=promptVar)
     promptManual = Button(tabGeneral, text='Manual prompt...', command=lambda: assign(promptVar, simpledialog.askinteger('Manual Prompt', prompt='[0-100]: ')))
     mistakeScale = Scale(tabGeneral, label='Prompt Mistakes', from_=0, to=150, orient='horizontal', variable=promptMistakeVar)
-    mistakeManual = Button(tabGeneral, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-50]: ')))
+    mistakeManual = Button(tabGeneral, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-150]: ')))
         #drive row
     fillBox = Checkbutton(tabGeneral, text='Fill Drive', variable=fillVar, command=lambda: toggleAssociateSettings(fillVar.get(), fill_group))
     fillDelay = Scale(tabGeneral, label='Fill Delay (ms)', from_=0, to=250, orient='horizontal', variable=fillDelayVar)
@@ -180,9 +200,9 @@ def spawnWindow():
     local_verLabel = Label(tabGeneral, text='Local Version:\n' + defaultVars[0])
     web_verLabel = Label(tabGeneral, text='GitHub Version:\n' + webv, bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
     openGitButton = Button(tabGeneral, text='Open Github', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
-    setPanicButtonButton = Button(tabGeneral, text='Set Panic Button\n' + str(panicButtonVar.get()), command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
+    setPanicButtonButton = Button(tabGeneral, text='Set Panic Button\n<' + str(panicButtonVar.get()) + '>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
     panicDisableButton = Checkbutton(tabGeneral, text='Disable Panic Hotkey', variable=panicVar)
-
+    
     hibernate_group.append(h_activityScale)
     hibernate_group.append(hibernateMinButton)
     hibernate_group.append(hibernateMinScale)
@@ -200,18 +220,21 @@ def spawnWindow():
 
     popupScale.grid(column=1, row=1)
     popupManual.grid(column=1, row=2)
+    mitosisToggle.grid(column=2,row=1)
+    popupWebToggle.grid(column=2,row=2)
 
-    webScale.grid(column=2, row=1)
-    webManual.grid(column=2, row=2)
+    webScale.grid(column=4, row=1)
+    webManual.grid(column=4, row=2)
+    onlyVidToggle.grid(column=4,row=3)
 
     audioScale.grid(column=3, row=1)
     audioManual.grid(column=3, row=2)
 
-    promptScale.grid(column=4, row=1)
-    promptManual.grid(column=4, row=2)
+    promptScale.grid(column=5, row=1)
+    promptManual.grid(column=5, row=2)
 
-    mistakeScale.grid(column=4, row=3)
-    mistakeManual.grid(column=4, row=4)
+    mistakeScale.grid(column=5, row=3)
+    mistakeManual.grid(column=5, row=4)
 
     fillBox.grid(column=0, row=4, sticky='w')
     fillDelay.grid(column=1, row=4)
@@ -290,9 +313,15 @@ def spawnWindow():
     
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')
-
+    
+    if mitosisVar.get():
+        toggleAssociateSettings(not mitosisVar.get(), mitosis_group)
+    
+    #first time alert popup
     if not settingJsonObj['is_configed'] == 1: 
-        messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0.\n[This alert will only appear on the first run of config]')
+        messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0 except for popups.\n[This alert will only appear on the first run of config]')
+    #version alert, if core web version (0.0.0) is different from the github configdefault, alerts user that update is available
+    #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     if local_version.split('_')[0] != webv.split('_')[0]:
         messagebox.showwarning('Update Available', 'Core local version and web version are not the same.\nPlease visit the Github and download the newer files.')
 
@@ -374,7 +403,7 @@ def write_save(varList, nameList):
     for name in varNames:
         try:
             p = varList[nameList.index(name)].get()
-            temp[name] = p if type(p) is int else (1 if type(p) is bool and p else 0)
+            temp[name] = p if type(p) is int or type(p) is str else (1 if type(p) is bool and p else 0)
         except:
             temp[name] = settingJsonObj[name]
     with open(PATH + 'config.cfg', 'w') as file:
@@ -445,7 +474,7 @@ def getKeyboardInput(button, var):
 
 def assignKey(parent, button, var, key):
     button.configure(text='Set Panic Button\n<' + key.keysym + '>')
-    var.set(str(key.keycode))
+    var.set(str(key.keysym))
     parent.destroy()
 
 try:

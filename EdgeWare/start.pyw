@@ -12,6 +12,7 @@ liveFillThreads = 0 #count of live threads for hard drive filling
 isPlayingAudio = False #audio thread flag
 replaceThreadLive = False #replace thread flag
 hasPromptJson = False #can use prompts flag
+mitosisStarted = False #flag for if the mitosis mode popup has been spawned
 
 #default data for generating working default asset resource folder
 DEFAULT_WEB = '{"urls":["https://duckduckgo.com/"], "args":["?q=why+are+you+gay"]}'
@@ -52,11 +53,11 @@ def fileExists(dir):
 def desktopExists(obj):
     return os.path.exists(os.path.join(DESKTOP_PATH, obj))
 
-def pipPackage(packageName, settingName):
+def pipPackage(packageName, version, settingName):
     try:
-        subprocess.call('py -m pip install ' + packageName)
+        subprocess.call('py -m pip install ' + version + ' ' + packageName)
     except:
-        subprocess.call('pip install ' + packageName)
+        subprocess.call('pip install '+ version + ' '  + packageName)
     settingJsonObj[settingName] = 1
     with open(PATH + '\\config.cfg', 'w') as f:
         f.write(json.dumps(settingJsonObj))
@@ -108,11 +109,11 @@ def loadSettings():
 
     #check pillow installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pil_installed'])==1:
-        pipPackage('pillow', 'pil_installed')
+        pipPackage('pillow', '8.1.0', 'pil_installed')
             
     #check pypresence installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pypres_installed'])==1:
-        pipPackage('pypresence', 'pypres_installed')
+        pipPackage('pypresence', '4.2.0', 'pypres_installed')
 
 #start init portion, check resources, config, etc.
 try:
@@ -164,7 +165,7 @@ if os.path.exists(PATH + '\\resource\\web.json'):
 #load settings, if first run open options, then reload options from file
 loadSettings()
 if not settingJsonObj['is_configed']==1:
-    messagebox.showinfo('First Time Config', 'Configure settings for the first time; by default all annoyance features are disabled!\n[Config will not run from start again. Run config.pyw to configure after this.]')
+    #messagebox.showinfo('First Time Config', 'Configure settings for the first time; by default all annoyance features are disabled!\n[Config will not run from start again. Run config.pyw to configure after this.]')
     subprocess.call('pythonw config.pyw')
     loadSettings()
 
@@ -204,6 +205,13 @@ if not int(settingJsonObj['hibernateMode'])==1:
 def urlSelect(arg):
     return webJsonDat['urls'][arg] + webJsonDat['args'][arg].split(',')[rand.randrange(len(webJsonDat['args'][arg].split(',')))]
 
+#setting flags for readability
+hasVid = len(VIDEOS) > 0
+hasImg = len(IMAGES) > 0
+hasAud = len(AUDIO) > 0
+hasWeb = len(webJsonDat['urls']) > 0
+mitosisMode = int(settingJsonObj['mitosisMode'])==1
+
 #main function, probably can do more with this but oh well i'm an idiot so
 def main():
     if(not int(settingJsonObj['hibernateMode'])==1):
@@ -227,8 +235,12 @@ def doRoll(mod):
 #             as threads become available they will be restarted.
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
 def annoyance():
+    global mitosisStarted
     while(True):
         rollForInitiative()
+        if not mitosisStarted:
+            os.startfile('popup.pyw')
+            mitosisStarted = True
         if(int(settingJsonObj['fill'])==1 and liveFillThreads <= int(settingJsonObj['maxFillThreads'])):
             thread.Thread(target=fillDrive).start()
         if(int(settingJsonObj['replace'])==1 and not replaceThreadLive):
@@ -237,17 +249,27 @@ def annoyance():
 
 #independtently attempt to do all active settings with probability equal to their freq value     
 def rollForInitiative():
-    if(doRoll(int(settingJsonObj['webMod'])) and len(webJsonDat) > 0):
+    if(doRoll(int(settingJsonObj['webMod'])) and (hasWeb or hasVid)):
         try:
-            webbrowser.open_new(urlSelect(rand.randrange(len(webJsonDat['urls']))))
+            edgePath = str(os.path.join(os.environ['ProgramFiles(x86)'], 'Microsoft', 'Edge', 'Application', 'msedge.exe'))
+            if hasVid:
+                vidPath = 'file:///' + VIDEOS[rand.randrange(len(VIDEOS))]
+            if hasWeb:
+                urlPath = urlSelect(rand.randrange(len(webJsonDat['urls'])))
+            onlyVid = int(settingJsonObj['onlyVid'])==1
+            if doRoll((0 if (onlyVid or not hasWeb) else 
+                      (50 if (hasVid and hasWeb) else 100))):
+                webbrowser.open_new(urlPath)
+            else:
+                subprocess.Popen([edgePath, vidPath])
         except Exception as e:
             messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
-    if(doRoll(int(settingJsonObj['popupMod'])) and len(IMAGES) > 0):
+    if((not (mitosisMode)) and doRoll(int(settingJsonObj['popupMod'])) and hasImg):
         try:
             os.startfile('popup.pyw')
         except Exception as e:
             messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
-    if(doRoll(int(settingJsonObj['audioMod'])) and not isPlayingAudio and len(AUDIO) > 0):
+    if(doRoll(int(settingJsonObj['audioMod'])) and not isPlayingAudio and hasAud):
         try:
             thread.Thread(target=playAudio).start()
         except:
@@ -262,7 +284,7 @@ def rollForInitiative():
 #if audio is not playing, selects and plays random audio file from /aud/ folder
 def playAudio():
     global isPlayingAudio
-    if(len(AUDIO) == 0):
+    if(not hasAud):
         return
     isPlayingAudio = True
     winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)

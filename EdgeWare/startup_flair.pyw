@@ -3,6 +3,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 PATH = str(pathlib.Path(__file__).parent.absolute())
+os.chdir(PATH)
 scalar = 0.6
 
 def doAnimation():

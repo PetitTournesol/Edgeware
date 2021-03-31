@@ -1,4 +1,4 @@
-import os, random as rand, tkinter as tk, threading as thread, time, json, ctypes, pathlib
+import os, random as rand, tkinter as tk, time, json, ctypes, pathlib, webbrowser
 from tkinter import *
 from tkinter import messagebox
 from itertools import count, cycle
@@ -59,6 +59,10 @@ allow_scream = True
 show_captions = False
 has_captions = False
 panic_disabled = False
+extreme_mode = False
+web_open = False
+web_prob = 0
+submission_text = 'I Submit <3'
 sqLim = 800
 panic_key = ''
 captions = json.loads('{}')
@@ -70,13 +74,28 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     show_captions = int(jsonObj['showCaptions']) == 1
     allow_scream = int(jsonObj['promptMod']) == 0
     panic_disabled = int(jsonObj['panicDisabled']) == 1
+    mitosis_enabled = int(jsonObj['mitosisMode']) == 1
+    web_open = int(jsonObj['webPopup']) == 1
+    web_prob = int(jsonObj['webMod'])
     sqLim = int(jsonObj['squareLim'])
     panic_key = jsonObj['panicButton']
+    #extreme_mode = int(jsonObj['extremeMode']) == 1
+
+if web_open:
+    webJsonDat = ''
+    if os.path.exists(PATH + '\\resource\\web.json'):
+        with open(PATH + '\\resource\\web.json', 'r') as webF:
+            webJsonDat = json.loads(webF.read())
+    hasWeb = len(webJsonDat['urls']) > 0
 
 try:
     with open(PATH + '\\resource\\captions.json', 'r') as capF:
         captions = json.loads(capF.read())
         has_captions = True
+        try:
+            submission_text = captions['subtext']
+        except:
+            print('will use default submission text')
 except:
     print('no captions.json')
 
@@ -136,11 +155,12 @@ def unborderedWindow():
             #could potentially get stuck with ungodly massive images, but just don't use 500x10e50 dim images
             #   if image is STILL too large for screen after above changes, forcibly downscales it by 75% repeatedly until it fits
     
+    image = bResize(image)
+    
     while(image.height > screenHgt or image.width > screenWid):
         image = image.resize((int(image.width*0.75), int(image.height*0.75)), Image.ANTIALIAS)
     
-    
-    rImg = bResize(image)
+    rImg = image #bResize(image)
 
     image_ = ImageTk.PhotoImage(rImg)
     
@@ -153,23 +173,33 @@ def unborderedWindow():
         label.load(path=os.path.abspath(os.getcwd()) + '\\resource\\img\\' + item, rWid = rImg.width, rHgt = rImg.height)
         label.pack()
 
-    locX = rand.randint(data_list[0], data_list[2] - (rImg.width + 50))
-    locY = rand.randint(data_list[1], max(data_list[3] - (rImg.height + 50), 0))
+    locX = rand.randint(data_list[0], data_list[2] - (rImg.width))
+    locY = rand.randint(data_list[1], max(data_list[3] - (rImg.height), 0))
 
     root.geometry('%dx%d+%d+%d' % ((rImg.width), (rImg.height), locX, locY))
     
     if(gif_bool):
         label.nextFrame()
+    
 
     if show_captions and has_captions:
-        captionLabel = Label(root, text=selectCaption(item), wraplength=rImg.width - border_wid_const)
-        captionLabel.place(x=5, y=5)
-    subButton = Button(root, text='I Submit <3', command=die)
+        capText = selectCaption(item)
+        if len(capText) > 0:
+            captionLabel = Label(root, text=capText, wraplength=rImg.width - border_wid_const)
+            captionLabel.place(x=5, y=5)
+
+    subButton = Button(root, text=submission_text, command=die)
     subButton.place(x=rImg.width - 5 - subButton.winfo_reqwidth(), y=rImg.height - 5 - subButton.winfo_reqheight())
     #disabled for performance
     #if allow_scream:
     #    thread.Thread(target=lambda: scream(root)).start()
     root.mainloop()
+
+def doRoll(mod):
+    return mod > rand.randint(0, 100)
+
+def urlSelect(arg):
+    return webJsonDat['urls'][arg] + webJsonDat['args'][arg].split(',')[rand.randrange(len(webJsonDat['args'][arg].split(',')))]
 
 def scream(root):
     while True:
@@ -177,16 +207,24 @@ def scream(root):
         root.focus_force()
 
 def die():
+    if web_open and hasWeb and doRoll((100-web_prob) / 2):
+        urlPath = urlSelect(rand.randrange(len(webJsonDat['urls'])))
+        webbrowser.open_new(urlPath)
+    if mitosis_enabled:
+        os.startfile('popup.pyw')
+        os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
 def selectCaption(strObj):
     for obj in captions['prefix']:
         if strObj.startswith(obj):
-            return captions[obj][rand.randrange(0, len(captions[obj]))]
+            ls = captions[obj]
+            ls.extend(captions['default'])
+            return ls[rand.randrange(0, len(captions[obj]))]
     return captions['default'][rand.randrange(0, len(captions['default']))] if (len(captions['default']) > 0) else ''
 
 def panic(key):
-    if not panic_disabled and key.keycode == panic_key:
+    if not panic_disabled and (key.keysym == panic_key or key.keycode == panic_key): #(post or is to keep backwards compatibility)
         os.startfile('panic.pyw')
 
 try:

@@ -5,6 +5,8 @@ from tkinter import *
 hasData = False
 textData = {}
 maxMistakes = 3
+submission_text = 'I Submit <3'
+command_text    = 'Type for me, slut~'
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
@@ -15,6 +17,14 @@ if(os.path.exists(PATH + '\\resource\\prompt.json')):
     hasData = True
     with open(PATH + '\\resource\\prompt.json', 'r') as f:
         textData = json.loads(f.read())
+        try:
+            submission_text = textData['subtext']
+        except:
+            print('no subtext')
+        try:
+            command_text = textData['commandtext']
+        except:
+            print('no commandtext')
 
 if(not hasData):
     messagebox.showerror('Prompt Error', 'Resource folder contains no "prompt.json". Either set prompt freq to 0 or add "prompt.json" to resource folder.')
@@ -23,7 +33,7 @@ def unborderedWindow():
     if(not hasData):
         exit()
     root = Tk()
-    label = tk.Label(root, text='\nType For Me, Slut~\n')
+    label = tk.Label(root, text='\n' + command_text + '\n')
     label.pack()
     
     txt = buildText()
@@ -44,7 +54,7 @@ def unborderedWindow():
     inputBox = Text(root)
     inputBox.pack()
 
-    subButton = Button(root, text='I Submit <3', command=lambda: checkTotal(root, txt, inputBox.get(1.0, "end-1c")))
+    subButton = Button(root, text=submission_text, command=lambda: checkTotal(root, txt, inputBox.get(1.0, "end-1c")))
     subButton.place(x=wid - 5 - subButton.winfo_reqwidth(), y=hgt - 5 - subButton.winfo_reqheight())
     root.mainloop()
 
