@@ -33,10 +33,7 @@ Start by downloading this repository as a zip, and then extracting it somewhere 
 (*If not using a premade package, skip this step.* )
 Download one of the premade packages listed below. Once it's downloaded (if using a premade package), place it into the Edgeware folder inside Edgeware-main. 
 
-Ensure that you have a recent installation of Python 3 (3.9+ is preferred).
-
-Finally, double click to run start.pyw. If it's your first time running the program in that directory, it will install PIP (https://www.w3schools.com/python/python_pip.asp) and use it to perform some library installations to ensure proper functionality. After this is complete, the Config menu will appear. Configure the settings to your liking and save. Finally, Edgeware proper will start. Enjoy!
-
+Double click "EdgewareSetup.bat" and follow the instructions. It should check your Python version, and then automatically download the correct installer from python.org and run it. Once you finish with that installation, it will run start.pyw, which will walk through an automated first time setup. Once this setup is complete, it will provide you with the config window to select your settings, and then run! (The installations only need to be performed on the first run)
 
    _**[Premade Packages]**_
 
