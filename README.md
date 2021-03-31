@@ -1,59 +1,30 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.1.2 Updates
-
-**(2.1.2)**
+Version 2.2.0 Updates
 
    _**[New Additions]**_
    
-•**Promlt** *Prompts now allow for a configurable number of acceptable typo letters*
+•**Easy Setup** *New EdgewareSetup.bat file makes first time setup substantially easier; checks for Python and will automatically download and run the proper version if it appears that Python is not installed*
+
+•**Mitosis Mode** *New mode for popups; clicking to close any popup will result in it splitting into two new popups"
+
+•**Custom Text** *All text for popup and prompt windows can now be customized in caption.json and prompt.json, respectively*
+
+•**Video Integration** *Finally actually USES the video folder; videos share a frequency with websites, which can now be toggled to ONLY open videos*
+
+•**Popup Web** *New option to have a popup use web freq chance to open a website upon being closed*
 
    _**[Updated Features]**_
 
-•**Popup Scaling** *Popup scaling has been updated; should not longer allow images to be wider or taller than the screen*
+•**Sizing** *Minor tweaks to popup sizing*
 
-•**GIF Scaling** *Gifs are now resized by the same rules as other images instead of receiving no size changes*
-
-**(2.1.1)**
-
-   _**[New Additions]**_
-   
-•**Import** *Config now has a manual resource zip import button*
-
-•**Alerts** *Added additional alert dialogs*
-
-   _**[Updated Features]**_
-
-•**Multi monitors** *Popups now appear on all monitors, instead of just the main monitor*
+•**Pretty Code** *For those who like to peruse the code, some portions have been updated for improved readability*
 
    _**[Bugfixes]**_
    
-•**Paths** *Updated path fetch functions, should now avoid System32 Permission Denied errors due to incorrect path fetching*
+•**Panic Button?** *Panic button now properly displays the actually key to be pressed for the panic function instead of the keycode*
 
-**(2.1.0)**
-
-   _**[New Additions]**_
-   
-•**Panic! Panic!** *Panic button now has a proper, assignable button associated with it (this only works when pressed while a prompt is in focus). Panic button also now restores wallpaper to the Windows 10 default instead of leaving it be*
-
-•**Captions** *Prompts now have basic caption support; this feature is toggleable and currently unused. Packs will be updated within the coming weeks to include captions. (An empty captions.json file will be in example assets)*
-
-•**Updates** *Config now has a version checking feature; if the local version and the version listed on Github are different it will alert you with a popup and the version display at the bottom left will be red.*
-
-•**What zip?** *Config now has a section at the bottom left that tells you what zip file start will select to unpack.*
-
-   _**[Updated Features]**_
-   
-•**Custom Images** *Improved Discord integration to use custom images; these are only able to be pulled from a select number of pre-cached images with certain codes. Default packs will be updated to reflect this with the pack caption update.*
-
-•**Threads** *The maxFillThread variable to manage hard drive fill speed has been added to the advanced section of the config menu. Be careful adjusting this if you don't know what you're doing.*
-        
-   _**[Bugfixes]**_
-
-•**Borders** *Popup windows now properly show their borders all the way around the image.*
-
-•**Disk Skipping** *Fill drive no longer skips avoiding every other non-useable folder in the directory.*
 
 _**[How to Use]**_
 
@@ -93,11 +64,17 @@ https://drive.google.com/file/d/1phBN4JhoyOg3yAMomGgIKVTryYc8dv4Q/view?usp=shari
 
 https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=sharing
 
-**Gooner**
+**Hentai/Basic Gooner**
 
-*Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg. Fair warning, most things are fair game for this one, including furry, farts, cringe, ponies, etc.*
+*Includes mostly 3D or hentai images, has 100% gifs, some videos, and audio from the porn addict brainwash program and queue balls*
 
-https://drive.google.com/file/d/1GhJQ7OtL9hblQJ4NTLP3Nz23AKcUqdz-/view?usp=sharing
+https://drive.google.com/file/d/10_t11qm_2fRp4GVh0JK4hskdwW9ppCme/view?usp=sharing
+
+**No Limit Gooner**
+
+*Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg. Heavier focus on stranger kinks such as ponies, furry, farts, cringe, emoji, etc.*
+
+https://drive.google.com/file/d/1nExnM00ODbZjAV2w8UX-Ybw8wp3ffNjK/view?usp=sharing
 
 **Elsa**
 
