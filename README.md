@@ -39,7 +39,7 @@ Version 2.1.2 Updates
 
 •**Captions** *Prompts now have basic caption support; this feature is toggleable and currently unused. Packs will be updated within the coming weeks to include captions. (An empty captions.json file will be in example assets)*
 
-•**Updates** *Config now has a version checking feature; if the local version and the version listed on Github are differet it will alert you with a popup and the version display at the bottom left will be red.*
+•**Updates** *Config now has a version checking feature; if the local version and the version listed on Github are different it will alert you with a popup and the version display at the bottom left will be red.*
 
 •**What zip?** *Config now has a section at the bottom left that tells you what zip file start will select to unpack.*
 
