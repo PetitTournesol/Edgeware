@@ -25,6 +25,7 @@ Version 2.2.0 Updates
    
 •**Panic Button?** *Panic button now properly displays the actually key to be pressed for the panic function instead of the keycode*
 
+•**Bugfix Patch B** *Updated text in the "About" tab to include the addition of videos and explain "Mitosis Mode"*
 
 _**[How to Use]**_
 
