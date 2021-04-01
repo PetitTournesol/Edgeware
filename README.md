@@ -90,7 +90,7 @@ __**What is Edgeware?**__
 
 Edgeware is an Elsavirus inspired fetishware tool, built from the ground up to use interchangeable resource packages for easily customized user experience.
 
-Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, was written ENTIRELY in Python. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++ forms or other tricks that might hide the true nature of the application.
+Much like Elsavirus and Doppelvirus, this program was written in brainlet level Python, but unlike the two of them, has no compiled executables. If you're the type to fear some hidden actually malicious scripts, this ensures that *all* of the code is front and center; no C++/C# forms or other tricks that might hide the true nature of the application.
 
 
 The software features the popups, hard drive filling, porn library replacing, website opening features of its predecesors.
