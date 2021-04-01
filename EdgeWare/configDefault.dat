@@ -1,2 +1,2 @@
 version,delay,fill,replace,webMod,popupMod,audioMod,promptMod,replaceThresh,slowMode,pip_installed,is_configed,fill_delay,start_on_logon,hibernateMode,hibernateMin,hibernateMax,wakeupActivity,pypres_installed,showDiscord,pil_installed,showLoadingFlair,showCaptions,maxFillThreads,panicButton,panicDisabled,promptMistakes,squareLim,mitosisMode,onlyVid,webPopup
-2.2.0_A,1000,0,0,0,100,0,0,500,0,0,0,0,0,0,240,300,20,0,1,0,1,0,8,quoteleft,0,3,800,0,0,0
+2.2.0_B,1000,0,0,0,100,0,0,500,0,0,0,0,0,0,240,300,20,0,1,0,1,0,8,quoteleft,0,3,800,0,0,0
