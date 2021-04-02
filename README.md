@@ -44,11 +44,15 @@ Double click "EdgewareSetup.bat" and follow the instructions. It should check yo
 
 https://drive.google.com/file/d/1BHLrCO5cvm9YCF_EeWGYS8AmAsPxUZPJ/view?usp=sharing
 
+https://mega.nz/file/IfJS1JLB#eEkreHNBH5g_maKsiUC0I1BOeh1FvdOwU5i-Eto6FwA
+
 **Gay Yiff**
 
 *Includes lots and lots of steamy, hulking furry cocks*
 
 https://drive.google.com/file/d/1b2gOJBLy-nD5p1cOM8xTDPh7LGsf1g58/view?usp=sharing
+
+https://mega.nz/file/kOA2DZAJ#5A7pfQUdEKq8s3ner4dhmrKxS7xoYupMcNAAK3voU3M
 
 **Censored**
 
@@ -56,11 +60,15 @@ https://drive.google.com/file/d/1b2gOJBLy-nD5p1cOM8xTDPh7LGsf1g58/view?usp=shari
 
 https://drive.google.com/file/d/1phBN4JhoyOg3yAMomGgIKVTryYc8dv4Q/view?usp=sharing
 
+https://mega.nz/file/lPBUxRyA#AJlC4Kwrtdci3cjISWkZ8YThuWEmyHcL81MfZoprrqQ
+
 **Hypno**
 
 *Includes the most gifs of any pack by far, as well as Porn Addict Brainwash Program 5 & 6, and Queue Balls 1*
 
 https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=sharing
+
+https://mega.nz/file/YHB2ABAa#QApGJHeg6EF-20VP0OVf8yZyQtmCdZRQduXrHOHvUCM
 
 **Hentai/Basic Gooner**
 
@@ -68,11 +76,15 @@ https://drive.google.com/file/d/1W2u_wAp2DAWa-h0O5VUlGKhKSVMwQkh5/view?usp=shari
 
 https://drive.google.com/file/d/10_t11qm_2fRp4GVh0JK4hskdwW9ppCme/view?usp=sharing
 
+https://mega.nz/file/gWwDmYJT#xWGsdfaPB5TvsnvDC4OUEWR06flqn7Bc9pvOErSUBuY
+
 **No Limit Gooner**
 
 *Includes the same audio as Hypno, as well as an MLP worship themed hypnosis file by https://twitter.com/AlmondMilkomg. Heavier focus on stranger kinks such as ponies, furry, farts, cringe, emoji, etc.*
 
 https://drive.google.com/file/d/1nExnM00ODbZjAV2w8UX-Ybw8wp3ffNjK/view?usp=sharing
+
+https://mega.nz/file/0SQEzZrb#UK6SSDUFz8u_xM5lcNMStqQdS-bqE_ilB6u7RkGUjGM
 
 **Elsa**
 
@@ -80,11 +92,15 @@ https://drive.google.com/file/d/1nExnM00ODbZjAV2w8UX-Ybw8wp3ffNjK/view?usp=shari
 
 https://drive.google.com/file/d/1QLJI52zM9HrJP_ozNxLaUSSEVUoDpjJP/view?usp=sharing
 
+https://mega.nz/file/JKRCHR4a#SnxrAar_rvhK4BYjewz1TZmtV6EEeyEG9QU8JTkWOck
+
 **Futanari**
 
 *Futa themed pack, includes some generic moaning and plap plap audio. This and the Elsa pack are the first to make use of the caption feature, older packs will be updated with new resources and caption assets in the coming weeks.*
 
 https://drive.google.com/file/d/12L9lKiOzKgBlDaoPudNhkYgZH-3khUeh/view?usp=sharing
+
+https://mega.nz/file/AWQUTDYb#1rjRbHbDfqTVt-w7m-IryWFAf95us0tg3kBq-5VybGw
 
 
 __**What is Edgeware?**__
