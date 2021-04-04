@@ -27,6 +27,8 @@ Version 2.2.0 Updates
 
 •**Bugfix Patch B** *Updated text in the "About" tab to include the addition of videos and explain "Mitosis Mode"*
 
+•**Bugfix Patch C** *Fixed bug prevent audio from playing properly*
+
 _**[How to Use]**_
 
 Start by downloading this repository as a zip, and then extracting it somewhere on your computer.
