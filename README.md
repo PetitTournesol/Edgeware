@@ -29,6 +29,8 @@ Version 2.2.0 Updates
 
 •**Bugfix Patch C** *Fixed bug prevent audio from playing properly*
 
+•**Bugfix Patch D** *Fixed similar bug preventing video from playing properly*
+
 _**[How to Use]**_
 
 Start by downloading this repository as a zip, and then extracting it somewhere on your computer.
