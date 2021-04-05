@@ -169,8 +169,12 @@ if not settingJsonObj['is_configed']==1:
     subprocess.call('pythonw config.pyw')
     loadSettings()
 
-IMAGES = os.listdir(PATH + '\\resource\\img\\')
-VIDEOS = os.listdir(PATH + '\\resource\\vid\\')
+IMAGES = []
+for aud in os.listdir(PATH + '\\resource\\img\\'):
+    IMAGES.append(PATH + '\\resource\\vid\\' + aud)
+VIDEOS = []
+for aud in os.listdir(PATH + '\\resource\\vid\\'):
+    VIDEOS.append(PATH + '\\resource\\vid\\' + aud)
 AUDIO = []
 for aud in os.listdir(PATH + '\\resource\\aud\\'):
     AUDIO.append(PATH + '\\resource\\aud\\' + aud)
