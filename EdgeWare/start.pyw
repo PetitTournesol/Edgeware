@@ -53,11 +53,11 @@ def fileExists(dir):
 def desktopExists(obj):
     return os.path.exists(os.path.join(DESKTOP_PATH, obj))
 
-def pipPackage(packageName, version, settingName):
+def pipPackage(packageName, settingName):
     try:
-        subprocess.call('py -m pip install ' + version + ' ' + packageName)
+        subprocess.call('py -m pip install ' + packageName)
     except:
-        subprocess.call('pip install '+ version + ' '  + packageName)
+        subprocess.call('pip install ' + packageName)
     settingJsonObj[settingName] = 1
     with open(PATH + '\\config.cfg', 'w') as f:
         f.write(json.dumps(settingJsonObj))
@@ -109,11 +109,11 @@ def loadSettings():
 
     #check pillow installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pil_installed'])==1:
-        pipPackage('pillow', '8.1.0', 'pil_installed')
+        pipPackage('pillow', 'pil_installed')
             
     #check pypresence installed config flag, if not installed attempt to install with pip
     if not int(settingJsonObj['pypres_installed'])==1:
-        pipPackage('pypresence', '4.2.0', 'pypres_installed')
+        pipPackage('pypresence', 'pypres_installed')
 
 #start init portion, check resources, config, etc.
 try:
