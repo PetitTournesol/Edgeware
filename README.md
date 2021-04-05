@@ -31,6 +31,8 @@ Version 2.2.0 Updates
 
 •**Bugfix Patch D** *Fixed similar bug preventing video from playing properly*
 
+•**Bugfix Patch E** *Fixed leftover from planned addition to the pip install function that broke its functionality and prevented first time startup from installing needed libraries*
+
 _**[How to Use]**_
 
 Start by downloading this repository as a zip, and then extracting it somewhere on your computer.
