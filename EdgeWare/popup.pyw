@@ -1,4 +1,4 @@
-import os, random as rand, tkinter as tk, time, json, ctypes, pathlib, webbrowser
+import os, random as rand, tkinter as tk, time, json, pathlib, webbrowser, ctypes, threading as thread
 from tkinter import *
 from tkinter import messagebox
 from itertools import count, cycle
@@ -61,11 +61,15 @@ has_captions = False
 panic_disabled = False
 extreme_mode = False
 web_open = False
+has_lifespan = False
+lifespan = 0
 web_prob = 0
+mitosis_stren = 2
 submission_text = 'I Submit <3'
 sqLim = 800
 panic_key = ''
 captions = json.loads('{}')
+FADE_OUT_TIME = 1.5
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
@@ -79,6 +83,10 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     web_prob = int(jsonObj['webMod'])
     sqLim = int(jsonObj['squareLim'])
     panic_key = jsonObj['panicButton']
+    has_lifespan = int(jsonObj['timeoutPopups']) == 1
+    if has_lifespan:
+        lifespan = int(jsonObj['popupTimeout'])
+    mitosis_stren = int(jsonObj['mitosisStrength'])
     #extreme_mode = int(jsonObj['extremeMode']) == 1
 
 if web_open:
@@ -139,21 +147,12 @@ def unborderedWindow():
     root.frame = Frame(root, borderwidth=border_wid_const, relief=RAISED)
     root.wm_attributes('-topmost', 1)
 
+    #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def bResize(img) -> Image:
-        aspect_WH = img.width / img.height
-        aspect_HW = img.height / img.width
-        ogSize = img.width*img.height
-        #super ugly method of downscaling, but I'm an idiot so as long as it works, I don't really care
-            #scalefactor uses scaling of 40-55% if image is > squareLim^2 pixels, otherwises scales by 80-110% scaling applied
-            #   this is to ensure that already small images are not downsized by a large amount
-        scalefactor = float(rand.randint(40, 55)) / 100.0 if ogSize > (sqLim*sqLim) else float(rand.randint(80, 110)) / 100.0
-            #calculates new width&height from the minimum aspect ratio between width/height and height/width, then takes the
-            #   minimum between the new formula and the old
-        newWid = min(int(img.width*min(aspect_WH, aspect_HW)*scalefactor), int((img.width * (float(screenWid) / float(img.width)) * scalefactor)))
-        newHgt = min(int(img.height*min(aspect_WH, aspect_HW)*scalefactor), int((img.height * (float(screenWid) / float(img.width))* scalefactor)))
-        return image.resize((newWid - border_wid_const+1, newHgt - border_wid_const+1), Image.ANTIALIAS)
-            #could potentially get stuck with ungodly massive images, but just don't use 500x10e50 dim images
-            #   if image is STILL too large for screen after above changes, forcibly downscales it by 75% repeatedly until it fits
+        size_source = max(img.width, img.height) / min(screenWid, screenHgt)
+        size_target = rand.randint(30, 70) / 100
+        resize_factor = size_target / size_source
+        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
     
     image = bResize(image)
     
@@ -181,6 +180,8 @@ def unborderedWindow():
     if(gif_bool):
         label.nextFrame()
     
+    if has_lifespan:
+        thread.Thread(target=lambda: liveLife(root)).start()
 
     if show_captions and has_captions:
         capText = selectCaption(item)
@@ -194,6 +195,13 @@ def unborderedWindow():
     #if allow_scream:
     #    thread.Thread(target=lambda: scream(root)).start()
     root.mainloop()
+
+def liveLife(parent):
+    time.sleep(lifespan)
+    for i in range(0, 100):
+        parent.attributes('-alpha', 1-i/100)
+        time.sleep(FADE_OUT_TIME / 100)
+    os.kill(os.getpid(), 9)
 
 def doRoll(mod):
     return mod > rand.randint(0, 100)
@@ -211,8 +219,8 @@ def die():
         urlPath = urlSelect(rand.randrange(len(webJsonDat['urls'])))
         webbrowser.open_new(urlPath)
     if mitosis_enabled:
-        os.startfile('popup.pyw')
-        os.startfile('popup.pyw')
+        for i in range(0, mitosis_stren):
+            os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
 def selectCaption(strObj):
