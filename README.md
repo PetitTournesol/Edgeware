@@ -1,37 +1,33 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.2.0 Updates
+Version 2.3.0 Updates
 
    _**[New Additions]**_
    
-•**Easy Setup** *New EdgewareSetup.bat file makes first time setup substantially easier; checks for Python and will automatically download and run the proper version if it appears that Python is not installed*
+•**Rotating Wallpapers** *Multiple wallpapers can now be selected from anywhere on your drive or automatically imported from the resource folder*
 
-•**Mitosis Mode** *New mode for popups; clicking to close any popup will result in it splitting into two new popups"
+•**Folder Name Blacklist** *You can now add blacklisted folder names to the fill/replace feature; any folder with a blacklisted name (and all of its subfolders) will be ignored when filling or selecting folders for image replacing*
 
-•**Custom Text** *All text for popup and prompt windows can now be customized in caption.json and prompt.json, respectively*
+•**Drive Selection** *The parent folder for fill/replace can also now be manually selected instead of only having the default option of expanding the user path*
 
-•**Video Integration** *Finally actually USES the video folder; videos share a frequency with websites, which can now be toggled to ONLY open videos*
+•**Booru Downloading** *Can now automatically download new images from any Booru of your choice, with any number of tags*
 
-•**Popup Web** *New option to have a popup use web freq chance to open a website upon being closed*
+•**Batch Downloading** *Can now also download images from a list file containing direct image download links (example file is in example resources folder)*
 
    _**[Updated Features]**_
 
-•**Sizing** *Minor tweaks to popup sizing*
+•**Config Layout** *Config layout has been updated and expanded; things are now much less cluttered and there's plenty more room for new features in the future*
 
-•**Pretty Code** *For those who like to peruse the code, some portions have been updated for improved readability*
+•**Config Panic** *Panic can now be triggered form the config menu, in the event you're unable to select a popup to press the panic button or reach the folder containing the scripts*
+
+•**Popup Timeout** *Popups now have the optional ability to time out after a certain number of seconds, after which they will fade out and close to save resources*
+
+•**Mitosis Strength** *Mitosis mode can now open between 2 and 10 new popup windows, based on the Mitosis Strength setting*
 
    _**[Bugfixes]**_
    
-•**Panic Button?** *Panic button now properly displays the actually key to be pressed for the panic function instead of the keycode*
-
-•**Bugfix Patch B** *Updated text in the "About" tab to include the addition of videos and explain "Mitosis Mode"*
-
-•**Bugfix Patch C** *Fixed bug prevent audio from playing properly*
-
-•**Bugfix Patch D** *Fixed similar bug preventing video from playing properly*
-
-•**Bugfix Patch E** *Fixed leftover from planned addition to the pip install function that broke its functionality and prevented first time startup from installing needed libraries*
+•**Image Resizing** *Should be the final update to image resizing, courtesy of @MercyNudes fixing my stupid old resizing method (https://twitter.com/MercyNudes)*
 
 _**[How to Use]**_
 
