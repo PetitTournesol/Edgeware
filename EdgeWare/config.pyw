@@ -1,6 +1,16 @@
-import json, os, shutil, webbrowser, zipfile, pathlib, ast, requests, urllib.request 
+import json, os, shutil, subprocess, webbrowser, zipfile, pathlib, ast, urllib.request 
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog
 from tkinter import *
+
+#emergency fix because i'm fucking stupid and forgot that requests isn't a default library
+try:
+    import requests
+except:
+    try:
+        subprocess.call('py -m pip install requests')
+    except:
+        subprocess.call('pip install requests')
+    import requests
 
 PATH = str(pathlib.Path(__file__).parent.absolute()) + '\\'
 os.chdir(PATH)

@@ -1,5 +1,15 @@
-import requests, urllib, pathlib, ctypes, hashlib, os, subprocess, ast, time, webbrowser, zipfile, shutil, json, winsound, random as rand, threading as thread
+import urllib, pathlib, ctypes, hashlib, os, subprocess, ast, time, webbrowser, zipfile, shutil, json, winsound, random as rand, threading as thread
 from tkinter import messagebox
+
+#emergency fix because i'm fucking stupid and forgot that requests isn't a default library
+try:
+    import requests
+except:
+    try:
+        subprocess.call('py -m pip install requests')
+    except:
+        subprocess.call('pip install requests')
+    import requests
 
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
