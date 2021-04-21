@@ -3,6 +3,10 @@
 
 Version 2.3.0 Updates
 
+   _**[Bugfixes]**_
+
+•**2.3.1** *Major bugfix to ensure that program will properly start even without the requests module pre-installed*
+
    _**[New Additions]**_
    
 •**Rotating Wallpapers** *Multiple wallpapers can now be selected from anywhere on your drive or automatically imported from the resource folder*
