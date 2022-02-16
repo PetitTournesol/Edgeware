@@ -1,0 +1,2 @@
+These are my personal preferences when I use Edgeware.
+Intended to create a semi-inconsistent speed that makes it feel like your computer is straining more than it actually is.

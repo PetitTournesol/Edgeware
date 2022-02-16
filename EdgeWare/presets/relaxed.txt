@@ -1,0 +1,1 @@
+More laid back, relaxed preset. Somewhat spaced out popups that fade out around when the next new one pops up. Ensures audio is always playing and occasionally has additional video popups with low volume.

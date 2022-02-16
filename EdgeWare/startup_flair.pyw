@@ -1,5 +1,8 @@
-import time, os, threading as thread, pathlib
-from tkinter import *
+import time
+import os
+import threading as thread
+import pathlib
+from tkinter import Tk, Frame, Label, RAISED
 from PIL import Image, ImageTk
 
 PATH = str(pathlib.Path(__file__).parent.absolute())

@@ -1,4 +1,8 @@
-import os, pathlib, json, random as rand, tkinter as tk
+import os
+import pathlib
+import json
+import random as rand
+import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 
@@ -13,7 +17,7 @@ os.chdir(PATH)
 with open(PATH + '\\config.cfg') as settings:
     maxMistakes = int(json.loads(settings.read())['promptMistakes'])
 
-if(os.path.exists(PATH + '\\resource\\prompt.json')):
+if os.path.exists(PATH + '\\resource\\prompt.json'):
     hasData = True
     with open(PATH + '\\resource\\prompt.json', 'r') as f:
         textData = json.loads(f.read())
@@ -26,11 +30,11 @@ if(os.path.exists(PATH + '\\resource\\prompt.json')):
         except:
             print('no commandtext')
 
-if(not hasData):
+if not hasData:
     messagebox.showerror('Prompt Error', 'Resource folder contains no "prompt.json". Either set prompt freq to 0 or add "prompt.json" to resource folder.')
 
 def unborderedWindow():
-    if(not hasData):
+    if not hasData:
         exit()
     root = Tk()
     label = tk.Label(root, text='\n' + command_text + '\n')

@@ -1,0 +1,2 @@
+This is the default preset.
+It is identical to the default config file generated on first startup.

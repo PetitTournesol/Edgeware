@@ -1,0 +1,2 @@
+Hardcore preset, intended to be difficult to handle.
+Very fast popup speed, high frequency, no timeout, and "Run on Startup."
