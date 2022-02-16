@@ -1,37 +1,70 @@
+
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
-Version 2.3.0 Updates
+Version 2.4.0 Updates
 
-   _**[Bugfixes]**_
-
-•**2.3.1** *Major bugfix to ensure that program will properly start even without the requests module pre-installed*
-
-   _**[New Additions]**_
+   _**[Large Additions]**_
    
-•**Rotating Wallpapers** *Multiple wallpapers can now be selected from anywhere on your drive or automatically imported from the resource folder*
+•**Timer Mode** *Timed runs can now be set, during which the Panic features cannot be used (unless a password is set and used). Run on startup is also forcibly enabled during this time.*
 
-•**Folder Name Blacklist** *You can now add blacklisted folder names to the fill/replace feature; any folder with a blacklisted name (and all of its subfolders) will be ignored when filling or selecting folders for image replacing*
+•**Mode Presets** *Config files can now be saved as "Presets," and can be freely swapped between in the config menu itself. These can have descriptions along with them, stored as [preset name].txt text files inside the preset folder.*
 
-•**Drive Selection** *The parent folder for fill/replace can also now be manually selected instead of only having the default option of expanding the user path*
+•**Lowkey Mode** *A more laid back way to enjoy Edgeware, but more active than Hibernate Mode. Popups will flash from corner to corner before slowly fading away and being replaced by another new popup.*
 
-•**Booru Downloading** *Can now automatically download new images from any Booru of your choice, with any number of tags*
+•**Denial Mode** *While Denial Mode is toggled, popups can randomly be blurred out or otherwise censored. Text will appear on top of them, either a default phrase or a phrase selected from the captions.json file under the "denial" tag.*
 
-•**Batch Downloading** *Can now also download images from a list file containing direct image download links (example file is in example resources folder)*
+•**Popup Subliminals** *Popups can now have subliminal gifs overlayed on top of them. To accompany this, a "submliminals" folder is now supported in resource packs, from which a subliminal gif will be randomly selected and overlayed on top of the image. If none are present, the default gif in default_resources will be used.*
+
+     •*Please be aware that this feature can potentially be very memory/cpu intensive and set your popup fadeout accordingly.*
+
+•**Booru Downloader Update** *The previous booru downloader was incompatible with Rule34, and had actually completely broken due to a Booru update. The new version is more efficient and easier to maintain/fix if the issue arises again, and is also now able to handle exceptions to standard Booru URLs like Rule34.*
+
+  _**[Small Additions]**_
+  
+•**Logging** *Start, config, and popup now all generate log files detailing their operation and any errors they encounter with greater detail.*
+
+•**Panic Wallpaper** *Panic wallpaper is now previewed in the config menu, and can be changed to an image of your choice there, under the wallpaper tab.*
+
+•**Debug Tool** *For other errors/viewing of print statements, a small debug batch tool has been added.*
+
+•**Popup Opacity** *Added a new opacity setting for popups.*
+
+•**Tray Icon** *Added a tray icon for Edgeware, which allows you to easily use the panic feature even while no popups are on the screen without manually running the panic files.*
 
    _**[Updated Features]**_
 
-•**Config Layout** *Config layout has been updated and expanded; things are now much less cluttered and there's plenty more room for new features in the future*
+•**Panic Button** *The panic button is now "e" by default instead of "\`".*
 
-•**Config Panic** *Panic can now be triggered form the config menu, in the event you're unable to select a popup to press the panic button or reach the folder containing the scripts*
+•**Fill Delay** *Updated fill delay setting, now ranges from 0ms to 2500ms instead of the previous 0-25ms.*
 
-•**Popup Timeout** *Popups now have the optional ability to time out after a certain number of seconds, after which they will fade out and close to save resources*
+•**Video Player** *Videos no longer play in a web browser, and instead now play in popup windows. The volume of the videos can also be configured on the config menu.*
 
-•**Mitosis Strength** *Mitosis mode can now open between 2 and 10 new popup windows, based on the Mitosis Strength setting*
+•**Audio Handling** *Updated how audio is played, so now mp3 OR wav files, probably others too but I haven't tested them.*
+
+•**Wallpaper Handling** *Updated wallpaper handling, which should result in wallpapers being more stable for config to handle, and prevent any accidental self doxxing when sharing config files.*
+
+•**Library Imports** *Updated library importing at the start of start and config. Much more standardized and no longer requires checks in the config file.*
+
+•**Config Layout** *Config layout has been updated, with features being more spaced out.*
+
+•**General Standardization** *Start and Config have been updated to make their code more standardized. (I did my best to comply with pep8 but I'm very stupid so please bear with me programmers)*
+
+•**Advanced Tab** *Minor adjustments to the Advanced tab layout, bringing it into line with the rest of the config menu.*
 
    _**[Bugfixes]**_
    
-•**Image Resizing** *Should be the final update to image resizing, courtesy of @MercyNudes fixing my stupid old resizing method (https://twitter.com/MercyNudes)*
+•**Popup Borders** *Popups now properly have borders that go all the way around the image instead of just the top and left sides.*
+
+•**Config/Start Crash** *Fixed bug where the config file would be corrupted by config.cfg saving wallpapers in a certain configuration.*
+
+•**Wallpaper Crash** *Fixed bug where missing wallpaper setting would cause config to crash when opening.*
+
+•**Run on Startup Failure** *Fixed bug where the startup bat would not be placed into the windows startup folder. (This should be fixed, but it's always possible I just fixed a different but connected issue instead.)*
+
+   _**[Additional Note]**_**
+   
+Hello! This will likely be the last update (or at least, last main release version) of Edgeware for the time being. Unfortunately with the constraints of life and my declining interest in porn, it's become more and more difficult to maintain the project as I had originally planned to. It does make me very happy that so many people enjoy my work, and I hope that this update can at least make it feel a bit more complete for you all. I'm very thankful for all the kind words I've received regarding the project, and maybe one day I'll be back to make more updates, but for now I'll be focusing on life and other projects. I'll also be sporadically available on my Twitter to answer tech support questions or just chat. I love you all and please take care of yourselves! <3
 
 _**[How to Use]**_
 
@@ -96,6 +129,8 @@ https://mega.nz/file/0SQEzZrb#UK6SSDUFz8u_xM5lcNMStqQdS-bqE_ilB6u7RkGUjGM
 
 *More or less all of the original assets and resources from the original Elsavirus. It's not a 1:1 experience, but if you liked the Elsa theming and original writing, it's all still there.*
 
+*Warning that this pack does contain ALL of the resources from the original Elsavirus, including the noose image.*
+
 https://drive.google.com/file/d/1QLJI52zM9HrJP_ozNxLaUSSEVUoDpjJP/view?usp=sharing
 
 https://mega.nz/file/JKRCHR4a#SnxrAar_rvhK4BYjewz1TZmtV6EEeyEG9QU8JTkWOck
@@ -107,6 +142,17 @@ https://mega.nz/file/JKRCHR4a#SnxrAar_rvhK4BYjewz1TZmtV6EEeyEG9QU8JTkWOck
 https://drive.google.com/file/d/12L9lKiOzKgBlDaoPudNhkYgZH-3khUeh/view?usp=sharing
 
 https://mega.nz/file/AWQUTDYb#1rjRbHbDfqTVt-w7m-IryWFAf95us0tg3kBq-5VybGw
+
+
+__**FAQ**__
+
+**Q: "Why do I keep getting white circles in my popups?"**
+
+**A: *This occurs when the resource folder is generated without any resource zip in the script folder. Either delete your resource folder and restart Edgeware with the zip located properly or manually import your zip with the config function.***
+
+**Q: "Where does the booru downloader save files?"**
+
+**A: *The booru downloader saves all files it downloads into the /resource/img/ folder.***
 
 
 __**What is Edgeware?**__
@@ -132,13 +178,17 @@ __**Packages**__
        ->aud
          (Audio Files) (Optional)
        ->img
-         (Image Files)
+         (Image Files, Gif Files)
+	   ->subliminals
+	     (Gif files only) (Optional)
        ->vid
-         (Video Files) (Optional) (Currently unused)
+         (Video Files) (Optional)
        icon.ico
        wallpaper.png
        web.json (Optional)
        prompt.json (Optional)
+	   discord.dat (Optional)
+	   captions.json (Optional)
    
   The web.json file should contain two sets:
   
