@@ -2,6 +2,10 @@
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
 
+Version 2.4.1 Update
+
+•*Fixed bug where start and config would crash on startup for new users due to PIL not being properly placed into the safe import blocks*
+
 Version 2.4.0 Updates
 
    _**[Large Additions]**_
