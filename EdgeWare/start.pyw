@@ -15,7 +15,6 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
-from PIL import Image
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 
@@ -134,9 +133,11 @@ except:
 
 try:
     import PIL
+    from PIL import Image
 except:
     logging.warning('failed to import pillow module')
     pip_install('pillow')
+    from PIL import Image
 
 try:
     import pypresence
