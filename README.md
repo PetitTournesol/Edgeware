@@ -4,6 +4,10 @@
 
 If you get error "TypeError: unsupported operand type(s) for |: 'type' and 'type'", please make sure your Python is up to date! This version was primarily developed on Python 3.10.2!
 
+Bugfix Version 2.4.1_2 Update
+
+•*Properly re-fixed the issue causing config to corrupt the config file under specific circumstances which resulted in start and config crashing*
+
 Bugfix Version 2.4.1_1 Update
 
 •*Fixed Run on Startup*
