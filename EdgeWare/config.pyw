@@ -115,7 +115,10 @@ if settings['version'] != defaultVars[0] or len(settings) != len(defaultSettings
     tempSettingDict['version'] = defaultVars[0]
     settings = tempSettingDict.copy()
     with open(f'{PATH}config.cfg', 'w') as f:
-        f.write(str(tempSettingDict).replace('\'', '"'))
+        #bugfix for the config crash issue
+        tempSettingDict['wallpaperDat'] = str(tempSettingDict['wallpaperDat']).replace("'", '%^%')
+        tempSettingString = str(tempSettingDict).replace("'", '"')
+        f.write(tempSettingString.replace("%^%", "'"))
         logging.info('wrote regenerated settings.')
 
 logging.info('converting wallpaper dict string.')
