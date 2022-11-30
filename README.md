@@ -10,7 +10,7 @@ If you get error "TypeError: unsupported operand type(s) for |: 'type' and 'type
 
 •*Added a small message in the Booru Downloader section of config*
 
-	Hiya! I'm not dead! This update fixes some issues with popups that have been nagging at me in the back of my head for a while and adds a direct, in-application answer to the most common question I get messages about. I'd like to come back to the project when I have some more time, and it's possible that a code overhaul is in the future, but as life tends to be a roller coaster I can make no definite promises for the timeframe of that sort of an update. But know that this is a project I hope to fix up in the future, even if there will be fewer new features added with time.
+Hiya! I'm not dead! This update fixes some issues with popups that have been nagging at me in the back of my head for a while and adds a direct, in-application answer to the most common question I get messages about. I'd like to come back to the project when I have some more time, and it's possible that a code overhaul is in the future, but as life tends to be a roller coaster I can make no definite promises for the timeframe of that sort of an update. But know that this is a project I hope to fix up in the future, even if there will be fewer new features added with time.
 
 Bugfix Version 2.4.1_2 Update
 
