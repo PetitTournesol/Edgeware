@@ -716,6 +716,7 @@ def show_window():
     download_group.append(minScoreSlider)
 
     Label(tabDrive, text='Image Download Settings').pack(fill='x')
+    Label(downloadHostFrame, text='THE BOORU DOWNLOADER IS OUTDATED AND BROKEN. IT WILL LIKELY BARELY FUNCTION, IF AT ALL.\nNo I will not fix it, this shit is a pain in the ass and I\'m stupid.', foreground='red').pack(fill='x')
     tagFrame.pack(fill='y', side='left')
     booruFrame.pack(fill='y', side='left')
     otherFrame.pack(fill='both',side='right')
@@ -874,7 +875,7 @@ def show_window():
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     #   the version will still be red to draw attention to it
     if local_version.split('_')[0] != webv.split('_')[0] and not local_version.endswith('DEV'):
-        messagebox.showwarning('Update Available', 'Core local version and web version are not the same.\nPlease visit the Github and download the newer files.')
+        messagebox.showwarning('Update Available', 'Main local version and web version are not the same.\nPlease visit the Github and download the newer files.')
     root.mainloop()
 
 def pickZip() -> str:

@@ -1,5 +1,4 @@
 import hashlib
-import sounddevice
 import os
 import sys
 import random as rand
@@ -10,11 +9,7 @@ import pathlib
 import webbrowser
 import ctypes
 import threading as thread
-import imageio
 import logging
-from types import NoneType
-from moviepy.editor import AudioFileClip
-from videoprops import get_video_properties
 from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
@@ -205,6 +200,10 @@ class GifLabel(tk.Label):
 #video label class
 class VideoLabel(tk.Label):
     def load(self, path:str, resized_width:int, resized_height:int):
+        import imageio
+        from moviepy.editor import AudioFileClip
+        from videoprops import get_video_properties
+        
         self.path = path
         self.configure(background='black')
         self.wid = resized_width
@@ -224,8 +223,9 @@ class VideoLabel(tk.Label):
         self.delay = 1 / self.fps
         
     def play(self):
-        if not isinstance(self.audio_track, NoneType):
+        if not isinstance(self.audio_track):
             try:
+                import sounddevice
                 sounddevice.play(self.audio_track, samplerate=len(self.audio_track) / self.duration, loop=True)
             except Exception as e:
                 print(f'failed to play sound, reason:\n\t{e}')
@@ -237,6 +237,7 @@ class VideoLabel(tk.Label):
                 self.image = self.video_frame_image
                 self.time_offset_end = time.perf_counter()
                 time.sleep(max(0, self.delay - (self.time_offset_end - self.time_offset_start)))
+
 
 def run():
     #var things
@@ -259,6 +260,7 @@ def run():
             except:
                 item = arr[rand.randrange(len(arr))]
     else:
+        from videoprops import get_video_properties
         video_path = os.path.join(PATH, 'resource', 'vid', item)
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
@@ -297,6 +299,8 @@ def run():
         resized_image = resized_image.filter(blur_modes.pop())
 
     photoimage_image = ImageTk.PhotoImage(resized_image)
+    image.close()
+    resized_image.close()
 
     #different handling for videos vs gifs vs normal images
     if video_mode:
