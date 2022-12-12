@@ -4,6 +4,10 @@
 
 If you get error "TypeError: unsupported operand type(s) for |: 'type' and 'type'", please make sure your Python is up to date! This version was primarily developed on Python 3.10.2!
 
+2.4.2_A Update
+
+•*Fixed bugs with popups that caused videos and subliminal adjusted images to not load properly*
+
 (Small) 2.4.2 Update
 
 •*Popups should open faster and take up less memory while running*
