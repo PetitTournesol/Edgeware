@@ -223,7 +223,8 @@ class VideoLabel(tk.Label):
         self.delay = 1 / self.fps
         
     def play(self):
-        if not isinstance(self.audio_track):
+        from types import NoneType
+        if not isinstance(self.audio_track, NoneType):
             try:
                 import sounddevice
                 sounddevice.play(self.audio_track, samplerate=len(self.audio_track) / self.duration, loop=True)
@@ -300,7 +301,6 @@ def run():
 
     photoimage_image = ImageTk.PhotoImage(resized_image)
     image.close()
-    resized_image.close()
 
     #different handling for videos vs gifs vs normal images
     if video_mode:
