@@ -1,0 +1,9 @@
+# IDE and local-run associated files
+.idea
+venv
+*.zip
+
+# Files generated during configuration.
+logs
+resource
+config.cfg
