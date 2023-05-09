@@ -1,18 +1,21 @@
+import ast
+import ctypes
+import hashlib
 import json
+import logging
 import os
+import pathlib
 import shutil
 import subprocess
+import sys
+import time
+import urllib.request
 import webbrowser
 import zipfile
-import pathlib
-import ast
-import urllib.request
-import hashlib
-import ctypes
-import sys
-import logging
-import time
-from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED
+from tkinter import (DISABLED, GROOVE, RAISED, SINGLE, BooleanVar, Button,
+                     Checkbutton, Entry, Frame, IntVar, Label, Listbox,
+                     OptionMenu, Scale, StringVar, Tk, Toplevel, filedialog,
+                     messagebox, simpledialog, ttk)
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
 os.chdir(PATH)
