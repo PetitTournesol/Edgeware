@@ -1,3 +1,5 @@
 EdgeWare/logs
 EdgeWare/resource
 EdgeWare/config.cfg
+
+__pycache__
