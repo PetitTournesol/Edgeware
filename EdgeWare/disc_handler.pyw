@@ -3,6 +3,7 @@ import pathlib
 import time
 
 from pypresence import presence
+from pypresence import DiscordNotFound
 
 status_path = os.path.join(
     str(pathlib.Path(__file__).parent.absolute()), "resource", "discord.dat"
@@ -44,11 +45,14 @@ if not txt == "":
 
 # open discord api pipe and such
 def do_discord():
-    conn = presence.Presence("820204081410736148")
-    conn.connect()
-    conn.update(state=textObj[0], large_image=textObj[1], start=int(time.time()))
-    while True:
-        time.sleep(15)
+    try:
+        conn = presence.Presence("820204081410736148")
+        conn.connect()
+        conn.update(state=textObj[0], large_image=textObj[1], start=int(time.time()))
+        while True:
+            time.sleep(15)
+    except DiscordNotFound as e:
+        print(e)
 
 
 do_discord()
