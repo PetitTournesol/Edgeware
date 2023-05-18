@@ -1,10 +1,12 @@
 import ctypes
+from ctypes import util
 import hashlib
 import json
 import logging
 import os
 import pathlib
 import random as rand
+import subprocess
 import sys
 import threading as thread
 import time
@@ -12,15 +14,11 @@ import tkinter as tk
 import webbrowser
 from itertools import count, cycle
 from tkinter import RAISED, Button, Frame, Label, Tk, messagebox, simpledialog
-
 from PIL import Image, ImageFilter, ImageTk
+from utils import utils
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
-
-# Start Imported Code
-# Code from: https://code.activestate.com/recipes/460509-get-the-actual-and-usable-sizes-of-all-the-monitor/
-user = ctypes.windll.user32
 
 
 class RECT(ctypes.Structure):  # rect class for containing monitor info
@@ -33,55 +31,6 @@ class RECT(ctypes.Structure):  # rect class for containing monitor info
 
     def dump(self):
         return map(int, (self.left, self.top, self.right, self.bottom))
-
-
-class MONITORINFO(
-    ctypes.Structure
-):  # unneeded for this, but i don't want to rework the entire thing because i'm stupid
-    _fields_ = [
-        ("cbSize", ctypes.c_ulong),
-        ("rcMonitor", RECT),
-        ("rcWork", RECT),
-        ("dwFlags", ctypes.c_ulong),
-    ]
-
-
-def get_monitors():
-    retval = []
-    CBFUNC = ctypes.WINFUNCTYPE(
-        ctypes.c_int,
-        ctypes.c_ulong,
-        ctypes.c_ulong,
-        ctypes.POINTER(RECT),
-        ctypes.c_double,
-    )
-
-    def cb(hMonitor, hdcMonitor, lprcMonitor, dwData):
-        r = lprcMonitor.contents
-        data = [hMonitor]
-        data.append(r.dump())
-        retval.append(data)
-        return 1
-
-    cbfunc = CBFUNC(cb)
-    temp = user.EnumDisplayMonitors(0, 0, cbfunc, 0)
-    return retval
-
-
-def monitor_areas():  # all that matters from this is list(mapObj[monitor index][1])[k]; this is the list of monitor dimensions
-    retval = []
-    monitors = get_monitors()
-    for hMonitor, extents in monitors:
-        data = [hMonitor]
-        mi = MONITORINFO()
-        mi.cbSize = ctypes.sizeof(MONITORINFO)
-        mi.rcMonitor = RECT()
-        mi.rcWork = RECT()
-        res = user.GetMonitorInfoA(hMonitor, ctypes.byref(mi))
-        data.append(mi.rcMonitor.dump())
-        data.append(mi.rcWork.dump())
-        retval.append(data)
-    return retval
 
 
 # End Imported Code
@@ -99,8 +48,10 @@ def check_setting(name: str, default: bool = False) -> bool:
         return default
 
 
-PATH = str(pathlib.Path(__file__).parent.absolute())
+PATH = pathlib.Path(__file__).parent
 os.chdir(PATH)
+
+config_file = PATH / "config.cfg"
 
 ALLOW_SCREAM = True
 SHOW_CAPTIONS = False
@@ -126,29 +77,30 @@ DENIAL_MODE = False
 DENIAL_CHANCE = 0
 SUBLIMINAL_MODE = False
 
-with open(PATH + "\\config.cfg", "r") as cfg:
-    settings = json.loads(cfg.read())
-    SHOW_CAPTIONS = check_setting("showCaptions")
-    PANIC_DISABLED = check_setting("panicDisabled")
-    MITOSIS_MODE = check_setting("mitosisMode")
-    WEB_OPEN = check_setting("webPopup")
-    WEB_PROB = int(settings["webMod"])
-    PANIC_KEY = settings["panicButton"]
-    HAS_LIFESPAN = check_setting("timeoutPopups")
-    LIFESPAN = int(settings["popupTimeout"])
-    MITOSIS_STRENGTH = int(settings["mitosisStrength"])
-    PANIC_REQUIRES_VALIDATION = check_setting("timerMode")
-    LOWKEY_MODE = check_setting("lkToggle")
-    LOWKEY_CORNER = int(settings["lkCorner"])
-    DELAY = int(settings["delay"])
-    OPACITY = int(settings["lkScaling"])
-    VIDEO_VOLUME = float(settings["videoVolume"]) / 100
+config_file = PATH / "config.cfg"
+settings = json.loads(config_file.read_text())
 
-    VIDEO_VOLUME = min(max(0, VIDEO_VOLUME), 1)
+SHOW_CAPTIONS = check_setting("showCaptions")
+PANIC_DISABLED = check_setting("panicDisabled")
+MITOSIS_MODE = check_setting("mitosisMode")
+WEB_OPEN = check_setting("webPopup")
+WEB_PROB = int(settings["webMod"])
+PANIC_KEY = settings["panicButton"]
+HAS_LIFESPAN = check_setting("timeoutPopups")
+LIFESPAN = int(settings["popupTimeout"])
+MITOSIS_STRENGTH = int(settings["mitosisStrength"])
+PANIC_REQUIRES_VALIDATION = check_setting("timerMode")
+LOWKEY_MODE = check_setting("lkToggle")
+LOWKEY_CORNER = int(settings["lkCorner"])
+DELAY = int(settings["delay"])
+OPACITY = int(settings["lkScaling"])
 
-    DENIAL_MODE = check_setting("denialMode")
-    DENIAL_CHANCE = int(settings["denialChance"])
-    SUBLIMINAL_MODE = check_setting("popupSubliminals")
+VIDEO_VOLUME = float(settings["videoVolume"]) / 100
+VIDEO_VOLUME = min(max(0, VIDEO_VOLUME), 1)
+
+DENIAL_MODE = check_setting("denialMode")
+DENIAL_CHANCE = int(settings["denialChance"])
+SUBLIMINAL_MODE = check_setting("popupSubliminals")
 
 # functions for script mode, unused for now
 if checkTag("timeout="):
@@ -172,29 +124,30 @@ if checkTag("showCap"):
 
 # used for timer mode, checks if password is required to panic
 if PANIC_REQUIRES_VALIDATION:
-    hash_file_path = os.path.join(PATH, "pass.hash")
+    hash_file = PATH / "pass.hash"
     try:
-        with open(hash_file_path, "r") as file:
-            HASHED_PATH = file.readline()
+        HASHED_PATH = hash_file.read_text()
     except:
         # no hash found
         HASHED_PATH = None
 
 if WEB_OPEN:
     web_dict = ""
-    if os.path.exists(PATH + "\\resource\\web.json"):
-        with open(PATH + "\\resource\\web.json", "r") as web_file:
-            web_dict = json.loads(web_file.read())
+    web_resource = PATH / "resource" / "web.json"
+    if web_resource.exists():
+        web_dict = json.loads(web_resource.read_text())
 
-try:
-    with open(PATH + "\\resource\\CAPTIONS.json", "r") as caption_file:
-        CAPTIONS = json.loads(caption_file.read())
-        try:
-            SUBMISSION_TEXT = CAPTIONS["subtext"]
-        except:
-            print("will use default submission text")
-except:
+
+caption_file = PATH / "resource" / "captions.json"
+if caption_file.exists():
+    CAPTIONS = json.loads(caption_file.read_text())
+    try:
+        SUBMISSION_TEXT = CAPTIONS["subtext"]
+    except:
+        print("will use default submission text")
+else:
     print("no CAPTIONS.json")
+
 
 # gif label class
 class GifLabel(tk.Label):
@@ -292,30 +245,30 @@ class VideoLabel(tk.Label):
 
 def run():
     # var things
-    arr = os.listdir(f"{os.path.abspath(os.getcwd())}\\resource\\img\\")
+    arr = os.listdir(PATH / "resource" / "img")
     item = arr[rand.randrange(len(arr))]
     video_mode = False
 
     while item.split(".")[-1].lower() == "ini":
         item = arr[rand.randrange(len(arr))]
+
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != "%RAND%":
-        item = rand.choice(os.listdir(os.path.join(PATH, "resource", "vid")))
+        item = rand.choice(os.listdir(PATH / "resource" / "vid"))
+
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == "-video":
         video_mode = True
 
     if not video_mode:
         while True:
             try:
-                image = Image.open(
-                    os.path.abspath(f"{os.getcwd()}\\resource\\img\\{item}")
-                )
+                image = Image.open(PATH / "resource" / "img" / item)
                 break
             except:
-                item = arr[rand.randrange(len(arr))]
+                item = rand.choice(arr)
     else:
         from videoprops import get_video_properties
 
-        video_path = os.path.join(PATH, "resource", "vid", item)
+        video_path = PATH / "resource" / "vid" / item
         video_properties = get_video_properties(video_path)
         image = Image.new(
             "RGB", (video_properties["width"], video_properties["height"])
@@ -323,11 +276,9 @@ def run():
 
     gif_bool = item.split(".")[-1].lower() == "gif"
     border_wid_const = 5
-    monitor_data = monitor_areas()
+    monitor_data = utils.monitor_areas()
 
-    data_list = list(monitor_data[rand.randrange(0, len(monitor_data))][2])
-    screen_width = data_list[2] - data_list[0]
-    screen_height = data_list[3] - data_list[1]
+    area = rand.choice(monitor_data)
 
     # window start
     root = Tk()
@@ -339,7 +290,7 @@ def run():
 
     # many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img: Image.Image) -> Image.Image:
-        size_source = max(img.width, img.height) / min(screen_width, screen_height)
+        size_source = max(img.width, img.height) / min(area.width, area.height)
         size_target = (
             rand.randint(30, 70) / 100
             if not LOWKEY_MODE
@@ -375,7 +326,7 @@ def run():
         # video mode
         label = VideoLabel(root)
         label.load(
-            path=video_path,
+            path=str(video_path.absolute()),
             resized_width=resized_image.width,
             resized_height=resized_image.height,
         )
@@ -385,7 +336,7 @@ def run():
         # gif mode
         label = GifLabel(root)
         label.load(
-            path=os.path.abspath(f"{os.getcwd()}\\resource\\img\\{item}"),
+            path=str((PATH / "resource" / "img" / item).absolute()),
             resized_width=resized_image.width,
             resized_height=resized_image.height,
         )
@@ -397,23 +348,17 @@ def run():
             label.pack()
         else:
             label = GifLabel(root)
-            subliminal_path = os.path.join(PATH, "default_assets", "default_spiral.gif")
+            subliminal_path = PATH / "default_assets" / "default_spiral.gif"
 
-            if os.path.exists(os.path.join(PATH, "resource", "subliminals")):
+            subliminals = PATH / "resources" / "subliminals"
+            if subliminals.exists():
                 subliminal_options = [
                     file
-                    for file in os.listdir(
-                        os.path.join(PATH, "resource", "subliminals")
-                    )
+                    for file in os.listdir(subliminals)
                     if file.lower().endswith(".gif")
                 ]
                 if len(subliminal_options) > 0:
-                    subliminal_path = os.path.join(
-                        PATH,
-                        "resource",
-                        "subliminals",
-                        str(rand.choice(subliminal_options)),
-                    )
+                    subliminal_path = subliminals / rand.choice(subliminal_options)
 
             label.load(
                 subliminal_path,
@@ -437,25 +382,25 @@ def run():
                 y=int(resized_image.height / 2) - int(denyLabel.winfo_reqheight() / 2),
             )
 
-    locX = rand.randint(data_list[0], data_list[2] - (resized_image.width))
-    locY = rand.randint(data_list[1], max(data_list[3] - (resized_image.height), 0))
+    locX = rand.randint(area.x, area.width - (resized_image.width))
+    locY = rand.randint(area.y, max(area.height - (resized_image.height), 0))
 
     if LOWKEY_MODE:
         global LOWKEY_CORNER
         if LOWKEY_CORNER == 4:
             LOWKEY_CORNER = rand.randrange(0, 3)
         if LOWKEY_CORNER == 0:
-            locX = data_list[2] - (resized_image.width)
+            locX = area.width - (resized_image.width)
             locY = 0
         elif LOWKEY_CORNER == 1:
             locX = 0
             locY = 0
         elif LOWKEY_CORNER == 2:
             locX = 0
-            locY = data_list[3] - (resized_image.height)
+            locY = area.height - (resized_image.height)
         elif LOWKEY_CORNER == 3:
-            locX = data_list[2] - (resized_image.width)
-            locY = data_list[3] - (resized_image.height)
+            locX = area.width - (resized_image.width)
+            locY = area.height - (resized_image.height)
 
     root.geometry(
         f"{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{locX}+{locY}"
@@ -502,7 +447,7 @@ def live_life(parent: tk, length: int):
         parent.attributes("-alpha", 1 - i / 100)
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
-        os.startfile("popup.pyw")
+        utils.run_popup_script()
     os.kill(os.getpid(), 9)
 
 
@@ -524,8 +469,8 @@ def die():
         urlPath = select_url(rand.randrange(len(web_dict["urls"])))
         webbrowser.open_new(urlPath)
     if MITOSIS_MODE or LOWKEY_MODE:
-        for i in range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]:
-            os.startfile("popup.pyw")
+        for _ in range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]:
+            utils.run_popup_script()
     os.kill(os.getpid(), 9)
 
 
@@ -546,8 +491,8 @@ def panic(key):
     key_condition = key.keysym == PANIC_KEY or key.keycode == PANIC_KEY
     if PANIC_REQUIRES_VALIDATION and key_condition:
         try:
-            hash_file_path = os.path.join(PATH, "pass.hash")
-            time_file_path = os.path.join(PATH, "hid_time.dat")
+            hash_file_path = PATH / "pass.hash"
+            time_file_path = PATH / "hid_time.dat"
             pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
             t_hash = (
                 None
@@ -556,24 +501,23 @@ def panic(key):
                     pass_.encode(encoding="ascii", errors="ignore")
                 ).hexdigest()
             )
+            if t_hash == HASHED_PATH:
+                # revealing hidden files
+                try:
+                    utils.expose_file(hash_file_path)
+                    utils.expose_file(time_file_path)
+                    os.remove(hash_file_path)
+                    os.remove(time_file_path)
+                    utils.run_panic_script()
+                except:
+                    # if some issue occurs with the hash or time files just emergency panic
+                    utils.run_panic_script()
         except:
             # if some issue occurs with the hash or time files just emergency panic
-            os.startfile("panic.pyw")
-        if t_hash == HASHED_PATH:
-            # revealing hidden files
-            try:
-                SHOWN_ATTR = 0x08
-                ctypes.windll.kernel32.SetFileAttributesW(hash_file_path, SHOWN_ATTR)
-                ctypes.windll.kernel32.SetFileAttributesW(time_file_path, SHOWN_ATTR)
-                os.remove(hash_file_path)
-                os.remove(time_file_path)
-                os.startfile("panic.pyw")
-            except:
-                # if some issue occurs with the hash or time files just emergency panic
-                os.startfile("panic.pyw")
+            utils.run_panic_script()
     else:
         if not PANIC_DISABLED and key_condition:
-            os.startfile("panic.pyw")
+            utils.run_panic_script()
 
 
 if __name__ == "__main__":

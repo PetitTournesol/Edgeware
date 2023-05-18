@@ -5,30 +5,33 @@ import random as rand
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
+import utils
 
 hasData = False
 textData = {}
 maxMistakes = 3
 submission_text = "I Submit <3"
 command_text = "Type for me, slut~"
-PATH = str(pathlib.Path(__file__).parent.absolute())
+
+PATH = pathlib.Path(__file__).parent
 os.chdir(PATH)
 
-with open(PATH + "\\config.cfg") as settings:
-    maxMistakes = int(json.loads(settings.read())["promptMistakes"])
+config_file = PATH / "config.cfg"
 
-if os.path.exists(PATH + "\\resource\\prompt.json"):
+maxMistakes = int(json.loads(config_file.read_text())["promptMistakes"])
+
+promp_file = PATH / "resource" / "prompt.json"
+if promp_file.exists():
     hasData = True
-    with open(PATH + "\\resource\\prompt.json", "r") as f:
-        textData = json.loads(f.read())
-        try:
-            submission_text = textData["subtext"]
-        except:
-            print("no subtext")
-        try:
-            command_text = textData["commandtext"]
-        except:
-            print("no commandtext")
+    textData = json.loads(promp_file.read_text())
+    try:
+        submission_text = textData["subtext"]
+    except:
+        print("no subtext")
+    try:
+        command_text = textData["commandtext"]
+    except:
+        print("no commandtext")
 
 if not hasData:
     messagebox.showerror(
@@ -54,7 +57,12 @@ def unborderedWindow():
 
     root.geometry("%dx%d+%d+%d" % (wid, hgt, 2 * wid - wid / 2, hgt - hgt / 2))
 
-    root.overrideredirect(1)
+    # Using overrideredredirect on Linux & Mac seems to block the text input
+    # See: https://stackoverflow.com/a/39898634
+    # Seems to be also fixable by updating the parent first ? https://stackoverflow.com/a/68176130
+    if utils.is_windows():
+        root.overrideredirect(True)
+
     root.frame = Frame(root, borderwidth=2, relief=RAISED)
     root.frame.pack_propagate(True)
     root.wm_attributes("-topmost", 1)
@@ -70,6 +78,7 @@ def unborderedWindow():
     subButton.place(
         x=wid - 5 - subButton.winfo_reqwidth(), y=hgt - 5 - subButton.winfo_reqheight()
     )
+
     root.mainloop()
 
 

@@ -1,25 +1,33 @@
-import ctypes
 import os
-import pathlib
+from pathlib import Path
+import shlex
+import subprocess
+from utils import utils
 
-PATH = str(pathlib.Path(__file__).parent.absolute())
+PATH: Path = Path(__file__).parent
 
-timeObjPath = os.path.join(PATH, "hid_time.dat")
-HIDDEN_ATTR = 0x02
-SHOWN_ATTR = 0x08
+timeObjPath = PATH / "hid_time.dat"
+
 # checking timer
 try:
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    utils.expose_file(timeObjPath)
 except:
-    """"""
-if os.path.exists(os.path.join(PATH, "hid_time.dat")):
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
-    # sudoku if timer after hiding file again
-    os.kill(os.getpid(), 9)
-else:
-    # continue if no timer
-    ctypes.windll.user32.SystemParametersInfoW(
-        20, 0, PATH + "\\default_assets\\default_win10.jpg", 0
-    )
+    if os.path.exists(os.path.join(PATH, "hid_time.dat")):
+        utils.hide_file(timeObjPath)
+        # sudoku if timer after hiding file again
+        os.kill(os.getpid(), 9)
+    else:
+        # continue if no timer
+        utils.set_wallpaper(PATH / "defaut_assets" / "default_win10.jpg")
 
-os.startfile("panic.bat")
+if utils.is_windows():
+    os.startfile("panic.bat")
+elif utils.is_linux():
+    # I'm no expert but here we are
+    # Select all user python processes using files ending with .pyw in the command.
+    # Select the pid.
+    # Terminate it.
+    subprocess.run(
+        "for pid in $(ps -u $USER -ef | grep -E \"python.* *+.pyw\" | awk '{print $2}'); do echo $pid; kill -9 $pid; done",
+        shell=True,
+    )

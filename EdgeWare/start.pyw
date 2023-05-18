@@ -1,11 +1,12 @@
 import ast
 import ctypes
+from ctypes import util
 import hashlib
 import json
 import logging
 import os
-import pathlib
 import random as rand
+import re
 import shutil
 import subprocess
 import sys
@@ -16,20 +17,26 @@ import urllib
 import webbrowser
 import zipfile
 from dataclasses import dataclass
+from pathlib import Path
 from tkinter import messagebox, simpledialog
+from utils import utils
 
-PATH = str(pathlib.Path(__file__).parent.absolute())
+PATH = Path(__file__).parent
 os.chdir(PATH)
 
-# starting logging
-if not os.path.exists(os.path.join(PATH, "logs")):
-    os.mkdir(os.path.join(PATH, "logs"))
+config_file = PATH / "config.cfg"
+
+# Starting logging
+log_directory = PATH / "logs"
+if not log_directory.exists():
+    log_directory.mkdir(exist_ok=True, parents=True)
+
+
+log_file = (
+    log_directory / f"{time.asctime().replace(' ', '_').replace(':', '-')}-ew_start.txt"
+)
 logging.basicConfig(
-    filename=os.path.join(
-        PATH,
-        "logs",
-        time.asctime().replace(" ", "_").replace(":", "-") + "-ew_start.txt",
-    ),
+    filename=log_file,
     format="%(levelname)s:%(message)s",
     level=logging.DEBUG,
 )
@@ -39,38 +46,43 @@ SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 logging.info(f"args: {SYS_ARGS}")
 
+missing_dependencies, error_message = (
+    utils.check_dependencies() if utils.is_linux() else []
+)
+
+if missing_dependencies:
+    raise ImportError(error_message)
+
 settings = {}
-# func for loading settings, really just grouping it
+# Func for loading settings, really just grouping it
 def load_settings():
     global settings
     logging.info("loading config settings...")
     settings = {}
 
-    # creating objects to check vs live config for version updates
-    with open(PATH + "\\configDefault.dat") as r:
-        logging.info("reading in default config values")
-        defaultLines = r.readlines()
-        default_setting_keys = defaultLines[0].split(",")
-        default_setting_keys[-1] = default_setting_keys[-1].replace("\n", "")
-        default_setting_values = defaultLines[1].split(",")
+    # Creating objects to check vs live config for version updates
+    default_config_file = PATH / "configDefault.dat"
+    logging.info("reading in default config values")
+    defaultLines = default_config_file.read_text().splitlines()
+    default_setting_keys = defaultLines[0].split(",")
+    default_setting_keys[-1] = default_setting_keys[-1].replace("\n", "")
+    default_setting_values = defaultLines[1].split(",")
 
     for var in default_setting_keys:
         settings[var] = default_setting_values[default_setting_keys.index(var)]
 
-    # checking if config file exists and then writing the default config settings to a new file if it doesn't
-    if not os.path.exists(f"{PATH}\\config.cfg"):
-        with open(f"{PATH}\\config.cfg", "w") as f:
-            f.write(json.dumps(settings))
-            logging.warning("could not find config.cfg, wrote new file.")
+    # Checking if config file exists and then writing the default config settings to a new file if it doesn't
+    if not config_file.exists():
+        config_file.write_text(json.dumps(settings))
+        logging.warning("could not find config.cfg, wrote new file.")
 
-    # reading in config file
-    with open(f"{PATH}\\config.cfg", "r") as f:
-        settings = json.loads(f.readline())
-        logging.info("read in settings from config.cfg")
+    # Reading in config file
+    settings = json.loads(config_file.read_text())
+    logging.info("read in settings from config.cfg")
 
-    # if the config version and the version listed in the configdefault version are different to try to update with
+    # If the config version and the version listed in the configdefault version are different to try to update with
     # new setting tags if any are missing.
-    if settings["version"] != default_setting_values[0]:
+    if settings.get("version") != default_setting_values[0]:
         logging.warning(
             f'local version {settings["version"]} does not match default version, config will be updated'
         )
@@ -86,22 +98,19 @@ def load_settings():
         regen_settings["version"] = default_setting_values[0]
         regen_settings = json.loads(str(regen_settings).replace("'", '"'))
         settings = regen_settings
-        with open(f"{PATH}\\config.cfg", "w") as f:
-            f.write(str(regen_settings).replace("'", '"'))
-            logging.info("wrote updated config to config.cfg")
+        config_file.write_text(str(regen_settings).replace("'", '"'))
+        logging.info("wrote updated config to config.cfg")
 
-    # handling proper initialization of wallpapers
+    # Handling proper initialization of wallpapers
     default_wallpaper_dict = {"default": "wallpaper.png"}
     logging.info("converting wallpaper string to dict")
     try:
-        if settings["wallpaperDat"] == "WPAPER_DEF":
+        if settings.get("wallpaperDat") == "WPAPER_DEF":
             logging.info("default wallpaper data used")
             settings["wallpaperDat"] = default_wallpaper_dict
         else:
-            print(settings["wallpaperDat"])
             if type(settings["wallpaperDat"]) == dict:
                 logging.info("wallpaperdat already dict")
-                print("passed")
             else:
                 settings["wallpaperDat"] = ast.literal_eval(
                     settings["wallpaperDat"].replace("\\", "/")
@@ -114,41 +123,52 @@ def load_settings():
         )
 
 
-# load settings, if first run open options, then reload options from file
+# Load settings, if first run open options, then reload options from file
 load_settings()
-if not settings["is_configed"] == 1:
+if int(settings.get("is_configed")) != 1:
     logging.info("running config for first setup, is_configed flag is false.")
-    subprocess.call("pythonw config.pyw")
+    subprocess.run([sys.executable, "config.pyw"])
     logging.info("reloading settings")
     load_settings()
 
-# check for pip_installed flag, if not installed run get-pip.pyw and then install pillow for popups
-if not int(settings["pip_installed"]) == 1:
-    logging.warning("pip is not installed, running get-pip.pyw")
-    subprocess.call("python get-pip.pyw")
-    logging.warning(
-        "pip should be installed, but issues will occur if installation failed."
-    )
+# Check for pip_installed flag, if not installed run get-pip.pyw and then install pillow for popups
+if int(settings.get("pip_installed")) != 1:
+    pip_found = True
+    # Check if pip is installed
+    try:
+        subprocess.check_output("pip")
+    except:
+        try:
+            subprocess.check_output([sys.executable, "-m", "pip"])
+        except:
+            pip_found = False
+
+    if not pip_found:
+        logging.warning("pip is not installed, running get-pip.pyw")
+        subprocess.run([sys.executable, "get-pip.pyw"])
+        logging.warning(
+            "pip should be installed, but issues will occur if installation failed."
+        )
+
     settings["pip_installed"] = 1
-    with open(f"{PATH}\\config.cfg", "w") as f:
-        f.write(json.dumps(settings))
+    config_file.write_text(json.dumps(settings))
 
 
 def pip_install(packageName: str):
     try:
         logging.info(f"attempting to install {packageName}")
-        subprocess.call(f"py -m pip install {packageName}")
+        subprocess.run([sys.executable, "py" "-m", "install", packageName])
     except:
         logging.warning(
             f"failed to install {packageName} using py -m pip, trying raw pip request"
         )
-        subprocess.call(f"pip install {packageName}")
+        subprocess.run(["pip", "install", packageName])
         logging.warning(
             f"{packageName} should be installed, fatal errors will occur if install failed."
         )
 
 
-# i liked the emergency fix so much that i just made it import every non-standard lib like that c:
+# I liked the emergency fix so much that I just made it import every non-standard lib like that c:
 try:
     import requests
 except:
@@ -183,11 +203,12 @@ except:
     pip_install("playsound==1.2.2")
     import playsound
 
-try:
-    import videoprops
-except:
-    logging.warning("failed to import videoprops module")
-    pip_install("get-video-properties")
+if not utils.DEPENDENCIES.FFMPEG in missing_dependencies:
+    try:
+        import videoprops
+    except:
+        logging.warning("failed to import videoprops module")
+        pip_install("get-video-properties")
 
 try:
     import imageio
@@ -201,11 +222,13 @@ except:
     logging.warning("failed to import moviepy module")
     pip_install("moviepy")
 
-try:
-    import sounddevice
-except:
-    logging.warning("failed to import moviepy module")
-    pip_install("sounddevice")
+if not utils.DEPENDENCIES.PORT_AUDIO in missing_dependencies:
+    try:
+        import sounddevice
+    except:
+        logging.warning("failed to import sounddevice module")
+        pip_install("sounddevice")
+        # FIXME: Autoinstall libportaudio2 on linux
 
 try:
     from bs4 import BeautifulSoup
@@ -216,17 +239,17 @@ except:
 
 # end non-standard imports
 
-DESKTOP_PATH = os.path.join(
-    os.environ["USERPROFILE"], "Desktop"
-)  # desktop path for making shortcuts
 AVOID_LIST = ["EdgeWare", "AppData"]  # default avoid list for fill/replace
 FILE_TYPES = ["png", "jpg", "jpeg"]  # recognized file types for replace
-RESOURCE_PATHS = [
-    "\\resource\\",
-    "\\resource\\aud\\",
-    "\\resource\\img\\",
-    "\\resource\\vid\\",
-]
+
+
+@dataclass
+class Resource:
+    ROOT = PATH / "resource"
+    AUDIO = ROOT / "aud"
+    IMAGE = ROOT / "img"
+    VIDEO = ROOT / "vid"
+
 
 LIVE_FILL_THREADS = 0  # count of live threads for hard drive filling
 PLAYING_AUDIO = False  # audio thread flag
@@ -281,101 +304,57 @@ TIMER_MODE = int(settings["timerMode"]) == 1
 DRIVE_PATH = settings["drivePath"]
 
 
-def shortcut_script(pth_str: str, keyword: str, script: str, title: str):
-    # strings for batch script to write vbs script to create shortcut on desktop
-    # stupid and confusing? yes. the only way i could find to do this? also yes.
-    return [
-        "@echo off\n" 'set SCRIPT="%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"\n',
-        'echo Set oWS = WScript.CreateObject("WScript.Shell") >> %SCRIPT%\n',
-        'echo sLinkFile = "%USERPROFILE%\Desktop\\' + title + '.lnk" >> %SCRIPT%\n',
-        "echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%\n",
-        'echo oLink.WorkingDirectory = "' + pth_str + '\\" >> %SCRIPT%\n',
-        'echo oLink.IconLocation = "'
-        + pth_str
-        + "\\default_assets\\"
-        + keyword
-        + '_icon.ico" >> %SCRIPT%\n',
-        'echo oLink.TargetPath = "' + pth_str + "\\" + script + '" >> %SCRIPT%\n',
-        "echo oLink.Save >> %SCRIPT%\n",
-        "cscript /nologo %SCRIPT%\n",
-        "del %SCRIPT%",
-    ]
-
-
-# uses the above script to create a shortcut on desktop with given specs
-def make_shortcut(tList: list) -> bool:
-    with open(PATH + "\\tmp.bat", "w") as bat:
-        bat.writelines(
-            tList
-        )  # write built shortcut script text to temporary batch file
-    try:
-        logging.info(f"making shortcut to {tList[2]}")
-        subprocess.call(PATH + "\\tmp.bat")
-        os.remove(PATH + "\\tmp.bat")
-        return True
-    except Exception as e:
-        print("failed")
-        logging.warning(
-            f"failed to call or remove temp batch file for making shortcuts\n\tReason: {e}"
-        )
-        return False
-
-
 # for checking directories/files
 def file_exists(dir: str) -> bool:
-    return os.path.exists(PATH + dir)
+    return (PATH / dir).exists()
 
 
-# same as file_exists but checking paths on the desktop specifically
-def desktop_file_exists(obj: str) -> bool:
-    return os.path.exists(os.path.join(DESKTOP_PATH, obj))
+def write_default_if_doesnt_exists(file: Path, default_data: str):
+    if not file.exists():
+        file.write_text(default_data)
 
 
 # start init portion, check resources, config, etc.
 try:
-    if not file_exists("\\resource\\"):
+    if not Resource.ROOT.exists():
         logging.warning("no resource folder found")
         pth = "pth-default_ignore"
+
         # selecting first zip found in script folder
-        for obj in os.listdir(PATH + "\\"):
-            try:
-                if obj.split(".")[-1].lower() == "zip":
-                    logging.info(f"found zip file {obj}")
-                    pth = f"{PATH}\\{obj}"
-                    break
-            except:
-                print(f"{obj} is not a zip file.")
+        for obj in PATH.glob("*.zip"):
+            logging.info(f"found zip file {obj}")
+            pth = obj.absolute()
+            break
+
         # if found zip unpack
         if not pth == "pth-default_ignore":
             with zipfile.ZipFile(pth, "r") as obj:
                 logging.info("extracting resources from zip")
-                obj.extractall(PATH + "\\resource\\")
+                obj.extractall(Resource.ROOT)
         else:
             # if no zip found, use default resources
             logging.warning(
                 "no zip file found, generating resource folder from default assets."
             )
-            for obj in RESOURCE_PATHS:
-                os.mkdir(PATH + obj)
-            default_path = PATH + "\\default_assets\\"
-            output_path = PATH + "\\resource\\"
+            for obj in (Resource.AUDIO, Resource.IMAGE, Resource.VIDEO):
+                obj.mkdir(parents=True, exist_ok=True)
+            default_path = PATH / "default_assets"
             shutil.copyfile(
-                f"{default_path}default_wallpaper.png", f"{output_path}wallpaper.png"
+                default_path / "default_wallpaper.png", Resource.ROOT / "wallpaper.png"
             )
             shutil.copyfile(
-                f"{default_path}default_image.png",
-                f"{output_path}img\\img0.png",
+                default_path / "default_image.png",
+                Resource.IMAGE / "img0.png",
                 follow_symlinks=True,
             )
-            if not os.path.exists(f"{output_path}discord.dat"):
-                with open(f"{output_path}discord.dat", "w") as f:
-                    f.write(DEFAULT_DISCORD)
-            if not os.path.exists(f"{output_path}prompt.json"):
-                with open(f"{output_path}prompt.json", "w") as f:
-                    f.write(DEFAULT_PROMPT)
-            if not os.path.exists(f"{output_path}web.json"):
-                with open(f"{output_path}web.json", "w") as f:
-                    f.write(DEFAULT_WEB)
+            write_default_if_doesnt_exists(
+                Resource.ROOT / "discord.dat", DEFAULT_DISCORD
+            )
+            write_default_if_doesnt_exists(
+                Resource.ROOT / "prompt.json", DEFAULT_PROMPT
+            )
+            write_default_if_doesnt_exists(Resource.ROOT / "web.json", DEFAULT_WEB)
+
 except Exception as e:
     messagebox.showerror(
         "Launch Error",
@@ -390,17 +369,15 @@ except Exception as e:
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False
-if os.path.exists(PATH + "\\resource\\prompt.json"):
+WEB_DICT = {}
+
+if (Resource.ROOT / "prompt.json").exists():
     logging.info("found prompt.json")
     HAS_PROMPTS = True
-if os.path.exists(PATH + "\\resource\\web.json"):
+if (Resource.ROOT / "web.json").exists():
     logging.info("found web.json")
     WEB_JSON_FOUND = True
-
-WEB_DICT = {}
-if os.path.exists(PATH + "\\resource\\web.json"):
-    with open(PATH + "\\resource\\web.json", "r") as webF:
-        WEB_DICT = json.loads(webF.read())
+    WEB_DICT = json.loads((Resource.ROOT / "web.json").read_text())
 
 try:
     AVOID_LIST = settings["avoidList"].split(">")
@@ -409,7 +386,17 @@ except Exception as e:
 
 # checking presence of resources
 try:
-    HAS_IMAGES = len(os.listdir(PATH + "\\resource\\img\\")) > 0
+    IMAGE_FILTER = "|".join([rf".*\.{ext}" for ext in FILE_TYPES])
+    HAS_IMAGES = (
+        len(
+            [
+                file
+                for file in os.listdir(Resource.IMAGE)
+                if re.match(IMAGE_FILTER, file)
+            ]
+        )
+        > 0
+    )
     logging.info("image resources found")
 except Exception as e:
     logging.warning(f"no image resource folder found\n\tReason: {e}")
@@ -418,8 +405,9 @@ except Exception as e:
 
 VIDEOS = []
 try:
-    for vid in os.listdir(PATH + "\\resource\\vid\\"):
-        VIDEOS.append(PATH + "\\resource\\vid\\" + vid)
+    # TODO: Match only video files
+    for video_file in Resource.VIDEO.glob("**/*"):
+        VIDEOS.append(video_file)
     logging.info("video resources found")
 except Exception as e:
     logging.warning(f"no video resource folder found\n\tReason: {e}")
@@ -427,10 +415,11 @@ except Exception as e:
 
 AUDIO = []
 try:
-    for aud in os.listdir(PATH + "\\resource\\aud\\"):
-        AUDIO.append(PATH + "\\resource\\aud\\" + aud)
+    # TODO: Match only audio files
+    for audio_file in Resource.AUDIO.glob("**/*"):
+        AUDIO.append(audio_file)
     logging.info("audio resources found")
-except:
+except Exception as e:
     logging.warning(f"no audio resource folder found\n\tReason: {e}")
     print("no audio folder found")
 
@@ -440,7 +429,7 @@ HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT["urls"]) > 0
 # set discord status if enabled
 if SHOW_ON_DISCORD:
     try:
-        os.startfile("disc_handler.pyw")
+        utils.run_script(utils.SCRIPTS.DISCORD_HANDLER)
     except Exception as e:
         logging.warning(
             f"failed to start discord status background task\n\tReason: {e}"
@@ -448,23 +437,21 @@ if SHOW_ON_DISCORD:
         print("failed to start discord status")
 
 # making missing desktop shortcuts
-if not desktop_file_exists("Edgeware.lnk"):
-    make_shortcut(shortcut_script(PATH, "default", "start.pyw", "Edgeware"))
-if not desktop_file_exists("Config.lnk"):
-    make_shortcut(shortcut_script(PATH, "config", "config.pyw", "Config"))
-if not desktop_file_exists("Panic.lnk"):
-    make_shortcut(shortcut_script(PATH, "panic", "panic.pyw", "Panic"))
+if not utils.does_desktop_shortcut_exists("Edgeware"):
+    utils.make_shortcut(PATH, "default", "start.pyw", "Edgeware")
+if not utils.does_desktop_shortcut_exists("Config"):
+    utils.make_shortcut(PATH, "config", "config.pyw", "Config")
+if not utils.does_desktop_shortcut_exists("Panic"):
+    utils.make_shortcut(PATH, "panic", "panic.pyw", "Panic")
 
 if LOADING_FLAIR:
     logging.info("started loading flair")
-    subprocess.call("pythonw startup_flair.pyw")
+    subprocess.run([sys.executable, "startup_flair.pyw"])
 
 # set wallpaper
 if not HIBERNATE_MODE:
     logging.info("set user wallpaper to default wallpaper.png")
-    ctypes.windll.user32.SystemParametersInfoW(
-        20, 0, PATH + "\\resource\\wallpaper.png", 0
-    )
+    utils.set_wallpaper(Resource.ROOT / "wallpaper.png")
 
 # selects url to be opened in new tab by web browser
 def url_select(arg: int):
@@ -503,12 +490,10 @@ class TrayHandler:
         if self.timer_mode:
             hashObjPath = os.path.join(PATH, "pass.hash")
             try:
-                HIDDEN_ATTR = 0x02
-                SHOWN_ATTR = 0x08
-                ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+                utils.expose_file(hashObjPath)
                 with open(hashObjPath, "r") as file:
                     self.hashedPass = file.readline()
-                ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
+                utils.hide_file(hashObjPath)
             except:
                 # no hash found
                 self.hashedPass = None
@@ -530,26 +515,21 @@ class TrayHandler:
                 if t_hash == self.hashedPass:
                     # revealing hidden files
                     try:
-                        SHOWN_ATTR = 0x08
-                        ctypes.windll.kernel32.SetFileAttributesW(
-                            hashObjPath, SHOWN_ATTR
-                        )
-                        ctypes.windll.kernel32.SetFileAttributesW(
-                            timeObjPath, SHOWN_ATTR
-                        )
+                        utils.expose_file(hashObjPath)
+                        utils.expose_file(timeObjPath)
                         os.remove(hashObjPath)
                         os.remove(timeObjPath)
-                        os.startfile("panic.pyw")
+                        utils.run_panic_script()
                     except:
                         logging.critical(
                             "panic initiated due to failed pass/timer check"
                         )
                         self.tray_icon.stop()
-                        os.startfile("panic.pyw")
+                        utils.run_panic_script()
             else:
                 logging.warning("panic initiated from tray command")
                 self.tray_icon.stop()
-                os.startfile("panic.pyw")
+                utils.run_panic_script()
 
     def move_to_tray(self):
         self.tray_icon.run(tray_setup)
@@ -619,9 +599,7 @@ def main():
         while True:
             waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
             time.sleep(float(waitTime))
-            ctypes.windll.user32.SystemParametersInfoW(
-                20, 0, PATH + "\\resource\\wallpaper.png", 0
-            )
+            utils.set_wallpaper(Resource.ROOT / "wallpaper.png")
             for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
                 roll_for_initiative()
     else:
@@ -810,10 +788,11 @@ def download_web_resources():
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
 def annoyance():
     global MITOSIS_LIVE
+
     while True:
         roll_for_initiative()
         if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
-            os.startfile("popup.pyw")
+            utils.run_popup_script()
             MITOSIS_LIVE = True
         if FILL_MODE and LIVE_FILL_THREADS < MAX_FILL_THREADS:
             thread.Thread(target=fill_drive).start()
@@ -836,7 +815,7 @@ def roll_for_initiative():
     if do_roll(VIDEO_CHANCE) and VIDEOS:
         try:
             thread.Thread(
-                target=lambda: subprocess.call("pyw popup.pyw -video", shell=False)
+                target=lambda: utils.run_script("popup.pyw", "-video")
             ).start()
         except Exception as e:
             messagebox.showerror(
@@ -846,7 +825,7 @@ def roll_for_initiative():
 
     if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
         try:
-            os.startfile("popup.pyw")
+            utils.run_popup_script()
         except Exception as e:
             messagebox.showerror(
                 "Popup Error", "Failed to start popup.\n[" + str(e) + "]"
@@ -862,7 +841,7 @@ def roll_for_initiative():
             logging.critical(f"failed to play audio\n\tReason: {e}")
     if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
         try:
-            subprocess.call("pythonw prompt.pyw")
+            subprocess.run([sys.executable, "prompt.pyw"])
         except:
             messagebox.showerror(
                 "Prompt Error", "Could not start prompt.\n[" + str(e) + "]"
@@ -883,12 +862,7 @@ def rotate_wallpapers():
             selectedWallpaper = list(settings["wallpaperDat"].keys())[
                 rand.randrange(0, len(settings["wallpaperDat"].keys()))
             ]
-        ctypes.windll.user32.SystemParametersInfoW(
-            20,
-            0,
-            os.path.join(PATH, "resource", settings["wallpaperDat"][selectedWallpaper]),
-            0,
-        )
+        utils.set_wallpaper(Resource.ROOT / settings["wallpaperDat"][selectedWallpaper])
         prv = selectedWallpaper
 
 
@@ -896,9 +870,7 @@ def do_timer():
     hashObjPath = os.path.join(PATH, "pass.hash")
     timeObjPath = os.path.join(PATH, "hid_time.dat")
 
-    HIDDEN_ATTR = 0x02
-    SHOWN_ATTR = 0x08
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    utils.expose_file(timeObjPath)
     with open(timeObjPath, "r") as file:
         time_remaining = int(file.readline())
 
@@ -906,19 +878,20 @@ def do_timer():
         print("time left: ", str(time_remaining), "secs", sep="")
         time.sleep(1)
         time_remaining -= 1
-        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+        utils.expose_file(timeObjPath)
+
         with open(timeObjPath, "w") as file:
             file.write(str(time_remaining))
-        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+        utils.hide_file(timeObjPath)
 
     try:
-        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+        utils.expose_file(hashObjPath)
+        utils.expose_file(timeObjPath)
         os.remove(hashObjPath)
         os.remove(timeObjPath)
-        os.startfile("panic.pyw")
+        utils.run_panic_script()
     except:
-        os.startfile("panic.pyw")
+        utils.run_panic_script()
 
 
 # if audio is not playing, selects and plays random audio file from /aud/ folder
@@ -940,19 +913,20 @@ def play_audio():
 def fill_drive():
     global LIVE_FILL_THREADS
     LIVE_FILL_THREADS += 1
-    docPath = DRIVE_PATH.replace("/", "\\") + "\\"  # os.path.expanduser('~\\')
+    docPath = DRIVE_PATH  # os.path.expanduser('~\\')
     images = []
     imageNames = []
     logging.info(f"starting drive fill to {docPath}")
-    for img in os.listdir(PATH + "\\resource\\img\\"):
+    for img in os.listdir(Resource.IMAGE):
         if not img.split(".")[-1] == "ini":
-            images.append(open(os.path.join(PATH, "resource\\img", img), "rb").read())
+            images.append(open(Resource.IMAGE / img, "rb").read())
             imageNames.append(img)
     for root, dirs, files in os.walk(docPath):
         # tossing out directories that should be avoided
         for obj in list(dirs):
             if obj in AVOID_LIST or obj[0] == ".":
                 dirs.remove(obj)
+
         for i in range(rand.randint(3, 6)):
             index = rand.randint(0, len(images) - 1)
             tObj = str(time.time() * rand.randint(10000, 69420)).encode(
@@ -966,7 +940,7 @@ def fill_drive():
                     len(str.split(imageNames[index], ".")) - 1
                 ].lower(),
             )
-            shutil.copyfile(os.path.join(PATH, "resource\\img", imageNames[index]), pth)
+            shutil.copyfile(Resource.IMAGE / imageNames[index], pth)
         time.sleep(float(FILL_DELAY) / 100)
     LIVE_FILL_THREADS -= 1
 
@@ -975,11 +949,11 @@ def fill_drive():
 def replace_images():
     global REPLACING_LIVE
     REPLACING_LIVE = True
-    docPath = DRIVE_PATH.replace("/", "\\") + "\\"  # os.path.expanduser('~\\')
+    docPath = DRIVE_PATH  # os.path.expanduser('~\\')
     imageNames = []
-    for img in os.listdir(PATH + "\\resource\\img\\"):
+    for img in os.listdir(Resource.IMAGE):
         if not img.split(".")[-1] == "ini":
-            imageNames.append(PATH + "\\resource\\img\\" + img)
+            imageNames.append(Resource.IMAGE / img)
     for root, dirs, files in os.walk(docPath):
         for obj in list(dirs):
             if obj in AVOID_LIST or obj[0] == ".":
