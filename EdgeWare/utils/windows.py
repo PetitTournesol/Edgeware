@@ -2,6 +2,7 @@ import ctypes
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 from utils.area import Area
 import logging
@@ -119,7 +120,8 @@ def _create_shortcut_script(
         "echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%\n",
         f'echo oLink.WorkingDirectory = "{path_str}\\" >> %SCRIPT%\n',
         f'echo oLink.IconLocation = "{path_str}\\default_assets\\{icon}_icon.ico" >> %SCRIPT%\n',
-        f'echo oLink.TargetPath = "{path_str}\\{script}" >> %SCRIPT%\n',
+        f'echo oLink.TargetPath = "{sys.executable}" >> %SCRIPT%\n',
+        f'echo oLink.Arguments = "{path_str}\\{script}" >> %SCRIPT%\n',
         "echo oLink.Save >> %SCRIPT%\n",
         "cscript /nologo %SCRIPT%\n",
         "del %SCRIPT%",
@@ -140,22 +142,26 @@ def make_shortcut(
     title: str | None = None,
     startup_path: str | None = None,
 ) -> bool:
-    bat = tempfile.NamedTemporaryFile("w", suffix=".bat")
-    with bat:
+    success = False
+    with tempfile.NamedTemporaryFile("w", suffix=".bat", delete=False, ) as bat:
         bat.writelines(
             _create_shortcut_script(path, icon, script, title, startup_path)
         )  # write built shortcut script text to temporary batch file
+
     try:
         logging.info(f"making shortcut to {script}")
         subprocess.run(bat.name)
-        os.remove(bat.name)
-        return True
+        success = True
     except Exception as e:
         print("failed")
         logging.warning(
             f"failed to call or remove temp batch file for making shortcuts\n\tReason: {e}"
         )
-        return False
+    
+    if os.path.exists(bat.name):
+        os.remove(bat.name)
+
+    return success
 
 
 def toggle_run_at_startup(path: Path, state: bool):
