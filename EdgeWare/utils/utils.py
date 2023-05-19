@@ -3,7 +3,7 @@ from enum import Enum
 
 
 def is_windows() -> bool:
-    return "windows" in sys.platform
+    return "win32" in sys.platform
 
 
 def is_linux() -> bool:
