@@ -47,7 +47,7 @@ SYS_ARGS.pop(0)
 logging.info(f"args: {SYS_ARGS}")
 
 missing_dependencies, error_message = (
-    utils.check_dependencies() if utils.is_linux() else []
+    utils.check_dependencies() if utils.is_linux() else ([], "")
 )
 
 if missing_dependencies:

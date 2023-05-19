@@ -1,6 +1,5 @@
 import codecs
 from configparser import ConfigParser
-from enum import Enum
 import os
 from pathlib import Path
 import re
@@ -11,6 +10,7 @@ from Xlib.display import Display
 from Xlib.ext import randr
 import subprocess
 from utils.area import Area
+from utils import DEPENDENCIES
 
 
 def find_mode(id, modes):
@@ -66,12 +66,6 @@ def expose_file(path: Path | str):
     hidden_path = path.parent / f".{path.name}"
     if hidden_path.exists():
         hidden_path.rename(path)
-
-
-class DEPENDENCIES(str, Enum):
-    FFMPEG = "FFMPEG"
-    PORT_AUDIO = "PortAudio"
-
 
 def check_dependencies() -> tuple[list[DEPENDENCIES], str]:
     missing_dependencies: list[DEPENDENCIES] = []

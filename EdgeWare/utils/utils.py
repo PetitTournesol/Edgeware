@@ -9,6 +9,9 @@ def is_windows() -> bool:
 def is_linux() -> bool:
     return "linux" in sys.platform
 
+class DEPENDENCIES(str, Enum):
+    FFMPEG = "FFMPEG"
+    PORT_AUDIO = "PortAudio"
 
 if is_linux():
     from .linux import *
