@@ -1,13 +1,14 @@
 import ast
-import ctypes
-from ctypes import util
 import hashlib
 import json
 import logging
+from logging.config import listen
+from multiprocessing import Pool
 import os
 import random as rand
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading as thread
@@ -20,6 +21,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from tkinter import messagebox, simpledialog
 from utils import utils
+import panic_listener
+import asyncio
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -251,6 +254,10 @@ class Resource:
     VIDEO = ROOT / "vid"
 
 
+MUTEX_LIVE_FILL_THREADS = thread.Lock()
+MUTEX_REPLACING_LIVE = thread.Lock()
+MUTEX_PLAYING_AUDIO = thread.Lock()
+
 LIVE_FILL_THREADS = 0  # count of live threads for hard drive filling
 PLAYING_AUDIO = False  # audio thread flag
 REPLACING_LIVE = False  # replace thread flag
@@ -454,7 +461,7 @@ if not HIBERNATE_MODE:
     utils.set_wallpaper(Resource.ROOT / "wallpaper.png")
 
 # selects url to be opened in new tab by web browser
-def url_select(arg: int):
+def url_select(arg: int) -> str | None:
     logging.info(f"selected url {arg}")
     return (
         WEB_DICT["urls"][arg]
@@ -540,6 +547,8 @@ def tray_setup(icon):
     icon.visible = True
 
 
+shutdown_event = thread.Event()
+
 # main function, probably can do more with this but oh well i'm an idiot so
 def main():
     logging.info("entered main function")
@@ -593,18 +602,35 @@ def main():
         logging.info("start rotate_wallpapers thread")
         thread.Thread(target=rotate_wallpapers).start()
 
-    # run annoyance thread or do hibernate mode
-    if HIBERNATE_MODE:
-        logging.info("starting in hibernate mode")
-        while True:
-            waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
-            time.sleep(float(waitTime))
-            utils.set_wallpaper(Resource.ROOT / "wallpaper.png")
-            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
-                roll_for_initiative()
-    else:
-        logging.info("starting annoyance loop")
-        annoyance()
+    def hibernate_or_annoy(event: thread.Event):
+        # run annoyance thread or do hibernate mode
+        if HIBERNATE_MODE:
+            logging.info("starting in hibernate mode")
+            while not shutdown_event.is_set():
+                waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
+                time.sleep(float(waitTime))
+                utils.set_wallpaper(Resource.ROOT / "wallpaper.png")
+                for i in range(
+                    0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)
+                ):
+                    roll_for_initiative()
+        else:
+            logging.info("starting annoyance loop")
+            while not shutdown_event.is_set():
+                annoy()
+        shutdown_event.set()
+
+    panic_listen = thread.Thread(
+        target=panic_listener.listen, args=(shutdown_event,)
+    )
+
+    panic_listen.start()
+    hibernate_or_annoy(shutdown_event)
+    panic_listen.join()
+
+    # Should already be set at this point, but you know. Just to be sure.
+    shutdown_event.set()
+    os.killpg(os.getpgid(os.getpid()), signal.SIGTERM)
 
 
 # just checking %chance of doing annoyance options
@@ -786,32 +812,34 @@ def download_web_resources():
 #       fill: will only happen if fill is on AND until there are 8 threads running simultaneously
 #             as threads become available they will be restarted.
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
-def annoyance():
+def annoy():
     global MITOSIS_LIVE
 
-    while True:
-        roll_for_initiative()
-        if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
-            utils.run_popup_script()
-            MITOSIS_LIVE = True
+    roll_for_initiative()
+    if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
+        utils.run_popup_script()
+        MITOSIS_LIVE = True
+    with MUTEX_LIVE_FILL_THREADS:
         if FILL_MODE and LIVE_FILL_THREADS < MAX_FILL_THREADS:
             thread.Thread(target=fill_drive).start()
+    with MUTEX_REPLACING_LIVE:
         if REPLACE_MODE and not REPLACING_LIVE:
             thread.Thread(target=replace_images).start()
-        time.sleep(float(DELAY) / 1000.0)
+    time.sleep(float(DELAY) / 1000.0)
 
 
 # independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
     if do_roll(WEB_CHANCE) and HAS_WEB:
-        try:
-            url = url_select(rand.randrange(len(WEB_DICT["urls"]))) if HAS_WEB else None
-            webbrowser.open_new(url)
-        except Exception as e:
-            messagebox.showerror(
-                "Web Error", "Failed to open website.\n[" + str(e) + "]"
-            )
-            logging.critical(f"failed to open website {url}\n\tReason: {e}")
+        url = url_select(rand.randrange(len(WEB_DICT["urls"]))) if HAS_WEB else None
+        if url:
+            try:
+                webbrowser.open_new(url)
+            except Exception as e:
+                messagebox.showerror(
+                    "Web Error", "Failed to open website.\n[" + str(e) + "]"
+                )
+                logging.critical(f"failed to open website {url}\n\tReason: {e}")
     if do_roll(VIDEO_CHANCE) and VIDEOS:
         try:
             thread.Thread(
@@ -831,18 +859,20 @@ def roll_for_initiative():
                 "Popup Error", "Failed to start popup.\n[" + str(e) + "]"
             )
             logging.critical(f"failed to start popup.pyw\n\tReason: {e}")
-    if do_roll(AUDIO_CHANCE) and not PLAYING_AUDIO and AUDIO:
-        try:
-            thread.Thread(target=play_audio).start()
-        except:
-            messagebox.showerror(
-                "Audio Error", "Failed to play audio.\n[" + str(e) + "]"
-            )
-            logging.critical(f"failed to play audio\n\tReason: {e}")
+    if do_roll(AUDIO_CHANCE):
+        with MUTEX_PLAYING_AUDIO:
+            if not PLAYING_AUDIO and AUDIO:
+                try:
+                    thread.Thread(target=play_audio).start()
+                except Exception as e:
+                    messagebox.showerror(
+                        "Audio Error", "Failed to play audio.\n[" + str(e) + "]"
+                    )
+                    logging.critical(f"failed to play audio\n\tReason: {e}")
     if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
         try:
             subprocess.run([sys.executable, "prompt.pyw"])
-        except:
+        except Exception as e:
             messagebox.showerror(
                 "Prompt Error", "Could not start prompt.\n[" + str(e) + "]"
             )
@@ -853,17 +883,21 @@ def rotate_wallpapers():
     prv = "default"
     base = int(settings["wallpaperTimer"])
     vari = int(settings["wallpaperVariance"])
+
+    time.sleep(base + rand.randint(-vari, vari))
     while len(settings["wallpaperDat"].keys()) > 1:
+        if shutdown_event.is_set():
+            return
+        available_wallpapers: list[str] = list(settings["wallpaperDat"].keys())
+        available_wallpapers.remove(prv)
+
+        if available_wallpapers:
+            selectedWallpaper = rand.choice(available_wallpapers)
+            utils.set_wallpaper(
+                Resource.ROOT / settings["wallpaperDat"][selectedWallpaper]
+            )
+            prv = selectedWallpaper
         time.sleep(base + rand.randint(-vari, vari))
-        selectedWallpaper = list(settings["wallpaperDat"].keys())[
-            rand.randrange(0, len(settings["wallpaperDat"].keys()))
-        ]
-        while selectedWallpaper == prv:
-            selectedWallpaper = list(settings["wallpaperDat"].keys())[
-                rand.randrange(0, len(settings["wallpaperDat"].keys()))
-            ]
-        utils.set_wallpaper(Resource.ROOT / settings["wallpaperDat"][selectedWallpaper])
-        prv = selectedWallpaper
 
 
 def do_timer():
@@ -897,84 +931,135 @@ def do_timer():
 # if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
     global PLAYING_AUDIO
+
     if not AUDIO:
         return
+
     logging.info("starting audio playback")
-    PLAYING_AUDIO = True
-    # winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
-    playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
-    PLAYING_AUDIO = False
-    logging.info("finished audio playback")
+
+    with MUTEX_PLAYING_AUDIO:
+        PLAYING_AUDIO = True
+        # winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
+        playsound.playsound(rand.choice(AUDIO))
+        PLAYING_AUDIO = False
+        logging.info("finished audio playback")
 
 
 # fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
 #   can only have 8 threads live at once to avoid 'memory leak'
 def fill_drive():
-    global LIVE_FILL_THREADS
-    LIVE_FILL_THREADS += 1
+    with MUTEX_LIVE_FILL_THREADS:
+        global LIVE_FILL_THREADS
+        LIVE_FILL_THREADS += 1
+
     docPath = DRIVE_PATH  # os.path.expanduser('~\\')
     images = []
     imageNames = []
     logging.info(f"starting drive fill to {docPath}")
-    for img in os.listdir(Resource.IMAGE):
-        if not img.split(".")[-1] == "ini":
-            images.append(open(Resource.IMAGE / img, "rb").read())
-            imageNames.append(img)
-    for root, dirs, files in os.walk(docPath):
-        # tossing out directories that should be avoided
-        for obj in list(dirs):
-            if obj in AVOID_LIST or obj[0] == ".":
-                dirs.remove(obj)
 
-        for i in range(rand.randint(3, 6)):
-            index = rand.randint(0, len(images) - 1)
-            tObj = str(time.time() * rand.randint(10000, 69420)).encode(
-                encoding="ascii", errors="ignore"
-            )
-            pth = os.path.join(
-                root,
-                hashlib.md5(tObj).hexdigest()
-                + "."
-                + str.split(imageNames[index], ".")[
-                    len(str.split(imageNames[index], ".")) - 1
-                ].lower(),
-            )
-            shutil.copyfile(Resource.IMAGE / imageNames[index], pth)
-        time.sleep(float(FILL_DELAY) / 100)
-    LIVE_FILL_THREADS -= 1
+    def exit():
+        with MUTEX_LIVE_FILL_THREADS:
+            global LIVE_FILL_THREADS
+            LIVE_FILL_THREADS -= 1
+        raise ShutdownEvent()
+
+    try:
+        for img in os.listdir(Resource.IMAGE):
+            if shutdown_event.is_set():
+                exit()
+            if not img.split(".")[-1] == "ini":
+                images.append(open(Resource.IMAGE / img, "rb").read())
+                imageNames.append(img)
+
+        for root, dirs, files in os.walk(docPath):
+            if shutdown_event.is_set():
+                exit()
+            # tossing out directories that should be avoided
+            for obj in list(dirs):
+                if shutdown_event.is_set():
+                    exit()
+                if obj in AVOID_LIST or obj[0] == ".":
+                    dirs.remove(obj)
+
+            for i in range(rand.randint(3, 6)):
+                if shutdown_event.is_set():
+                    exit()
+                index = rand.randint(0, len(images) - 1)
+                tObj = str(time.time() * rand.randint(10000, 69420)).encode(
+                    encoding="ascii", errors="ignore"
+                )
+                pth = os.path.join(
+                    root,
+                    hashlib.md5(tObj).hexdigest()
+                    + "."
+                    + str.split(imageNames[index], ".")[
+                        len(str.split(imageNames[index], ".")) - 1
+                    ].lower(),
+                )
+                shutil.copyfile(Resource.IMAGE / imageNames[index], pth)
+            time.sleep(float(FILL_DELAY) / 100)
+        exit()
+    except ShutdownEvent:
+        return
 
 
 # seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
 def replace_images():
     global REPLACING_LIVE
-    REPLACING_LIVE = True
+    with MUTEX_REPLACING_LIVE:
+        REPLACING_LIVE = True
     docPath = DRIVE_PATH  # os.path.expanduser('~\\')
     imageNames = []
-    for img in os.listdir(Resource.IMAGE):
-        if not img.split(".")[-1] == "ini":
-            imageNames.append(Resource.IMAGE / img)
-    for root, dirs, files in os.walk(docPath):
-        for obj in list(dirs):
-            if obj in AVOID_LIST or obj[0] == ".":
-                dirs.remove(obj)
-        toReplace = []
-        # ignore any folders with fewer items than the replace threshold
-        if len(files) >= REPLACE_THRESHOLD:
-            # if folder has enough items, check how many of them are images
-            for obj in files:
-                if obj.split(".")[-1] in FILE_TYPES:
-                    if os.path.exists(os.path.join(root, obj)):
-                        toReplace.append(os.path.join(root, obj))
-            # if has enough images, finally do replacing
-            if len(toReplace) >= REPLACE_THRESHOLD:
-                for obj in toReplace:
-                    shutil.copyfile(
-                        imageNames[rand.randrange(len(imageNames))],
-                        obj,
-                        follow_symlinks=True,
-                    )
+
+    def exit():
+        with MUTEX_REPLACING_LIVE:
+            REPLACING_LIVE = False
+        raise ShutdownEvent
+
+    try:
+        for img in os.listdir(Resource.IMAGE):
+            if shutdown_event.is_set():
+                exit()
+            if not img.split(".")[-1] == "ini":
+                imageNames.append(Resource.IMAGE / img)
+
+        for root, dirs, files in os.walk(docPath):
+            if shutdown_event.is_set():
+                exit()
+            for obj in list(dirs):
+                if shutdown_event.is_set():
+                    exit()
+                if obj in AVOID_LIST or obj[0] == ".":
+                    dirs.remove(obj)
+            toReplace = []
+            # ignore any folders with fewer items than the replace threshold
+            if len(files) >= REPLACE_THRESHOLD:
+                # if folder has enough items, check how many of them are images
+                for obj in files:
+                    if shutdown_event.is_set():
+                        exit()
+                    if obj.split(".")[-1] in FILE_TYPES:
+                        if os.path.exists(os.path.join(root, obj)):
+                            toReplace.append(os.path.join(root, obj))
+                # if has enough images, finally do replacing
+                if len(toReplace) >= REPLACE_THRESHOLD:
+                    for obj in toReplace:
+                        if shutdown_event.is_set():
+                            exit()
+                        shutil.copyfile(
+                            imageNames[rand.randrange(len(imageNames))],
+                            obj,
+                            follow_symlinks=True,
+                        )
+        exit()
+    except ShutdownEvent:
+        return
     # never turns off threadlive variable because it should only need to do this once
+
+
+class ShutdownEvent(Exception):
+    pass
 
 
 if __name__ == "__main__":
