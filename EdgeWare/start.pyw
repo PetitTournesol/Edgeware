@@ -630,7 +630,10 @@ def main():
 
     # Should already be set at this point, but you know. Just to be sure.
     shutdown_event.set()
-    os.killpg(os.getpgid(os.getpid()), signal.SIGTERM)
+    if utils.is_linux():
+        os.killpg(os.getpgid(os.getpid()), signal.SIGTERM)
+    elif utils.is_windows():
+        os.kill(os.getpid(),  signal.SIGTERM)
 
 
 # just checking %chance of doing annoyance options
