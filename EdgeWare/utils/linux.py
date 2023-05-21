@@ -9,8 +9,8 @@ from tkinter import messagebox
 from Xlib.display import Display
 from Xlib.ext import randr
 import subprocess
-from .dependencies import DEPENDENCIES
-from .area import Area
+from utils.area import Area
+from utils.dependencies import DEPENDENCIES
 
 
 def find_mode(id, modes):
