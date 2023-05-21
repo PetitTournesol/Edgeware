@@ -1,22 +1,26 @@
-import ctypes
 import os
-import pathlib
-PATH = str(pathlib.Path(__file__).parent.absolute())
+from pathlib import Path
+from multiprocessing.connection import Client
+from array import array
+from utils import utils
+from panic_listener import ADDRESS, AUTH_KEY
 
-timeObjPath = os.path.join(PATH, 'hid_time.dat')
-HIDDEN_ATTR = 0x02
-SHOWN_ATTR  = 0x08
-#checking timer
+PATH: Path = Path(__file__).parent
+
+timeObjPath = PATH / "hid_time.dat"
+
+# checking timer
 try:
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    utils.expose_file(timeObjPath)
 except:
-    ''
-if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
-    #sudoku if timer after hiding file again
-    os.kill(os.getpid(), 9)
-else:
-    #continue if no timer
-    ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
+    if os.path.exists(os.path.join(PATH, "hid_time.dat")):
+        utils.hide_file(timeObjPath)
+        # sudoku if timer after hiding file again
+        os.kill(os.getpid(), 9)
+    else:
+        # continue if no timer
+        utils.set_wallpaper(PATH / "defaut_assets" / "default_win10.jpg")
 
-os.startfile('panic.bat')
+
+with Client(ADDRESS, authkey=AUTH_KEY) as conn:
+    conn.send("panic_close")

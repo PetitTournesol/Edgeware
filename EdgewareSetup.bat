@@ -2,10 +2,21 @@
 :open
 color 5d
 echo +==============[ Welcome to Edgeware Setup~ ]==============+
-echo Python Version:
+
+echo Python Version(py):
 py --version 
-if NOT %errorlevel%==0 goto pyInstall
-goto run
+if %errorlevel%==0 goto run
+
+echo Failed to get version for "py", let's try for "python"
+echo Python Version(python):
+python --version 
+if %errorlevel%==0 goto run
+
+echo Failed to get version for "python", let's try for "python3"
+echo Python Version(python3):
+python3 --version 
+if %errorlevel%==0 goto run
+
 :pyInstall
 echo Could not find Python.
 echo Now downloading installer from python.org, please wait...
