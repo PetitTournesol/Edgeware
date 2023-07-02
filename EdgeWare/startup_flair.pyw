@@ -18,7 +18,7 @@ def doAnimation():
     
     img_ = Image.open(os.path.join(PATH, 'default_assets', 'loading_splash.png'))
     
-    img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.ANTIALIAS))
+    img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.LANCZOS))
     root.geometry('{}x{}+{}+{}'.format(img.width(), img.height(), int((root.winfo_screenwidth() - img.width()) / 2), int((root.winfo_screenheight() - img.height()) / 2)))
     lbl = Label(root, image=img)
     lbl.pack()

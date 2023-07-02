@@ -1,3 +1,5 @@
+Fork of Edgeware to add linux-compatability and more.
+https://github.com/Sassy0P/Edgeware/tree/linux-compability
 
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**

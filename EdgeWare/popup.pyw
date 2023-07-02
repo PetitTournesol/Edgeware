@@ -287,7 +287,7 @@ def run():
         size_source = max(img.width, img.height) / min(screen_width, screen_height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
-        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
+        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.LANCZOS)
 
     resized_image = resize(image)
 
