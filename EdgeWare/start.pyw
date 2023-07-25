@@ -15,6 +15,8 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
+import mouse
+import winsound
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 
@@ -215,6 +217,7 @@ AUDIO_CHANCE = int(settings['audioMod'])
 PROMPT_CHANCE = int(settings['promptMod'])
 VIDEO_CHANCE = int(settings['vidMod'])
 WEB_CHANCE = int(settings['webMod'])
+MOUSE_CHANCE = int(settings['mouseMod'])
 
 VIDEOS_ONLY = int(settings['onlyVid']) == 1
 
@@ -368,6 +371,7 @@ try:
     for aud in os.listdir(PATH + '\\resource\\aud\\'):
         AUDIO.append(PATH + '\\resource\\aud\\' + aud)
     logging.info('audio resources found')
+    logging.info(AUDIO)
 except:
     logging.warning(f'no audio resource folder found\n\tReason: {e}')
     print('no audio folder found')
@@ -412,7 +416,7 @@ class TrayHandler:
         self.root.title('Edgeware')
         self.timer_mode = settings['timerMode'] == 1
         
-        self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
+        self.option_list = [pystray.MenuItem('Config', self.start_config), pystray.MenuItem('Panic', self.try_panic)]
         self.tray_icon = pystray.Icon('Edgeware',
                                     Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
                                     'Edgeware',
@@ -435,6 +439,14 @@ class TrayHandler:
             except:
                 #no hash found
                 self.hashedPass = None
+
+    def start_config(self):
+        try:
+            os.startfile('config.pyw')
+            logging.info('Starting config from tray command')
+        except:
+            logging.warning(f'fail to start config from tray command')
+            print('fail to start config from tray command')
 
     def try_panic(self):
         logging.info('attempting tray panic')
@@ -550,14 +562,22 @@ class BooruDownloader:
 
     def download(self, page_start:int = 0, page_end:int = 1, min_score:int = None) -> None:
         self._page_start = max(page_start, 0)
-        self._page_start = min(self._page_start, self.page_count)
-        self._page_end   = min(page_end, self.max_page+1) if page_end >= self._page_start else self._page_start + 1
+        #self._page_start = min(self._page_start, self.page_count)
+        self._page_end   = min(page_end, self.max_page+1) if page_end > self._page_start else self._page_start + 1
+        logging.info(f'Page_start={self._page_start}')
+        logging.info(f'Page_end={self._page_end}')
+
 
         for page_index in range(self._page_start, self._page_end):
-            self._page_url = f'{self.booru_scheme.booru_search_url.format(booru_name=self.booru)}{self.tags}&pid={page_index*self.post_per_page}'
+            self._page_url = f'{self.booru_scheme.booru_search_url.format(booru_name=self.booru)}{self.tags}&pid={(page_index)*self.post_per_page}'
             logging.info(f'downloadpageurl={self._page_url}')
+            logging.info(f'Page_index={page_index}')
+            logging.info(f'Post_per_page={self.post_per_page}')
             self._html = requests.get(self._page_url).text
             self._soup = BeautifulSoup(self._html, 'html.parser')
+            
+            #if page_index > self._page_start and page_index < self._page_end:
+                #self.post_per_page += 20
 
             for image in self._soup.find_all('img'):
                 try:
@@ -577,6 +597,7 @@ class BooruDownloader:
                     if min_score is not None and self._score < min_score:
                         print(f'(score {self._score} too low) skipped {self._src}')
                         continue
+                    
                 except Exception as e:
                     print(f'skipped: {e}')
                     continue
@@ -702,6 +723,12 @@ def roll_for_initiative():
         except:
             messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
             logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
+    if do_roll(MOUSE_CHANCE):
+        try:
+            mouse.move(rand.randrange(-100,100),rand.randrange(-100,100), False, 5)
+        except:
+            messagebox.showerror('Mouse overtaken Error','\n[' + str(e) + ']')
+            logging.critical(f'failed to overtake mouse\n\tReason: {e}')
 
 def rotate_wallpapers():
     prv = 'default'
@@ -752,9 +779,30 @@ def play_audio():
     logging.info('starting audio playback')
     PLAYING_AUDIO = True
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
-    playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
+    try:
+        playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
+        logging.info('number of audios found: %d',len(AUDIO))
+    except:
+        logging.warning('cannot initiate play_audio')
     PLAYING_AUDIO = False
     logging.info('finished audio playback')
+#import queue
+#def play_audio():
+#    global PLAYING_AUDIO
+#    AUDIO_Q = queue.Queue()
+#    for audio in AUDIO:
+#        AUDIO_Q.put(audio)
+#        logging.info('Queued '+ audio +' for playing')
+#    while True:
+#        sound = AUDIO_Q.get()
+#        PLAYING_AUDIO = True
+#        logging.info('Playing ' + sound)
+#        if sound is None:
+#            logging.info('No more sound to play')
+#            PLAYING_AUDIO = False
+#            break
+#        playsound.playsound(sound)
+
 
 #fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see

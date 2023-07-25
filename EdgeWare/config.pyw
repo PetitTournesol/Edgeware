@@ -1,3 +1,4 @@
+#from curses import mouseinterval
 import json
 import os
 import shutil
@@ -160,6 +161,7 @@ def show_window():
         try:
             delayVar            = IntVar(root, value=int(settings['delay']))
             popupVar            = IntVar(root, value=int(settings['popupMod']))
+            mouseVar            = IntVar(root, value=int(settings['mouseMod']))
             webVar              = IntVar(root, value=int(settings['webMod']))
             audioVar            = IntVar(root, value=int(settings['audioMod']))
             promptVar           = IntVar(root, value=int(settings['promptMod']))
@@ -218,7 +220,7 @@ def show_window():
             booruMin            = IntVar(root, value=int(settings['booruMinScore']))
             
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, 
+            in_var_group = [delayVar, popupVar, mouseVar, webVar, audioVar, promptVar, fillVar, 
                             fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, 
                             hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, 
                             discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
@@ -230,7 +232,7 @@ def show_window():
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
                             booruMin]
 
-            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 
+            in_var_names = ['delay', 'popupMod', 'mouseMod', 'webMod', 'audioMod', 'promptMod', 'fill', 
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 
                             'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 
                             'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
@@ -277,6 +279,7 @@ def show_window():
     timer_group     = []
     lowkey_group    = []
     denial_group    = []
+    mouse_group     = []
 
     #tab display code start
     tabMaster    = ttk.Notebook(root)       #tab manager
@@ -547,15 +550,19 @@ def show_window():
     popupScale.pack(fill='x')
     popupManual.pack(fill='x')
     popupFrame.pack(fill='y', side='left')
+
     timeoutSlider.pack(fill='x')
     timeoutToggle.pack(fill='x')
     timeoutFrame.pack(fill='y', side='left')
+
     mitosisFrame.pack(fill='y', side='left')
     mitosisStren.pack(fill='x')
     mitosisToggle.pack(fill='x')
+
     denialFrame.pack(fill='y', side='left')
     denialSlider.pack(fill='x')
     denialToggle.pack(fill='x')
+
     panicFrame.pack(fill='y', side='left')
     setPanicButtonButton.pack(fill='x')
     doPanicButton.pack(fill='x')
@@ -570,6 +577,7 @@ def show_window():
 
     audioFrame = Frame(otherHostFrame)
     webFrame = Frame(otherHostFrame)
+    mouseFrame = Frame(otherHostFrame)
     vidFrameL = Frame(otherHostFrame)
     vidFrameR = Frame(otherHostFrame)
     promptFrame = Frame(otherHostFrame)
@@ -580,6 +588,11 @@ def show_window():
     
     webScale = Scale(webFrame, label='Website Freq (%)', from_=0, to=100, orient='horizontal', variable=webVar)
     webManual = Button(webFrame, text='Manual web...', command=lambda: assign(webVar, simpledialog.askinteger('Web Chance', prompt='[0-100]: ')))
+    
+    mouseScale = Scale(mouseFrame, label='Mouse Freq (%)', from_=0, to=100, orient='horizontal', variable=mouseVar)
+    mouseManual = Button(mouseFrame, text='Manual mouse...', command=lambda: assign(mouseVar, simpledialog.askinteger('Manual mouse', prompt='[0-100]')))
+    mouse_group.append(mouseScale)
+    mouse_group.append(mouseManual)
     
     vidScale = Scale(vidFrameL, label='Video Chance (%)', from_=0, to=100, orient='horizontal', variable=vidVar)
     vidManual = Button(vidFrameL, text='Manual vid...', command=lambda: assign(vidVar, simpledialog.askinteger('Video Chance', prompt='[0-100]: ')))
@@ -601,6 +614,10 @@ def show_window():
     webFrame.pack(fill='y', side='left', padx=3, expand=1)
     webScale.pack(fill='x')
     webManual.pack(fill='x')
+
+    mouseScale.pack(fill='x')
+    mouseManual.pack(fill='x')
+    mouseFrame.pack(fill='y', side='left')
 
     vidFrameL.pack(fill='x', side='left', padx=(3, 0), expand=1)
     vidScale.pack(fill='x')
@@ -716,7 +733,6 @@ def show_window():
     download_group.append(minScoreSlider)
 
     Label(tabDrive, text='Image Download Settings').pack(fill='x')
-    Label(downloadHostFrame, text='THE BOORU DOWNLOADER IS OUTDATED AND BROKEN. IT WILL LIKELY BARELY FUNCTION, IF AT ALL.\nNo I will not fix it, this shit is a pain in the ass and I\'m stupid.', foreground='red').pack(fill='x')
     tagFrame.pack(fill='y', side='left')
     booruFrame.pack(fill='y', side='left')
     otherFrame.pack(fill='both',side='right')
@@ -875,7 +891,7 @@ def show_window():
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     #   the version will still be red to draw attention to it
     if local_version.split('_')[0] != webv.split('_')[0] and not local_version.endswith('DEV'):
-        messagebox.showwarning('Update Available', 'Main local version and web version are not the same.\nPlease visit the Github and download the newer files.')
+        messagebox.showwarning('Update Available', 'Core local version and web version are not the same.\nPlease visit the Github and download the newer files.')
     root.mainloop()
 
 def pickZip() -> str:
