@@ -534,7 +534,7 @@ def show_window():
     toggleSubliminalButton = Checkbutton(popupHostFrame, text='Popup Subliminals', variable=popupSublim)
 
     timeoutToggle = Checkbutton(timeoutFrame, text='Popup Timeout', variable=timeoutPopupsVar, command=lambda: toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group))
-    timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=120, orient='horizontal', variable=popupTimeoutVar)
+    timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=150, orient='horizontal', variable=popupTimeoutVar)
 
     timeout_group.append(timeoutSlider)
 
@@ -1098,7 +1098,7 @@ def removeWallpaper(tkListObj):
         messagebox.showwarning('Remove Default', 'You cannot remove the default wallpaper.')
 
 def autoImportWallpapers(tkListObj:Listbox):
-    allow_ = confirmBox(tkListObj, 'Current list will be cleared before new list is imported from the /resource folder. Is that okay?')
+    allow_ = confirmBox(tkListObj, 'Current list will be cleared before new list is imported from the /resource/wallpapers folder. Is that okay?')
     if allow_:
         #clear list
         while True:
@@ -1107,7 +1107,7 @@ def autoImportWallpapers(tkListObj:Listbox):
                 tkListObj.delete(1)
             except:
                 break
-        for file in os.listdir(os.path.join(PATH, 'resource')):
+        for file in os.listdir(os.path.join(PATH, 'resource/wallpapers')):
             if (file.endswith('.png') or file.endswith('.jpg') or file.endswith('.jpeg')) and file != 'wallpaper.png':
                 name_ = file.split('.')[0]
                 tkListObj.insert(1, name_)

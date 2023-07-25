@@ -245,6 +245,9 @@ MITOSIS_MODE = int(settings['mitosisMode']) == 1
 LOWKEY_MODE = int(settings['lkToggle']) == 1
 
 TIMER_MODE = int(settings['timerMode']) == 1
+TIMER_SETUP = int(settings['timerSetupTime']) * 60
+
+SAFEWORD = settings['safeword']
 
 DRIVE_PATH = settings['drivePath']
 
@@ -412,15 +415,37 @@ class TrayHandler:
         self.root.title('Edgeware')
         self.timer_mode = settings['timerMode'] == 1
         
-        self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
+        self.option_list = [pystray.MenuItem('Edgeware Menu', self.config_from_tray), pystray.MenuItem('Panic', self.try_panic)]
         self.tray_icon = pystray.Icon('Edgeware',
                                     Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
                                     'Edgeware',
                                     self.option_list)
 
         self.root.withdraw()
-
+        self.timer_setup()
         self.password_setup()
+
+    def config_from_tray(self):
+        os.startfile('config.pyw')
+
+    def timer_setup(self):
+        if self.timer_mode:
+            try:
+                timeObjPath = os.path.join(PATH, 'hid_time.dat')
+            except:
+                logging.info('Cannot initialize hid_time.dat')
+            try:
+                HIDDEN_ATTR = 0x02
+                SHOWN_ATTR = 0x08
+                ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+                with open(timeObjPath, 'w') as file:
+                    file.write(str(TIMER_SETUP))
+                ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+                logging.info('hid_time.dat file set up successfully')
+            except:
+                #no timerSetupTime found
+                logging.info('Cannot set up hid_time.dat file')
+
 
     def password_setup(self):
         if self.timer_mode:
@@ -429,38 +454,64 @@ class TrayHandler:
                 HIDDEN_ATTR = 0x02
                 SHOWN_ATTR = 0x08
                 ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-                with open(hashObjPath, 'r') as file:
-                    self.hashedPass = file.readline()
+                with open(hashObjPath, 'w') as file:
+                    file.write(SAFEWORD)
                 ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
+                logging.info('pass.hash file set up successfully')
             except:
                 #no hash found
                 self.hashedPass = None
 
     def try_panic(self):
-        logging.info('attempting tray panic')
         if not PANIC_DISABLED:
+            logging.info('Panic not disabled, attempting tray panic')
             if self.timer_mode:
                 hashObjPath = os.path.join(PATH, 'pass.hash')
                 timeObjPath = os.path.join(PATH, 'hid_time.dat')
-                pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
-                t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
-                if t_hash == self.hashedPass:
-                    #revealing hidden files
-                    try:
-                        SHOWN_ATTR = 0x08
-                        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-                        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-                        os.remove(hashObjPath)
-                        os.remove(timeObjPath)
-                        os.startfile('panic.pyw')
-                    except:
-                        logging.critical('panic initiated due to failed pass/timer check')
-                        self.tray_icon.stop()
-                        os.startfile('panic.pyw')
+                #revealing hidden files
+                try:
+                    SHOWN_ATTR = 0x08
+                    ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+                    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+                    os.remove(hashObjPath)
+                    os.remove(timeObjPath)
+                    #self.tray_icon.stop()
+                    os.startfile('panic.pyw')
+                    logging.info('Successfully executed Panic in Timer mode')
+                except:
+                    #self.tray_icon.stop()
+                    os.startfile('panic.pyw')
+                    logging.critical('panic initiated due to failed pass/timer check')
             else:
-                logging.warning('panic initiated from tray command')
-                self.tray_icon.stop()
+                #self.tray_icon.stop()
                 os.startfile('panic.pyw')
+                logging.info('Successfully executed Panic in Non-Timer mode')
+        else:
+            logging.info('Panic disabled')
+
+
+            #if self.timer_mode:
+            #    hashObjPath = os.path.join(PATH, 'pass.hash')
+            #    timeObjPath = os.path.join(PATH, 'hid_time.dat')
+            #    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+            #    t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
+            #    if t_hash == self.hashedPass:
+            #        #revealing hidden files
+            #        try:
+            #            SHOWN_ATTR = 0x08
+            #            ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+            #            ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+            #            os.remove(hashObjPath)
+            #            os.remove(timeObjPath)
+            #            os.startfile('panic.pyw')
+            #        except:
+            #            logging.critical('panic initiated due to failed pass/timer check')
+            #            self.tray_icon.stop()
+            #            os.startfile('panic.pyw')
+            #else:
+            #    logging.warning('panic initiated from tray command')
+            #    self.tray_icon.stop()
+            #    os.startfile('panic.pyw')
 
     def move_to_tray(self):
         self.tray_icon.run(tray_setup)
@@ -740,6 +791,7 @@ def do_timer():
         os.remove(hashObjPath)
         os.remove(timeObjPath)
         os.startfile('panic.pyw')
+        logging.info('Timer run out successfully executed Panic')
     except:
         os.startfile('panic.pyw')
 

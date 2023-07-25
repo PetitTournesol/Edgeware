@@ -377,8 +377,10 @@ def run():
             captionLabel = Label(root, text=caption_text, wraplength=resized_image.width - border_wid_const)
             captionLabel.place(x=5, y=5)
 
-    submit_button = Button(root, text=SUBMISSION_TEXT, command=die)
-    submit_button.place(x=resized_image.width - 5 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
+    # Select and display submit text on popup screen
+    submit_text = select_submit()
+    submit_button = Button(root, text=submit_text, command=die)
+    submit_button.place(x=(resized_image.width - submit_button.winfo_reqwidth()) / 2, y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
@@ -417,6 +419,12 @@ def select_caption(filename:str) -> str:
             ls.extend(CAPTIONS['default'])
             return ls[rand.randrange(0, len(CAPTIONS[obj]))]
     return CAPTIONS['default'][rand.randrange(0, len(CAPTIONS['default']))] if (len(CAPTIONS['default']) > 0) else None
+
+def select_submit() -> str:
+    submit_text = 'I obey'
+    if len(CAPTIONS['subtext']) > 0:
+        submit_text = CAPTIONS['subtext'][rand.randrange(0, len(CAPTIONS['subtext']))]
+    return submit_text
 
 def panic(key):
     key_condition = (key.keysym == PANIC_KEY or key.keycode == PANIC_KEY)

@@ -11,12 +11,13 @@ try:
     ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
 except:
     ''
-if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
-    #sudoku if timer after hiding file again
-    os.kill(os.getpid(), 9)
-else:
-    #continue if no timer
-    ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
+#if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
+#    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+#    #sudoku if timer after hiding file again
+#    os.kill(os.getpid(), 9)
+#else:
+#    #continue if no timer
+#    ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
 
+ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
 os.startfile('panic.bat')
