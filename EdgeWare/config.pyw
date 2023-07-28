@@ -1,4 +1,3 @@
-#from curses import mouseinterval
 import json
 import os
 import shutil

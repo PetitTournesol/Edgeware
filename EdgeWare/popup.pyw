@@ -12,10 +12,12 @@ import ctypes
 import threading as thread
 import imageio
 import logging
+import win32gui
+import win32con
 from types import NoneType
 from moviepy.editor import AudioFileClip
 from videoprops import get_video_properties
-from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED
+from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, Canvas
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 
@@ -278,6 +280,11 @@ def run():
     root.overrideredirect(1)
     root.frame = Frame(root)
     root.wm_attributes('-topmost', 1)
+    # config for clickthrough video, gif and images. Buttons are not included
+    root.attributes('-transparentcolor', 'black', '-topmost', 1)
+    bg = Canvas(root, width=0, height=0, bg='black')
+    bg.pack()
+    setClickthrough(bg.winfo_id())
 
     #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img:Image.Image) -> Image.Image:
@@ -301,22 +308,22 @@ def run():
     #different handling for videos vs gifs vs normal images
     if video_mode:
         #video mode
-        label = VideoLabel(root)
+        label = VideoLabel(bg)
         label.load(path = video_path, resized_width = resized_image.width, resized_height = resized_image.height)
         label.pack()
         thread.Thread(target=lambda: label.play(), daemon=True).start()
     elif gif_bool:
         #gif mode
-        label = GifLabel(root)
+        label = GifLabel(bg)
         label.load(path=os.path.abspath(f'{os.getcwd()}\\resource\\img\\{item}'), resized_width = resized_image.width, resized_height = resized_image.height)
         label.pack()
     else:
         #standard image mode
         if not SUBLIMINAL_MODE:
-            label = Label(root, image=photoimage_image, bg='black')
+            label = Label(bg, image=photoimage_image, bg='black')
             label.pack()
         else:
-            label = GifLabel(root)
+            label = GifLabel(bg)
             subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
 
             if os.path.exists(os.path.join(PATH, 'resource', 'subliminals')):
@@ -380,6 +387,17 @@ def run():
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
+    
+# clickthrough function, on by default
+def setClickthrough(hwnd):
+    print("setting window properties")
+    try:
+        styles = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+        styles = win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT
+        win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, styles)
+        win32gui.SetLayeredWindowAttributes(hwnd, 0, 255, win32con.LWA_ALPHA)
+    except Exception as e:
+        print(e)
 
 def check_deny() -> bool:
     return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
