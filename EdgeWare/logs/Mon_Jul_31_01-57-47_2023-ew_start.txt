@@ -1,0 +1,7 @@
+INFO:Started start logging successfully.
+INFO:args: []
+INFO:loading config settings...
+INFO:reading in default config values
+INFO:read in settings from config.cfg
+INFO:converting wallpaper string to dict
+INFO:wallpaperdat already dict

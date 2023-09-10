@@ -1,0 +1,66 @@
+INFO:Started start logging successfully.
+INFO:args: []
+INFO:loading config settings...
+INFO:reading in default config values
+INFO:read in settings from config.cfg
+INFO:converting wallpaper string to dict
+INFO:parsed wallpaper dict from string
+INFO:found prompt.json
+INFO:found web.json
+INFO:image resources found
+INFO:video resources found
+INFO:audio resources found
+INFO:[]
+INFO:set user wallpaper to default wallpaper.png
+INFO:entered main function
+DEBUG:Importing BlpImagePlugin
+DEBUG:Importing BmpImagePlugin
+DEBUG:Importing BufrStubImagePlugin
+DEBUG:Importing CurImagePlugin
+DEBUG:Importing DcxImagePlugin
+DEBUG:Importing DdsImagePlugin
+DEBUG:Importing EpsImagePlugin
+DEBUG:Importing FitsImagePlugin
+DEBUG:Importing FitsStubImagePlugin
+DEBUG:Importing FliImagePlugin
+DEBUG:Importing FpxImagePlugin
+DEBUG:Image: failed to import FpxImagePlugin: No module named 'olefile'
+DEBUG:Importing FtexImagePlugin
+DEBUG:Importing GbrImagePlugin
+DEBUG:Importing GifImagePlugin
+DEBUG:Importing GribStubImagePlugin
+DEBUG:Importing Hdf5StubImagePlugin
+DEBUG:Importing IcnsImagePlugin
+DEBUG:Importing IcoImagePlugin
+DEBUG:Importing ImImagePlugin
+DEBUG:Importing ImtImagePlugin
+DEBUG:Importing IptcImagePlugin
+DEBUG:Importing JpegImagePlugin
+DEBUG:Importing Jpeg2KImagePlugin
+DEBUG:Importing McIdasImagePlugin
+DEBUG:Importing MicImagePlugin
+DEBUG:Image: failed to import MicImagePlugin: No module named 'olefile'
+DEBUG:Importing MpegImagePlugin
+DEBUG:Importing MpoImagePlugin
+DEBUG:Importing MspImagePlugin
+DEBUG:Importing PalmImagePlugin
+DEBUG:Importing PcdImagePlugin
+DEBUG:Importing PcxImagePlugin
+DEBUG:Importing PdfImagePlugin
+DEBUG:Importing PixarImagePlugin
+DEBUG:Importing PngImagePlugin
+DEBUG:Importing PpmImagePlugin
+DEBUG:Importing PsdImagePlugin
+DEBUG:Importing SgiImagePlugin
+DEBUG:Importing SpiderImagePlugin
+DEBUG:Importing SunImagePlugin
+DEBUG:Importing TgaImagePlugin
+DEBUG:Importing TiffImagePlugin
+DEBUG:Importing WebPImagePlugin
+DEBUG:Importing WmfImagePlugin
+DEBUG:Importing XbmImagePlugin
+DEBUG:Importing XpmImagePlugin
+DEBUG:Importing XVThumbImagePlugin
+DEBUG:STREAM b'IHDR' 118 13
+DEBUG:STREAM b'IDAT' 143 32768
+INFO:starting annoyance loop

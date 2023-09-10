@@ -1,0 +1,16 @@
+INFO:Started config logging successfully.
+INFO:args: []
+INFO:opening configDefault
+INFO:done with configDefault
+	default=['2.4.2_A', '1000', '0', '0', '0', '100', '0', '0', '0', '10', '500', '0', '0', '0', '0', '0', '0', '240', '300', '20', '0', '1', '0', '1', '0', '8', 'e', '0', '3', '800', '0', '0', '0', '0', '30', '0', '0', '0', '2', 'EdgeWare>AppData', '', '-5', 'all', '0', 'All', '0', '0', '0', '0', 'password', '0', '100', '0', '25', '0', '0', '0', 'C:/Users/', 'WPAPER_DEF']
+INFO:json loading settings
+INFO:converting wallpaper dict string.
+INFO:evaluated settings wallpaper str to dict.
+INFO:fetching github version
+INFO:set iconbitmap.
+WARNING:failed config var loading.
+	Reason: 'keyMod'
+WARNING:failed config var loading.
+	Reason: 'keyMod'
+CRITICAL:Config encountered fatal error:
+local variable 'hibernateVar' referenced before assignment

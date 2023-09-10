@@ -1,0 +1,208 @@
+INFO:Started start logging successfully.
+INFO:args: []
+INFO:loading config settings...
+INFO:reading in default config values
+INFO:read in settings from config.cfg
+INFO:converting wallpaper string to dict
+INFO:parsed wallpaper dict from string
+INFO:found prompt.json
+INFO:found web.json
+INFO:image resources found
+INFO:video resources found
+INFO:audio resources found
+INFO:[]
+INFO:started loading flair
+INFO:set user wallpaper to default wallpaper.png
+INFO:entered main function
+DEBUG:Importing BlpImagePlugin
+DEBUG:Importing BmpImagePlugin
+DEBUG:Importing BufrStubImagePlugin
+DEBUG:Importing CurImagePlugin
+DEBUG:Importing DcxImagePlugin
+DEBUG:Importing DdsImagePlugin
+DEBUG:Importing EpsImagePlugin
+DEBUG:Importing FitsImagePlugin
+DEBUG:Importing FitsStubImagePlugin
+DEBUG:Importing FliImagePlugin
+DEBUG:Importing FpxImagePlugin
+DEBUG:Image: failed to import FpxImagePlugin: No module named 'olefile'
+DEBUG:Importing FtexImagePlugin
+DEBUG:Importing GbrImagePlugin
+DEBUG:Importing GifImagePlugin
+DEBUG:Importing GribStubImagePlugin
+DEBUG:Importing Hdf5StubImagePlugin
+DEBUG:Importing IcnsImagePlugin
+DEBUG:Importing IcoImagePlugin
+DEBUG:Importing ImImagePlugin
+DEBUG:Importing ImtImagePlugin
+DEBUG:Importing IptcImagePlugin
+DEBUG:Importing JpegImagePlugin
+DEBUG:Importing Jpeg2KImagePlugin
+DEBUG:Importing McIdasImagePlugin
+DEBUG:Importing MicImagePlugin
+DEBUG:Image: failed to import MicImagePlugin: No module named 'olefile'
+DEBUG:Importing MpegImagePlugin
+DEBUG:Importing MpoImagePlugin
+DEBUG:Importing MspImagePlugin
+DEBUG:Importing PalmImagePlugin
+DEBUG:Importing PcdImagePlugin
+DEBUG:Importing PcxImagePlugin
+DEBUG:Importing PdfImagePlugin
+DEBUG:Importing PixarImagePlugin
+DEBUG:Importing PngImagePlugin
+DEBUG:Importing PpmImagePlugin
+DEBUG:Importing PsdImagePlugin
+DEBUG:Importing SgiImagePlugin
+DEBUG:Importing SpiderImagePlugin
+DEBUG:Importing SunImagePlugin
+DEBUG:Importing TgaImagePlugin
+DEBUG:Importing TiffImagePlugin
+DEBUG:Importing WebPImagePlugin
+DEBUG:Importing WmfImagePlugin
+DEBUG:Importing XbmImagePlugin
+DEBUG:Importing XpmImagePlugin
+DEBUG:Importing XVThumbImagePlugin
+DEBUG:STREAM b'IHDR' 118 13
+DEBUG:STREAM b'IDAT' 143 32768
+INFO:hid_time.dat file set up successfully
+INFO:pass.hash file set up successfully
+INFO:starting annoyance loop
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+INFO:Panic not disabled, attempting tray panic
+ERROR:An error occurred when calling message handler
+Traceback (most recent call last):
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 401, in _dispatcher
+    return int(icon._message_handlers.get(
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 213, in _on_notify
+    descriptors[index - 1](self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 324, in inner
+    callback(self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 449, in __call__
+    return self._action(icon, self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 544, in wrapper0
+    return action()
+  File "E:\Github Desktop\Edgeware\EdgeWare\start.pyw", line 513, in try_panic
+    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 411, in askstring
+    d = _QueryString(title, prompt, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 388, in __init__
+    _QueryDialog.__init__(self, *args, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 283, in __init__
+    Dialog.__init__(self, parent, title)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 109, in __init__
+    Toplevel.__init__(self, master)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2650, in __init__
+    BaseWidget.__init__(self, master, 'toplevel', cnf, {}, extra)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2601, in __init__
+    self.tk.call(
+RuntimeError: main thread is not in main loop
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+INFO:Panic not disabled, attempting tray panic
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+ERROR:An error occurred when calling message handler
+Traceback (most recent call last):
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 401, in _dispatcher
+    return int(icon._message_handlers.get(
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 213, in _on_notify
+    descriptors[index - 1](self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 324, in inner
+    callback(self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 449, in __call__
+    return self._action(icon, self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 544, in wrapper0
+    return action()
+  File "E:\Github Desktop\Edgeware\EdgeWare\start.pyw", line 513, in try_panic
+    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 411, in askstring
+    d = _QueryString(title, prompt, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 388, in __init__
+    _QueryDialog.__init__(self, *args, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 283, in __init__
+    Dialog.__init__(self, parent, title)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 109, in __init__
+    Toplevel.__init__(self, master)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2650, in __init__
+    BaseWidget.__init__(self, master, 'toplevel', cnf, {}, extra)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2601, in __init__
+    self.tk.call(
+RuntimeError: main thread is not in main loop
+INFO:Starting config from tray command
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+INFO:Panic not disabled, attempting tray panic
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+ERROR:An error occurred when calling message handler
+Traceback (most recent call last):
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 401, in _dispatcher
+    return int(icon._message_handlers.get(
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 213, in _on_notify
+    descriptors[index - 1](self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 324, in inner
+    callback(self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 449, in __call__
+    return self._action(icon, self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 544, in wrapper0
+    return action()
+  File "E:\Github Desktop\Edgeware\EdgeWare\start.pyw", line 513, in try_panic
+    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 411, in askstring
+    d = _QueryString(title, prompt, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 388, in __init__
+    _QueryDialog.__init__(self, *args, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 283, in __init__
+    Dialog.__init__(self, parent, title)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 109, in __init__
+    Toplevel.__init__(self, master)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2650, in __init__
+    BaseWidget.__init__(self, master, 'toplevel', cnf, {}, extra)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2601, in __init__
+    self.tk.call(
+RuntimeError: main thread is not in main loop
+INFO:Starting config from tray command
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+CRITICAL:failed to start popup.pyw
+	Reason: [WinError 2] The system cannot find the file specified: 'popup.pyw'
+INFO:Panic not disabled, attempting tray panic
+ERROR:An error occurred when calling message handler
+Traceback (most recent call last):
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 401, in _dispatcher
+    return int(icon._message_handlers.get(
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_win32.py", line 213, in _on_notify
+    descriptors[index - 1](self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 324, in inner
+    callback(self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 449, in __call__
+    return self._action(icon, self)
+  File "C:\Users\ngbla\AppData\Roaming\Python\Python310\site-packages\pystray\_base.py", line 544, in wrapper0
+    return action()
+  File "E:\Github Desktop\Edgeware\EdgeWare\start.pyw", line 513, in try_panic
+    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 411, in askstring
+    d = _QueryString(title, prompt, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 388, in __init__
+    _QueryDialog.__init__(self, *args, **kw)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 283, in __init__
+    Dialog.__init__(self, parent, title)
+  File "C:\Program Files (x86)\Python\lib\tkinter\simpledialog.py", line 109, in __init__
+    Toplevel.__init__(self, master)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2650, in __init__
+    BaseWidget.__init__(self, master, 'toplevel', cnf, {}, extra)
+  File "C:\Program Files (x86)\Python\lib\tkinter\__init__.py", line 2601, in __init__
+    self.tk.call(
+RuntimeError: main thread is not in main loop
+INFO:Timer run out successfully executed Panic

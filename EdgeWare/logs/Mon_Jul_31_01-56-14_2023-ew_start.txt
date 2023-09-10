@@ -1,0 +1,9 @@
+INFO:Started start logging successfully.
+INFO:args: []
+INFO:loading config settings...
+INFO:reading in default config values
+INFO:read in settings from config.cfg
+INFO:converting wallpaper string to dict
+INFO:parsed wallpaper dict from string
+WARNING:pip is not installed, running get-pip.pyw
+WARNING:pip should be installed, but issues will occur if installation failed.

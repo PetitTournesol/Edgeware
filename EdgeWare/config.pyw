@@ -160,10 +160,15 @@ def show_window():
         try:
             delayVar            = IntVar(root, value=int(settings['delay']))
             popupVar            = IntVar(root, value=int(settings['popupMod']))
-            mouseVar            = IntVar(root, value=int(settings['mouseMod']))
             webVar              = IntVar(root, value=int(settings['webMod']))
             audioVar            = IntVar(root, value=int(settings['audioMod']))
             promptVar           = IntVar(root, value=int(settings['promptMod']))
+            mouseVar            = BooleanVar(root, value=(int(settings['mouseMod'])==1))
+            mouseMoveVar        = IntVar(root, value=int(settings['mouseMoveMod']))
+            keyVar              = BooleanVar(root, value=(int(settings['keyMod'])==1))
+            keyPressVar         = IntVar(root, value=(int(settings['keyPressMod'])))
+            cthroughVar         = BooleanVar(root, value=(int(settings['cthroughMod'])==1))
+
             fillVar             = BooleanVar(root, value=(settings['fill']==1))
 
             fillDelayVar        = IntVar(root, value=int(settings['fill_delay']))
@@ -219,8 +224,9 @@ def show_window():
             booruMin            = IntVar(root, value=int(settings['booruMinScore']))
             
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, mouseVar, webVar, audioVar, promptVar, fillVar, 
-                            fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, 
+            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, mouseVar, 
+                            mouseMoveVar, keyVar, keyPressVar, cthroughVar,
+                            fillVar, fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, 
                             hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, 
                             discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
                             promptMistakeVar, mitosisVar, onlyVidVar, popupWebVar,
@@ -231,8 +237,9 @@ def show_window():
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
                             booruMin]
 
-            in_var_names = ['delay', 'popupMod', 'mouseMod', 'webMod', 'audioMod', 'promptMod', 'fill', 
-                            'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 
+            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'mouseMod',
+                            'mouseMoveMod', 'keyMod', 'keyPressMod', 'cthroughMod',
+                            'fill', 'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 
                             'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 
                             'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
                             'promptMistakes', 'mitosisMode', 'onlyVid', 'webPopup',
@@ -274,6 +281,8 @@ def show_window():
     mitosis_cGroup  = []
     wallpaper_group = []
     timeout_group   = []
+    mouse_group     = []
+    keyboard_group  = []
     download_group  = []
     timer_group     = []
     lowkey_group    = []
@@ -315,7 +324,7 @@ def show_window():
     hibernateMinScale = Scale(hibernateMinFrame, label='Min Sleep (sec)', variable=hibernateMinVar, orient='horizontal', from_=1, to=7200)
     hibernateMaxButton = Button(hibernateMaxFrame, text='Manual max...', command=lambda: assign(hibernateMaxVar, simpledialog.askinteger('Manual Maximum Sleep (sec)', prompt='[2-14400]: ')))
     hibernateMaxScale = Scale(hibernateMaxFrame, label='Max Sleep (sec)', variable=hibernateMaxVar, orient='horizontal', from_=2, to=14400)
-    h_activityScale = Scale(hibernateHostFrame, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
+    h_activityScale = Scale(hibernateHostFrame, label='Awaken Activity (x10)', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
         
     hibernate_group.append(h_activityScale)
     hibernate_group.append(hibernateMinButton)
@@ -504,7 +513,7 @@ def show_window():
 
     opacityScale.pack(fill='x')
     
-    #popup frame handling
+    # popup frame handling
     popupHostFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
     popupFrame = Frame(popupHostFrame)
     timeoutFrame = Frame(popupHostFrame)
@@ -523,17 +532,12 @@ def show_window():
         toggleAssociateSettings(mitosisVar.get(), mitosis_cGroup)
 
     mitosisToggle = Checkbutton(mitosisFrame, text='Mitosis Mode', variable=mitosisVar, command=toggleMitosis)
-    mitosisStren  = Scale(mitosisFrame, label='Mitosis Strength', orient='horizontal', from_=2, to=10, variable=mitosisStrenVar)
+    mitosisStren  = Scale(mitosisFrame, label='Mitosis Strength', orient='horizontal', from_=0, to=9, variable=mitosisStrenVar)
 
     mitosis_cGroup.append(mitosisStren)
 
     setPanicButtonButton = Button(panicFrame, text=f'Set Panic Button\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
     doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: os.startfile('panic.pyw'))
-    panicDisableButton = Checkbutton(popupHostFrame, text='Disable Panic Hotkey', variable=panicVar)
-
-    popupWebToggle= Checkbutton(popupHostFrame, text='Popup close opens web page', variable=popupWebVar)
-    toggleCaptionsButton = Checkbutton(popupHostFrame, text='Popup Captions', variable=captionVar)
-    toggleSubliminalButton = Checkbutton(popupHostFrame, text='Popup Subliminals', variable=popupSublim)
 
     timeoutToggle = Checkbutton(timeoutFrame, text='Popup Timeout', variable=timeoutPopupsVar, command=lambda: toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group))
     timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=150, orient='horizontal', variable=popupTimeoutVar)
@@ -565,18 +569,38 @@ def show_window():
     panicFrame.pack(fill='y', side='left')
     setPanicButtonButton.pack(fill='x')
     doPanicButton.pack(fill='x')
+    # popup frame handle end
+
+    # popup frame for toggle controls
+    popupToggleFrame = Frame(master=tabAnnoyance, borderwidth=5, relief=RAISED)
+    popupToggleFrame1 = Frame(popupToggleFrame)
+    popupToggleFrame2 = Frame(popupToggleFrame)
+    popupToggleFrame3 = Frame(popupToggleFrame)
+    
+    panicDisableButton      = Checkbutton(popupToggleFrame1, anchor='w', text='Disable Panic Hotkey', variable=panicVar)
+    cthroughToggleButton    = Checkbutton(popupToggleFrame1, anchor='w', text='Enable Click Through', variable=cthroughVar)
+    popupWebToggle          = Checkbutton(popupToggleFrame2, anchor='w', text='Popup close opens web page', variable=popupWebVar)
+    toggleCaptionsButton    = Checkbutton(popupToggleFrame3, anchor='w', text='Popup Captions', variable=captionVar)
+    toggleSubliminalButton  = Checkbutton(popupToggleFrame3, anchor='w', text='Popup Subliminals', variable=popupSublim)
+    
+    popupToggleFrame.pack(fill='x')
+
+    popupToggleFrame1.pack(fill='both', side='left', expand=1)
     panicDisableButton.pack(fill='x')
+    cthroughToggleButton.pack(fill='x')
+
+    popupToggleFrame2.pack(fill='both', side='left', expand=1)
     popupWebToggle.pack(fill='x')
-    toggleCaptionsButton.pack(fill='x')
+
+    popupToggleFrame3.pack(fill='both', side='right', expand=1)
     toggleSubliminalButton.pack(fill='x')
-    #popup frame handle end
+    toggleCaptionsButton.pack(fill='x')
 
     #other start
     otherHostFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
 
     audioFrame = Frame(otherHostFrame)
     webFrame = Frame(otherHostFrame)
-    mouseFrame = Frame(otherHostFrame)
     vidFrameL = Frame(otherHostFrame)
     vidFrameR = Frame(otherHostFrame)
     promptFrame = Frame(otherHostFrame)
@@ -587,12 +611,7 @@ def show_window():
     
     webScale = Scale(webFrame, label='Website Freq (%)', from_=0, to=100, orient='horizontal', variable=webVar)
     webManual = Button(webFrame, text='Manual web...', command=lambda: assign(webVar, simpledialog.askinteger('Web Chance', prompt='[0-100]: ')))
-    
-    mouseScale = Scale(mouseFrame, label='Mouse Freq (%)', from_=0, to=100, orient='horizontal', variable=mouseVar)
-    mouseManual = Button(mouseFrame, text='Manual mouse...', command=lambda: assign(mouseVar, simpledialog.askinteger('Manual mouse', prompt='[0-100]')))
-    mouse_group.append(mouseScale)
-    mouse_group.append(mouseManual)
-    
+        
     vidScale = Scale(vidFrameL, label='Video Chance (%)', from_=0, to=100, orient='horizontal', variable=vidVar)
     vidManual = Button(vidFrameL, text='Manual vid...', command=lambda: assign(vidVar, simpledialog.askinteger('Video Chance', prompt='[0-100]: ')))
     vidVolumeScale = Scale(vidFrameR, label='Video Volume', from_=0, to=100, orient='horizontal', variable=videoVolume)
@@ -614,10 +633,6 @@ def show_window():
     webScale.pack(fill='x')
     webManual.pack(fill='x')
 
-    mouseScale.pack(fill='x')
-    mouseManual.pack(fill='x')
-    mouseFrame.pack(fill='y', side='left')
-
     vidFrameL.pack(fill='x', side='left', padx=(3, 0), expand=1)
     vidScale.pack(fill='x')
     vidManual.pack(fill='x')
@@ -631,7 +646,32 @@ def show_window():
     mistakeFrame.pack(fill='y', side='left', padx=(0, 3), expand=1)
     mistakeScale.pack(fill='x')
     mistakeManual.pack(fill='x')
-    #end web
+
+    # Additional annoyances
+    extraHostFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
+    mouseFrame = Frame(extraHostFrame)
+    keyboardFrame = Frame(extraHostFrame)
+    
+    mouseToggle = Checkbutton(mouseFrame, text='Takeover Mouse', variable=mouseVar, command=lambda: toggleAssociateSettings(mouseVar.get(), mouse_group))
+    mouseScale = Scale(mouseFrame, label='Mouse Actions', from_=1, to=10, orient='horizontal', variable=mouseMoveVar)
+    mouse_group.append(mouseScale)
+    
+    keyboardToggle = Checkbutton(keyboardFrame, text='Random keypress', variable=keyVar, command=lambda: toggleAssociateSettings(keyVar.get(), keyboard_group))
+    keyboardScale = Scale(keyboardFrame, label='Keys (/sec)', from_=1, to=10, orient='horizontal', variable=keyPressVar)
+    keyboard_group.append(keyboardScale)
+    
+    extraHostFrame.pack(fill='x')
+
+    mouseScale.pack(fill='x')
+    mouseToggle.pack(fill='x')
+    mouseFrame.pack(fill='y', side='left')
+
+    keyboardScale.pack(fill='x')
+    keyboardToggle.pack(fill='x')
+    keyboardFrame.pack(fill='y', side='left')
+
+
+    #This is the end of Annoyance tab#
     #===================={DRIVE}==============================#
     tabMaster.add(tabDrive, text='Drive')
 
@@ -861,6 +901,8 @@ def show_window():
     toggleAssociateSettings(not mitosisVar.get(), mitosis_group)
     toggleAssociateSettings_manual(downloadEnabledVar.get(), download_group, 'white', 'gray25')
     toggleAssociateSettings(timerVar.get(), timer_group)
+    toggleAssociateSettings(mouseVar.get(), mouse_group)
+    toggleAssociateSettings(keyVar.get(), keyboard_group)
     toggleAssociateSettings(lkToggle.get(), lowkey_group)
     toggleAssociateSettings(denialMode.get(), denial_group)
     
@@ -869,18 +911,18 @@ def show_window():
     saveExitButton.pack(fill='x')
     
     
-    timeObjPath = os.path.join(PATH, 'hid_time.dat')
-    HIDDEN_ATTR = 0x02
-    SHOWN_ATTR  = 0x08
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-    if os.path.exists(timeObjPath):
-        with open(timeObjPath, 'r') as file:
-            time_ = int(file.readline()) / 60
-            if not time_ == int(settings['timerSetupTime']):
-                timerToggle.configure(state=DISABLED)
-                for item in timer_group:
-                    item.configure(state=DISABLED)
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+    #timeObjPath = os.path.join(PATH, 'hid_time.dat')
+    #HIDDEN_ATTR = 0x02
+    #SHOWN_ATTR  = 0x08
+    #ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    #if os.path.exists(timeObjPath):
+    #    with open(timeObjPath, 'r') as file:
+    #        time_ = int(file.readline()) / 60
+    #        if not time_ == int(settings['timerSetupTime']):
+    #            timerToggle.configure(state=DISABLED)
+    #            for item in timer_group:
+    #                item.configure(state=DISABLED)
+    #ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
 
     
     #first time alert popup
@@ -981,42 +1023,42 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
 
     toggleStartupBat(varList[nameList.index('start_on_logon')].get())
 
-    SHOWN_ATTR = 0x08
-    HIDDEN_ATTR = 0x02
-    hashObjPath = os.path.join(PATH, 'pass.hash')
-    timeObjPath = os.path.join(PATH, 'hid_time.dat')
+    #SHOWN_ATTR = 0x08
+    #HIDDEN_ATTR = 0x02
+    #hashObjPath = os.path.join(PATH, 'pass.hash')
+    #timeObjPath = os.path.join(PATH, 'hid_time.dat')
 
-    if int(varList[nameList.index('timerMode')].get()) == 1:
-        toggleStartupBat(True)
+    #if int(varList[nameList.index('timerMode')].get()) == 1:
+    #    toggleStartupBat(True)
 
-        #revealing hidden files
-        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-        logging.info('revealed hashed pass and time files')
+    #    #revealing hidden files
+    #    ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+    #    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    #    logging.info('revealed hashed pass and time files')
 
-        with open(hashObjPath, 'w') as passFile, open(timeObjPath, 'w') as timeFile:
-            logging.info('attempting file writes...')
-            passFile.write(hashlib.sha256(passVar.get().encode(encoding='ascii',errors='ignore')).hexdigest())
-            timeFile.write(str(varList[nameList.index('timerSetupTime')].get()*60))
-            logging.info('wrote files.')
+    #    with open(hashObjPath, 'w') as passFile, open(timeObjPath, 'w') as timeFile:
+    #        logging.info('attempting file writes...')
+    #        passFile.write(hashlib.sha256(passVar.get().encode(encoding='ascii',errors='ignore')).hexdigest())
+    #        timeFile.write(str(varList[nameList.index('timerSetupTime')].get()*60))
+    #        logging.info('wrote files.')
 
-        #hiding hash file with saved password hash for panic and time data
-        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
-        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
-        logging.info('hid hashed pass and time files')
-    else:
-        try:
-            if not varList[nameList.index('start_on_logon')].get():
-                toggleStartupBat(False)
-            ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-            ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-            os.remove(hashObjPath)
-            os.remove(timeObjPath)
-            logging.info('removed pass/time files.')
-        except Exception as e:
-            errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
-            logging.warning(f'failed timer file modifying\n\tReason: {errText}')
-            pass
+    #    #hiding hash file with saved password hash for panic and time data
+    #    ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
+    #    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+    #    logging.info('hid hashed pass and time files')
+    #else:
+    #    try:
+    #        if not varList[nameList.index('start_on_logon')].get():
+    #            toggleStartupBat(False)
+    #        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+    #        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    #        os.remove(hashObjPath)
+    #        os.remove(timeObjPath)
+    #        logging.info('removed pass/time files.')
+    #    except Exception as e:
+    #        errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
+    #        logging.warning(f'failed timer file modifying\n\tReason: {errText}')
+    #        pass
 
     for name in varNames:
         try:

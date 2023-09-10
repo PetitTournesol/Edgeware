@@ -15,7 +15,7 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
-import mouse
+import pyautogui as auto
 import winsound
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
@@ -217,7 +217,8 @@ AUDIO_CHANCE = int(settings['audioMod'])
 PROMPT_CHANCE = int(settings['promptMod'])
 VIDEO_CHANCE = int(settings['vidMod'])
 WEB_CHANCE = int(settings['webMod'])
-MOUSE_CHANCE = int(settings['mouseMod'])
+MOUSE_ACTIONS = int(settings['mouseMoveMod'])
+KEYPRESS_ACTION = int(settings['keyPressMod'])
 
 VIDEOS_ONLY = int(settings['onlyVid']) == 1
 
@@ -246,6 +247,8 @@ ROTATE_WALLPAPER = int(settings['rotateWallpaper']) == 1
 
 MITOSIS_MODE = int(settings['mitosisMode']) == 1
 LOWKEY_MODE = int(settings['lkToggle']) == 1
+MOUSE_MODE = int(settings['mouseMod']) == 1
+KEYPRESS_MODE = int(settings['keyMod']) == 1
 
 TIMER_MODE = int(settings['timerMode']) == 1
 TIMER_SETUP = int(settings['timerSetupTime']) * 60
@@ -462,6 +465,7 @@ class TrayHandler:
                 with open(hashObjPath, 'w') as file:
                     file.write(SAFEWORD)
                 ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
+                self.hashedPass = hashlib.sha256(SAFEWORD.encode(encoding='ascii', errors='ignore')).hexdigest()
                 logging.info('pass.hash file set up successfully')
             except:
                 #no hash found
@@ -478,53 +482,56 @@ class TrayHandler:
     def try_panic(self):
         if not PANIC_DISABLED:
             logging.info('Panic not disabled, attempting tray panic')
+        #    if self.timer_mode:
+        #        hashObjPath = os.path.join(PATH, 'pass.hash')
+        #        timeObjPath = os.path.join(PATH, 'hid_time.dat')
+        #        #revealing hidden files
+        #        try:
+        #            SHOWN_ATTR = 0x08
+        #            ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+        #            ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+        #            os.remove(hashObjPath)
+        #            os.remove(timeObjPath)
+        #            #self.tray_icon.stop()
+        #            os.startfile('panic.pyw')
+        #            logging.info('Successfully executed Panic in Timer mode')
+        #        except:
+        #            #self.tray_icon.stop()
+        #            os.startfile('panic.pyw')
+        #            logging.critical('panic initiated due to failed pass/timer check')
+        #    else:
+        #        #self.tray_icon.stop()
+        #        os.startfile('panic.pyw')
+        #        logging.info('Successfully executed Panic in Non-Timer mode')
+        #else:
+        #    logging.info('Panic disabled')
+
+
             if self.timer_mode:
                 hashObjPath = os.path.join(PATH, 'pass.hash')
                 timeObjPath = os.path.join(PATH, 'hid_time.dat')
-                #revealing hidden files
-                try:
-                    SHOWN_ATTR = 0x08
-                    ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-                    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-                    os.remove(hashObjPath)
-                    os.remove(timeObjPath)
-                    #self.tray_icon.stop()
-                    os.startfile('panic.pyw')
-                    logging.info('Successfully executed Panic in Timer mode')
-                except:
-                    #self.tray_icon.stop()
-                    os.startfile('panic.pyw')
-                    logging.critical('panic initiated due to failed pass/timer check')
+                pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+                t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
+                if t_hash == self.hashedPass:
+                    #revealing hidden files
+                    try:
+                        SHOWN_ATTR = 0x08
+                        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
+                        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+                        os.remove(hashObjPath)
+                        os.remove(timeObjPath)
+                        os.startfile('panic.pyw')
+                        logging.info('Successfully executed Panic in Timer mode')
+                    except:
+                        logging.critical('panic initiated due to failed pass/timer check')
+                        self.tray_icon.stop()
+                        os.startfile('panic.pyw')
             else:
-                #self.tray_icon.stop()
+                logging.warning('panic initiated from tray command')
+                self.tray_icon.stop()
                 os.startfile('panic.pyw')
-                logging.info('Successfully executed Panic in Non-Timer mode')
         else:
             logging.info('Panic disabled')
-
-
-            #if self.timer_mode:
-            #    hashObjPath = os.path.join(PATH, 'pass.hash')
-            #    timeObjPath = os.path.join(PATH, 'hid_time.dat')
-            #    pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
-            #    t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
-            #    if t_hash == self.hashedPass:
-            #        #revealing hidden files
-            #        try:
-            #            SHOWN_ATTR = 0x08
-            #            ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-            #            ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-            #            os.remove(hashObjPath)
-            #            os.remove(timeObjPath)
-            #            os.startfile('panic.pyw')
-            #        except:
-            #            logging.critical('panic initiated due to failed pass/timer check')
-            #            self.tray_icon.stop()
-            #            os.startfile('panic.pyw')
-            #else:
-            #    logging.warning('panic initiated from tray command')
-            #    self.tray_icon.stop()
-            #    os.startfile('panic.pyw')
 
     def move_to_tray(self):
         self.tray_icon.run(tray_setup)
@@ -576,7 +583,7 @@ def main():
             waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
             time.sleep(float(waitTime))
             ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
-            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
+            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY) * 10):
                 roll_for_initiative()
     else:
         logging.info('starting annoyance loop')
@@ -743,10 +750,17 @@ def annoyance():
 
 #independently attempt to do all active settings with probability equal to their freq value     
 def roll_for_initiative():
-    if do_roll(WEB_CHANCE) and HAS_WEB:
+    if do_roll(WEB_CHANCE/10) and HAS_WEB:
         try:
+            # auto.hotkey('ctrl', 'w')  # Attempt auto close tab with hot key (unused for now)
+            
+            # get chrome path
+            chrome_path = r'"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %s'
+
+            # Close current browser to avoid stacking up browser tabs
+            subprocess.call('taskkill /F /IM chrome.exe', shell=True)
             url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
-            webbrowser.open_new(url)
+            webbrowser.get(chrome_path).open_new(url)
         except Exception as e:
             messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
             logging.critical(f'failed to open website {url}\n\tReason: {e}')
@@ -775,12 +789,44 @@ def roll_for_initiative():
         except:
             messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
             logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
-    if do_roll(MOUSE_CHANCE):
-        try:
-            mouse.move(rand.randrange(-100,100),rand.randrange(-100,100), False, 5)
-        except:
-            messagebox.showerror('Mouse overtaken Error','\n[' + str(e) + ']')
-            logging.critical(f'failed to overtake mouse\n\tReason: {e}')
+    if MOUSE_MODE:
+        # get screen width and height for random mouse action
+        screenWidth, screenHeight = auto.size()
+        
+        # random number of actions between 1 and maximum actions
+        for action in range(1, MOUSE_ACTIONS):
+            time.sleep(0.1)
+
+            # random to choose mouse movement or click
+            act = rand.randint(0, 1)
+            if act:
+                try:
+                    # Random mouse movement on the screen with step of action
+                    auto.moveTo(rand.randrange(0, screenWidth, action), rand.randrange(0, screenHeight, action))
+                except:
+                    messagebox.showerror('Mouse movement Error','\n[' + str(e) + ']')
+                    logging.critical(f'failed to move mouse\n\tReason: {e}')
+            else:
+                try:
+                    # Random mouse movement and click on the screen
+                    auto.click(rand.randrange(0,screenWidth, action), rand.randrange(0, screenHeight,action))
+                except:
+                    messagebox.showerror('Mouse clicking Error', '\n[' +str(e) + ']')
+                    logging.critical(f'failed to execute mouse clicking\n\tReason: {e}')
+    if KEYPRESS_MODE:
+        # random key list
+        key_list = ['a', 'b', 'c', 'd', 'e','f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', 'esc']
+        
+        # random number of actions between 1 and maximum key press actions
+        for action in range(1, KEYPRESS_ACTION):
+            time.sleep(0.1)
+
+            try:
+                auto.press(rand.choice(key_list))
+            except:
+                messagebox.showerror('Key press Error', '\n[' + str(e) + ']')
+                logging.critical(f'failed to execute random key press\n\tReason: {e}')
+
 
 def rotate_wallpapers():
     prv = 'default'

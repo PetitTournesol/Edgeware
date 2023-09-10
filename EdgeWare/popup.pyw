@@ -424,6 +424,9 @@ def die():
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             os.startfile('popup.pyw')
+    if HAS_LIFESPAN and MITOSIS_MODE:
+        time.sleep(LIFESPAN)
+        os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
 def select_caption(filename:str) -> str:
