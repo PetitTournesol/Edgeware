@@ -240,3 +240,6 @@ __**Packages**__
 If resources are present, but not properly structured, the application could crash or exhibit strange behavior.
 
 *(If you like my work and would like to help me pay for food, please feel free to donate; Cashapp is $PetitTournesol)*
+
+# Requirements for linux
+Please already have portaudio installed

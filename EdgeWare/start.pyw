@@ -15,10 +15,24 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
+import utilities
+import requests
+import PIL
+import pypresence
+import pystray
+import playsound
+# import videoprops # I have no idea what this is
+import imageio
+import moviepy
+import sounddevice
+import pathlib
+from PIL import Image
+from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 
-PATH = str(pathlib.Path(__file__).parent.absolute())
+PATH = utilities.convert_path(str(pathlib.Path(__file__).parent.absolute()))
+PATH = os.path.join(PATH)
 os.chdir(PATH)
 
 #starting logging
@@ -39,7 +53,7 @@ def load_settings():
     settings = {}
 
     #creating objects to check vs live config for version updates
-    with open(PATH + '\\configDefault.dat') as r:
+    with open(os.path.join(PATH, 'configDefault.dat')) as r:
         logging.info('reading in default config values')
         defaultLines = r.readlines()
         default_setting_keys = defaultLines[0].split(',')
@@ -50,13 +64,13 @@ def load_settings():
         settings[var] = default_setting_values[default_setting_keys.index(var)]
 
     #checking if config file exists and then writing the default config settings to a new file if it doesn't
-    if not os.path.exists(f'{PATH}\\config.cfg'):
-        with open(f'{PATH}\\config.cfg', 'w') as f:
+    if not os.path.exists(os.path.join(PATH, 'config.cfg')):
+        with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
             f.write(json.dumps(settings))
             logging.warning('could not find config.cfg, wrote new file.')
 
     #reading in config file
-    with open(f'{PATH}\\config.cfg', 'r') as f:
+    with open(os.path.join(PATH, 'config.cfg'), 'r') as f:
         settings = json.loads(f.readline())
         logging.info('read in settings from config.cfg')
 
@@ -101,18 +115,18 @@ def load_settings():
 load_settings()
 if not settings['is_configed']==1:
     logging.info('running config for first setup, is_configed flag is false.')
-    subprocess.call('pythonw config.pyw')
+    subprocess.call(['python', 'config.pyw'])
     logging.info('reloading settings')
     load_settings()
 
 #check for pip_installed flag, if not installed run get-pip.pyw and then install pillow for popups
-if not int(settings['pip_installed'])==1:
-    logging.warning('pip is not installed, running get-pip.pyw')
-    subprocess.call('python get-pip.pyw')
-    logging.warning('pip should be installed, but issues will occur if installation failed.')
-    settings['pip_installed'] = 1
-    with open(f'{PATH}\\config.cfg', 'w') as f:
-        f.write(json.dumps(settings))
+# if not int(settings['pip_installed'])==1:
+#     logging.warning('pip is not installed, running get-pip.pyw')
+#     subprocess.call(['python', 'get-pip.pyw'])
+#     logging.warning('pip should be installed, but issues will occur if installation failed.')
+#     settings['pip_installed'] = 1
+#     with open(f'{PATH}\\config.cfg', 'w') as f:
+#         f.write(json.dumps(settings))
 
 def pip_install(packageName:str):
     try:
@@ -124,77 +138,87 @@ def pip_install(packageName:str):
         logging.warning(f'{packageName} should be installed, fatal errors will occur if install failed.')
 
 #i liked the emergency fix so much that i just made it import every non-standard lib like that c:
-try:
-    import requests
-except:
-    logging.warning('failed to import requests module')
-    pip_install('requests')
-    import requests
-
-try:
-    import PIL
-    from PIL import Image
-except:
-    logging.warning('failed to import pillow module')
-    pip_install('pillow')
-    from PIL import Image
-
-try:
-    import pypresence
-except:
-    logging.warning('failed to import pypresence module')
-    pip_install('pypresence')
-
-try:
-    import pystray
-except:
-    logging.warning('failed to import pystray module')
-    pip_install('pystray')
-
-try:
-    import playsound
-except:
-    logging.warning('failed to import playsound module')
-    pip_install('playsound==1.2.2')
-    import playsound
-
-try:
-    import videoprops
-except:
-    logging.warning('failed to import videoprops module')
-    pip_install('get-video-properties')
-
-try:
-    import imageio
-except:
-    logging.warning('failed to import imageio module')
-    pip_install('imageio')
-
-try:
-    import moviepy
-except:
-    logging.warning('failed to import moviepy module')
-    pip_install('moviepy')
-
-try:
-    import sounddevice
-except:
-    logging.warning('failed to import moviepy module')
-    pip_install('sounddevice')
-
-try:
-    from bs4 import BeautifulSoup
-except:
-    logging.warning('failed to import bs4 module')
-    pip_install('bs4')
-    from bs4 import BeautifulSoup
+# This is the wrong way to do this. The correct way is a requirements file
+# try:
+#     import requests
+# except:
+#     logging.warning('failed to import requests module')
+#     pip_install('requests')
+#     import requests
+#
+# try:
+#     import PIL
+#     from PIL import Image
+# except:
+#     logging.warning('failed to import pillow module')
+#     pip_install('pillow')
+#     from PIL import Image
+#
+# try:
+#     import pypresence
+# except:
+#     logging.warning('failed to import pypresence module')
+#     pip_install('pypresence')
+#
+# try:
+#     import pystray
+# except:
+#     logging.warning('failed to import pystray module')
+#     pip_install('pystray')
+#
+# try:
+#     import playsound
+# except:
+#     logging.warning('failed to import playsound module')
+#     pip_install('playsound==1.2.2')
+#     import playsound
+#
+# try:
+#     import videoprops
+# except:
+#     logging.warning('failed to import videoprops module')
+#     pip_install('get-video-properties')
+#
+# try:
+#     import imageio
+# except:
+#     logging.warning('failed to import imageio module')
+#     pip_install('imageio')
+#
+# try:
+#     import moviepy
+# except:
+#     logging.warning('failed to import moviepy module')
+#     pip_install('moviepy')
+#
+# try:
+#     import sounddevice
+# except:
+#     logging.warning('failed to import moviepy module')
+#     pip_install('sounddevice')
+#
+# try:
+#     from bs4 import BeautifulSoup
+# except:
+#     logging.warning('failed to import bs4 module')
+#     pip_install('bs4')
+#     from bs4 import BeautifulSoup
 
 #end non-standard imports
 
-DESKTOP_PATH = os.path.join(os.environ['USERPROFILE'], 'Desktop') #desktop path for making shortcuts
+if os.name == 'posix':
+    DESKTOP_PATH = os.path.join(os.environ['HOME'], 'Desktop')  # desktop path for making shortcuts
+else:
+    DESKTOP_PATH = os.path.join(os.environ['USERPROFILE'], 'Desktop') #desktop path for making shortcuts
 AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
 FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace
 RESOURCE_PATHS = ['\\resource\\', '\\resource\\aud\\', '\\resource\\img\\', '\\resource\\vid\\']
+RESOURCE_PATHS_TEMP = []
+if os.name == 'posix':
+    for path in RESOURCE_PATHS:
+        RESOURCE_PATHS_TEMP.append(path.replace('\\', '/'))
+    RESOURCE_PATHS = RESOURCE_PATHS_TEMP
+
 
 LIVE_FILL_THREADS = 0 #count of live threads for hard drive filling
 PLAYING_AUDIO = False #audio thread flag
@@ -265,7 +289,7 @@ def shortcut_script(pth_str:str, keyword:str, script:str, title:str):
 
 #uses the above script to create a shortcut on desktop with given specs
 def make_shortcut(tList:list) -> bool:
-    with open(PATH + '\\tmp.bat', 'w') as bat:
+    with open(os.path.join(PATH, 'tmp.bat'), 'w') as bat:
         bat.writelines(tList) #write built shortcut script text to temporary batch file
     try:
         logging.info(f'making shortcut to {tList[2]}')
@@ -279,22 +303,22 @@ def make_shortcut(tList:list) -> bool:
 
 #for checking directories/files
 def file_exists(dir:str) -> bool:
-    return os.path.exists(PATH + dir)
+    return os.path.exists(os.path.join(PATH, dir))
 #same as file_exists but checking paths on the desktop specifically
 def desktop_file_exists(obj:str) -> bool:
     return os.path.exists(os.path.join(DESKTOP_PATH, obj))
 
 #start init portion, check resources, config, etc.
 try:
-    if not file_exists('\\resource\\'):
+    if not file_exists(os.path.join(PATH, 'resource')):
         logging.warning('no resource folder found')
         pth = 'pth-default_ignore'
         #selecting first zip found in script folder
-        for obj in os.listdir(PATH + '\\'):
+        for obj in os.listdir(PATH):
             try:
                 if obj.split('.')[-1].lower() == 'zip':
                     logging.info(f'found zip file {obj}')
-                    pth = f'{PATH}\\{obj}'
+                    pth = os.path.join(PATH, obj)
                     break
             except:
                 print(f'{obj} is not a zip file.')
@@ -302,24 +326,26 @@ try:
         if not pth == 'pth-default_ignore':
            with zipfile.ZipFile(pth, 'r') as obj:
                 logging.info('extracting resources from zip')
-                obj.extractall(PATH + '\\resource\\')
+                obj.extractall(os.path.join(PATH, 'resource'))
         else:
             #if no zip found, use default resources
             logging.warning('no zip file found, generating resource folder from default assets.')
             for obj in RESOURCE_PATHS:
                 os.mkdir(PATH + obj)
-            default_path = PATH + '\\default_assets\\'
-            output_path = PATH + '\\resource\\'
-            shutil.copyfile(f'{default_path}default_wallpaper.png', f'{output_path}wallpaper.png')
-            shutil.copyfile(f'{default_path}default_image.png', f'{output_path}img\\img0.png', follow_symlinks=True)
-            if not os.path.exists(f'{output_path}discord.dat'):
-                with open(f'{output_path}discord.dat', 'w') as f:
+            default_path = os.path.join(PATH, 'default_assets')
+            output_path = os.path.join(PATH, 'resource')
+            shutil.copyfile(os.path.join(default_path, 'default_wallpaper.png'),
+                            os.path.join('output_pathwallpaper.png'))
+            shutil.copyfile(os.path.join(default_path, 'default_image.png'),
+                            os.path.join(output_path, 'img', 'img0.png'), follow_symlinks=True)
+            if not os.path.exists(os.path.join(output_path, 'discord.dat')):
+                with open(os.path.join(output_path, 'discord.dat'), 'w') as f:
                     f.write(DEFAULT_DISCORD)
-            if not os.path.exists(f'{output_path}prompt.json'):
-                with open(f'{output_path}prompt.json', 'w') as f:
+            if not os.path.exists(os.path.join(output_path, 'prompt.json')):
+                with open(os.path.join(output_path, 'prompt.json'), 'w') as f:
                     f.write(DEFAULT_PROMPT)
-            if not os.path.exists(f'{output_path}web.json'):
-                with open(f'{output_path}web.json', 'w') as f:
+            if not os.path.exists(os.path.join(output_path, 'web.json')):
+                with open(os.path.join(output_path, 'web.json'), 'w') as f:
                     f.write(DEFAULT_WEB)
 except Exception as e:
     messagebox.showerror('Launch Error', 'Could not launch Edgeware due to resource zip unpacking issues.\n[' + str(e) + ']')
@@ -328,16 +354,16 @@ except Exception as e:
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False
-if os.path.exists(PATH + '\\resource\\prompt.json'):
+if os.path.exists(os.path.join(PATH, 'resource', 'prompt.json')):
     logging.info('found prompt.json')
     HAS_PROMPTS = True
-if os.path.exists(PATH + '\\resource\\web.json'):
+if os.path.exists(os.path.join(PATH, 'resource', 'web.json')):
     logging.info('found web.json')
     WEB_JSON_FOUND = True
 
 WEB_DICT = {}
-if os.path.exists(PATH + '\\resource\\web.json'):
-    with open(PATH + '\\resource\\web.json', 'r') as webF:
+if os.path.exists(os.path.join(PATH, 'resource, web.json')):
+    with open(os.path.join(PATH, 'resource, web.json'), 'r') as webF:
         WEB_DICT = json.loads(webF.read())
 
 try:
@@ -347,7 +373,7 @@ except Exception as e:
 
 #checking presence of resources
 try:
-    HAS_IMAGES = len(os.listdir(PATH + '\\resource\\img\\')) > 0
+    HAS_IMAGES = len(os.listdir(os.path.join(PATH + 'resource', 'img'))) > 0
     logging.info('image resources found')
 except Exception as e:
     logging.warning(f'no image resource folder found\n\tReason: {e}')
@@ -356,8 +382,8 @@ except Exception as e:
 
 VIDEOS = []
 try:
-    for vid in os.listdir(PATH + '\\resource\\vid\\'):
-        VIDEOS.append(PATH + '\\resource\\vid\\' + vid)
+    for vid in os.listdir(os.path.join(PATH, 'resource,''vid')):
+        VIDEOS.append(os.path.join(PATH, 'resource', 'vid', vid))
     logging.info('video resources found')
 except Exception as e:
     logging.warning(f'no video resource folder found\n\tReason: {e}')
@@ -365,14 +391,15 @@ except Exception as e:
 
 AUDIO = []
 try:
-    for aud in os.listdir(PATH + '\\resource\\aud\\'):
-        AUDIO.append(PATH + '\\resource\\aud\\' + aud)
+    for aud in os.listdir(os.path.join(PATH, 'resource', 'aud')):
+        AUDIO.append(os.path.join(PATH, 'resource', 'aud', aud))
     logging.info('audio resources found')
 except:
     logging.warning(f'no audio resource folder found\n\tReason: {e}')
     print('no audio folder found')
 
-HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT['urls']) > 0
+if WEB_DICT != {}:
+    HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT['urls']) > 0
 #end of checking resource presence
 
 #set discord status if enabled
@@ -393,12 +420,13 @@ if not desktop_file_exists('Panic.lnk'):
 
 if LOADING_FLAIR:
     logging.info('started loading flair')
-    subprocess.call('pythonw startup_flair.pyw')
+    subprocess.call(['python, 'startup_flair.pyw'])
 
 #set wallpaper
 if not HIBERNATE_MODE:
     logging.info('set user wallpaper to default wallpaper.png')
-    ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
+    if not os.name == 'posix':
+        ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
 
 #selects url to be opened in new tab by web browser
 def url_select(arg:int):
