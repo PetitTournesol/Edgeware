@@ -199,6 +199,7 @@ def show_window():
             timeoutPopupsVar    = BooleanVar(root, value=(int(settings['timeoutPopups'])==1))
             popupTimeoutVar     = IntVar(root, value=(int(settings['popupTimeout'])))
             mitosisStrenVar     = IntVar(root, value=(int(settings['mitosisStrength'])))
+            mitosisProbVar      = IntVar(root, value=(int(settings['mitosisProb'])))
             booruNameVar        = StringVar(root, value=settings['booruName'])
             
             downloadEnabledVar  = BooleanVar(root, value=(int(settings['downloadEnabled']) == 1))
@@ -279,6 +280,7 @@ def show_window():
     replace_group   = []
     mitosis_group   = []
     mitosis_cGroup  = []
+    mitosis_pGroup  = []
     wallpaper_group = []
     timeout_group   = []
     mouse_group     = []
@@ -518,6 +520,7 @@ def show_window():
     popupFrame = Frame(popupHostFrame)
     timeoutFrame = Frame(popupHostFrame)
     mitosisFrame = Frame(popupHostFrame)
+    mitosisProbFrame = Frame(popupHostFrame)
     panicFrame = Frame(popupHostFrame)
     denialFrame = Frame(popupHostFrame)
     
@@ -535,6 +538,13 @@ def show_window():
     mitosisStren  = Scale(mitosisFrame, label='Mitosis Strength', orient='horizontal', from_=0, to=9, variable=mitosisStrenVar)
 
     mitosis_cGroup.append(mitosisStren)
+    
+    mitosisProbManual = Button(mitosisProbFrame, text='Manual Prob...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Probability', prompt='[50-100]: ')))
+    mitosisProb    = Scale(mitosisProbFrame, label='Mitosis Probability', orient='horizontal', from_=50, to=100, variable=mitosisProbVar)
+    mitosis_cGroup.append(mitosisProb)
+    mitosis_cGroup.append(mitosisProbManual)
+
+    mitosis_pGroup.append(mitosisProb)
 
     setPanicButtonButton = Button(panicFrame, text=f'Set Panic Button\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
     doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: os.startfile('panic.pyw'))
@@ -558,9 +568,13 @@ def show_window():
     timeoutToggle.pack(fill='x')
     timeoutFrame.pack(fill='y', side='left')
 
-    mitosisFrame.pack(fill='y', side='left')
+    mitosisFrame.pack(fill='x', side='left')
     mitosisStren.pack(fill='x')
     mitosisToggle.pack(fill='x')
+
+    mitosisProbFrame.pack(fill='x', side='left')
+    mitosisProb.pack(fill='x')
+    mitosisProbManual.pack(fill='x')
 
     denialFrame.pack(fill='y', side='left')
     denialSlider.pack(fill='x')
@@ -864,7 +878,7 @@ def show_window():
     dropdownMenu.configure(width=10)
     applyButton = Button(advPanel, text='Apply', command= lambda: assignJSON(dropdownObj.get(), textInput.get()))
     Label(tabAdvanced).pack()
-    Label(tabAdvanced, text='Be careful messing with some of these; improper configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
+    Label(tabAdvanced, text='Be careful messing with some of these; imProber configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
     Label(tabAdvanced).pack()
     Label(tabAdvanced).pack()
     advPanel.pack(fill='x', padx=2)

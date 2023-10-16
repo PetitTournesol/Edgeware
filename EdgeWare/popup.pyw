@@ -124,6 +124,7 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     HAS_LIFESPAN = check_setting('timeoutPopups')
     LIFESPAN = int(settings['popupTimeout'])
     MITOSIS_STRENGTH = int(settings['mitosisStrength'])
+    MITOSIS_PROP = int(settings['mitosisProp'])
     PANIC_REQUIRES_VALIDATION = check_setting('timerMode')
     LOWKEY_MODE = check_setting('lkToggle')
     LOWKEY_CORNER = int(settings['lkCorner'])
@@ -407,7 +408,7 @@ def live_life(parent:tk, length:int):
     for i in range(100-OPACITY, 100):
         parent.attributes('-alpha', 1-i/100)
         time.sleep(FADE_OUT_TIME / 100)
-    if LOWKEY_MODE:
+    if MITOSIS_MODE:
         os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
@@ -421,12 +422,15 @@ def die():
     if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:
         urlPath = select_url(rand.randrange(len(web_dict['urls'])))
         webbrowser.open_new(urlPath)
-    if MITOSIS_MODE or LOWKEY_MODE:
-        for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
-            os.startfile('popup.pyw')
-    if HAS_LIFESPAN and MITOSIS_MODE:
-        time.sleep(LIFESPAN)
+    #if MITOSIS_MODE or LOWKEY_MODE:
+    #    for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
+    #        os.startfile('popup.pyw')
+    if LOWKEY_MODE:
         os.startfile('popup.pyw')
+    if MITOSIS_MODE:
+        for i in (range(0, MITOSIS_STRENGTH + 1) if not LOWKEY_MODE else [1]):
+            if rand.randint(1, 100) > MITOSIS_PROP:
+                os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
 def select_caption(filename:str) -> str:
