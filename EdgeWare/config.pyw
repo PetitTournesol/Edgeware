@@ -1,3 +1,4 @@
+#/usr/bin/python
 import json
 import os
 import shutil
@@ -12,9 +13,14 @@ import ctypes
 import sys
 import logging
 import time
+import utilities
+import requests
+import PIL
+from PIL import Image, ImageTk
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED
 
-PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
+PATH = utilities.convert_path(f'{str(pathlib.Path(__file__).parent.absolute())}')
+
 os.chdir(PATH)
 
 #starting logging
@@ -32,19 +38,21 @@ def pip_install(packageName:str):
         subprocess.call(f'pip install {packageName}')
         logging.warning(f'{packageName} should be installed, fatal errors will occur if install failed.')
 
-try:
-    import requests
-except:
-    pip_install('requests')
-    import requests
 
-try:
-    import PIL
-    from PIL import Image, ImageTk
-except:
-    logging.warning('failed to import pillow module')
-    pip_install('pillow')
-    from PIL import Image, ImageTk
+## This is the wrong way of doing this I will fix it later
+# try:
+#     import requests
+# except:
+#     pip_install('requests')
+#     import requests
+#
+# try:
+#     import PIL
+#     from PIL import Image, ImageTk
+# except:
+#     logging.warning('failed to import pillow module')
+#     pip_install('pillow')
+#     from PIL import Image, ImageTk
 
 
 SYS_ARGS = sys.argv.copy()
@@ -71,7 +79,7 @@ UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/Ed
 local_version = '0.0.0_NOCONNECT'
 
 logging.info('opening configDefault')
-with open(f'{PATH}configDefault.dat') as r:
+with open(os.path.join(PATH, 'configDefault.dat')) as r:
     defaultSettingLines = r.readlines()
     varNames = defaultSettingLines[0].split(',')
     varNames[-1] = varNames[-1].replace('\n', '')
@@ -446,7 +454,7 @@ def show_window():
     #zipDownloadButton = Button(tabGeneral, text='Download Zip', command=lambda: downloadZip(zipDropVar.get(), zipLabel))
     zipLabel = Label(zipGitFrame, text=f'Current Zip:\n{pickZip()}', background='lightgray', wraplength=100)
     local_verLabel = Label(verFrame, text=f'Local Version:\n{defaultVars[0]}')
-    web_verLabel = Label(verFrame, text=f'GitHub Version:\n{webv}', bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
+    # web_verLabel = Label(verFrame, text=f'GitHub Version:\n{webv}', bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red')) #For some reason this is erroing out on the entire line
     openGitButton = Button(zipGitFrame, text='Open Github', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
 
     infoHostFrame.pack(fill='x')
@@ -455,7 +463,7 @@ def show_window():
     openGitButton.pack(fill='both', expand=1)
     verFrame.pack(fill='both', side='left', expand=1)
     local_verLabel.pack(fill='x')
-    web_verLabel.pack(fill='x')
+    # web_verLabel.pack(fill='x')
 
     forceReload = Button(infoHostFrame, text='Force Reload', command=refresh)
     optButton   = Button(infoHostFrame, text='Test Func', command=lambda: getDescriptText('default'))
@@ -843,7 +851,7 @@ def show_window():
     toggleAssociateSettings(rotateWallpaperVar.get(), wallpaper_group)
     toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group)
     toggleAssociateSettings(mitosisVar.get(), mitosis_cGroup)
-    toggleAssociateSettings(not mitosisVar.get(), mitosis_group)
+    # toggleAssociateSettings(not mitosisVar.get(), mitosis_group)
     toggleAssociateSettings_manual(downloadEnabledVar.get(), download_group, 'white', 'gray25')
     toggleAssociateSettings(timerVar.get(), timer_group)
     toggleAssociateSettings(lkToggle.get(), lowkey_group)
@@ -857,7 +865,10 @@ def show_window():
     timeObjPath = os.path.join(PATH, 'hid_time.dat')
     HIDDEN_ATTR = 0x02
     SHOWN_ATTR  = 0x08
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+    if os.name == 'posix':
+        pass
+    else:
+        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
     if os.path.exists(timeObjPath):
         with open(timeObjPath, 'r') as file:
             time_ = int(file.readline()) / 60
@@ -865,7 +876,10 @@ def show_window():
                 timerToggle.configure(state=DISABLED)
                 for item in timer_group:
                     item.configure(state=DISABLED)
-    ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+    if os.name == 'posix':
+        pass
+    else:
+        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
 
     
     #first time alert popup
@@ -880,7 +894,7 @@ def show_window():
 
 def pickZip() -> str:
     #selecting zip
-    for dirListObject in os.listdir(f'{PATH}\\'):
+    for dirListObject in os.listdir(f'{PATH}'):
         try:
             if dirListObject.split('.')[-1].lower() == 'zip':
                 return dirListObject.split('.')[0]
@@ -999,7 +1013,10 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
             os.remove(timeObjPath)
             logging.info('removed pass/time files.')
         except Exception as e:
-            errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
+            if os.name == 'posix':
+                errText = str(e).lower().replace(os.environ['HOME'], '[USERNAME_REDACTED]')
+            else:
+                errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
             logging.warning(f'failed timer file modifying\n\tReason: {errText}')
             pass
 
@@ -1176,16 +1193,22 @@ def make_shortcut(tList:list) -> bool:
 
 def toggleStartupBat(state:bool):
     try:
-        startup_path = os.path.expanduser('~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\')
+        if os.name == 'posix':
+            startup_path = os.path.expanduser('~/.config/autostart/org.gnome.Terminal.desktop')
+        else:
+            startup_path = os.path.expanduser('~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\')
         logging.info(f'trying to toggle startup bat to {state}')
         if state:
-            make_shortcut([PATH, startup_path, 'edgeware']) #i scream at my previous and current incompetence and poor programming
+            make_shortcut([PATH, startup_path, 'EdgeWare']) #i scream at my previous and current incompetence and poor programming
             logging.info('toggled startup run on.')
         else:
             os.remove(os.path.join(startup_path, 'edgeware.lnk'))
             logging.info('toggled startup run off.')
     except Exception as e:
-        errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
+        if os.name == 'posix':
+            errText = str(e).lower().replace(os.environ['HOME'], '[USERNAME_REDACTED]')
+        else:
+            errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
         logging.warning(f'failed to toggle startup bat.\n\tReason: {errText}')
         print('uwu')
 
@@ -1225,7 +1248,7 @@ def applyPreset(name:str):
         shutil.copyfile(os.path.join(PATH, 'presets', f'{name}.cfg'), os.path.join(PATH, 'config.cfg'))
         refresh()
     except Exception as e:
-        messagebox.showerror('Error', 'Failed to load preset.\n\n{e}')
+        messagebox.showerror('Error', f'Failed to load preset.\n\n{e}')
 
 def savePreset(name:str) -> bool:
     try:
