@@ -232,11 +232,11 @@ def show_window():
                             discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
                             promptMistakeVar, mitosisVar, onlyVidVar, popupWebVar,
                             rotateWallpaperVar, wallpaperDelayVar, wpVarianceVar,
-                            timeoutPopupsVar, popupTimeoutVar, mitosisStrenVar, booruNameVar,
+                            timeoutPopupsVar, popupTimeoutVar, mitosisStrenVar, mitosisProbVar,
                             downloadEnabledVar, downloadModeVar, useWebResourceVar, fillPathVar, rosVar,
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
-                            booruMin]
+                            booruNameVar, booruMin]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'mouseMod',
                             'mouseMoveMod', 'keyMod', 'keyPressMod', 'cthroughMod',
@@ -245,11 +245,11 @@ def show_window():
                             'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
                             'promptMistakes', 'mitosisMode', 'onlyVid', 'webPopup',
                             'rotateWallpaper', 'wallpaperTimer', 'wallpaperVariance',
-                            'timeoutPopups', 'popupTimeout', 'mitosisStrength', 'booruName',
+                            'timeoutPopups', 'popupTimeout', 'mitosisStrength', 'mitosisProb',
                             'downloadEnabled', 'downloadMode', 'useWebResource', 'drivePath', 'runOnSaveQuit',
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
-                            'booruMinScore']
+                            'booruName', 'booruMinScore']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -271,7 +271,7 @@ def show_window():
     #done painful control variables
     
     if getPresets() is None:
-        write_save(in_var_group, in_var_names, '', False)
+        write_save(in_var_group, in_var_names, safewordVar, False)
         savePreset('Default')
 
     #grouping for enable/disable
@@ -539,7 +539,7 @@ def show_window():
 
     mitosis_cGroup.append(mitosisStren)
     
-    mitosisProbManual = Button(mitosisProbFrame, text='Manual Prob...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Probability', prompt='[50-100]: ')))
+    mitosisProbManual = Button(mitosisProbFrame, text='Manual Prob...', command=lambda: assign(mitosisProbVar, simpledialog.askinteger('Manual Probability', prompt='[50-100]: ')))
     mitosisProb    = Scale(mitosisProbFrame, label='Mitosis Probability', orient='horizontal', from_=50, to=100, variable=mitosisProbVar)
     mitosis_cGroup.append(mitosisProb)
     mitosis_cGroup.append(mitosisProbManual)
@@ -878,7 +878,7 @@ def show_window():
     dropdownMenu.configure(width=10)
     applyButton = Button(advPanel, text='Apply', command= lambda: assignJSON(dropdownObj.get(), textInput.get()))
     Label(tabAdvanced).pack()
-    Label(tabAdvanced, text='Be careful messing with some of these; imProber configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
+    Label(tabAdvanced, text='Be careful messing with some of these; improper configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
     Label(tabAdvanced).pack()
     Label(tabAdvanced).pack()
     advPanel.pack(fill='x', padx=2)
