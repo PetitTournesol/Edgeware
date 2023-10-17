@@ -1252,7 +1252,7 @@ def toggleStartupBat(state:bool):
         if state:
             make_shortcut([PATH, startup_path, 'edgeware']) #i scream at my previous and current incompetence and poor programming
             logging.info('toggled startup run on.')
-        else:
+        elif os.path.exists(os.path.join(startup_path, 'edgeware.lnk')):
             os.remove(os.path.join(startup_path, 'edgeware.lnk'))
             logging.info('toggled startup run off.')
     except Exception as e:
