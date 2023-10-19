@@ -124,7 +124,7 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     HAS_LIFESPAN = check_setting('timeoutPopups')
     LIFESPAN = int(settings['popupTimeout'])
     MITOSIS_STRENGTH = int(settings['mitosisStrength'])
-    MITOSIS_PROP = int(settings['mitosisProp'])
+    MITOSIS_PROB = int(settings['mitosisProb'])
     PANIC_REQUIRES_VALIDATION = check_setting('timerMode')
     LOWKEY_MODE = check_setting('lkToggle')
     LOWKEY_CORNER = int(settings['lkCorner'])
@@ -428,7 +428,7 @@ def die():
         os.startfile('popup.pyw')
     if MITOSIS_MODE:
         for i in (range(0, MITOSIS_STRENGTH + 1) if not LOWKEY_MODE else [1]):
-            if rand.randint(1, 100) > MITOSIS_PROP:
+            if rand.randint(1, 100) > MITOSIS_PROB:
                 os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 

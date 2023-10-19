@@ -12,16 +12,14 @@ import ctypes
 import sys
 import logging
 import time
+import utils
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
 os.chdir(PATH)
 
 #starting logging
-if not os.path.exists(os.path.join(PATH, 'logs')):
-    os.mkdir(os.path.join(PATH, 'logs'))
-logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-dbg.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.info('Started config logging successfully.')
+logging = utils.start_logging('config')
 
 def pip_install(packageName:str):
     try:
