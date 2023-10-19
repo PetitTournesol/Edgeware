@@ -1,2 +1,0 @@
-CRITICAL:failed to start popup
-'subtext'
