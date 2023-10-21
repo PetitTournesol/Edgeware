@@ -537,8 +537,8 @@ def show_window():
 
     mitosis_cGroup.append(mitosisStren)
     
-    mitosisProbManual = Button(mitosisProbFrame, text='Manual Prob...', command=lambda: assign(mitosisProbVar, simpledialog.askinteger('Manual Probability', prompt='[50-100]: ')))
-    mitosisProb    = Scale(mitosisProbFrame, label='Mitosis Probability', orient='horizontal', from_=50, to=100, variable=mitosisProbVar)
+    mitosisProbManual = Button(mitosisProbFrame, text='Manual Prob...', command=lambda: assign(mitosisProbVar, simpledialog.askinteger('Manual Probability', prompt='[10-100]: ')))
+    mitosisProb    = Scale(mitosisProbFrame, label='Mitosis Probability', orient='horizontal', from_=10, to=100, variable=mitosisProbVar)
     mitosis_cGroup.append(mitosisProb)
     mitosis_cGroup.append(mitosisProbManual)
 
