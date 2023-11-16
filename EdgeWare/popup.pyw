@@ -96,6 +96,7 @@ EXTREME_MODE = False
 WEB_OPEN = False
 HAS_LIFESPAN = False
 LIFESPAN = 0
+HIDE_SUBMIT = False
 WEB_PROB = 0
 MITOSIS_STRENGTH = 2
 SUBMISSION_TEXT = 'I Submit <3'
@@ -123,6 +124,7 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     PANIC_KEY = settings['panicButton']
     HAS_LIFESPAN = check_setting('timeoutPopups')
     LIFESPAN = int(settings['popupTimeout'])
+    HIDE_SUBMIT = check_setting('hideSubmit')
     MITOSIS_STRENGTH = int(settings['mitosisStrength'])
     MITOSIS_PROB = int(settings['mitosisProb'])
     PANIC_REQUIRES_VALIDATION = check_setting('timerMode')
@@ -381,9 +383,10 @@ def run():
             captionLabel.place(x=5, y=5)
 
     # Select and display submit text on popup screen
-    submit_text = select_submit()
-    submit_button = Button(root, text=submit_text, command=die)
-    submit_button.place(x=(resized_image.width - submit_button.winfo_reqwidth()) / 2, y=resized_image.height - 5 - submit_button.winfo_reqheight())
+    if not HIDE_SUBMIT:
+        submit_text = select_submit()
+        submit_button = Button(root, text=submit_text, command=die)
+        submit_button.place(x=(resized_image.width - submit_button.winfo_reqwidth()) / 2, y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()

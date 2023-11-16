@@ -181,6 +181,8 @@ def show_window():
 
             discordVar          = BooleanVar(root, value=(int(settings['showDiscord'])==1))
             startFlairVar       = BooleanVar(root, value=(int(settings['showLoadingFlair'])==1))
+
+            hideSubmitVar        = BooleanVar(root, value=(int(settings['hideSubmit'])==1))
             captionVar          = BooleanVar(root, value=(int(settings['showCaptions'])==1))
             panicButtonVar      = StringVar(root, value=settings['panicButton'])
             panicVar            = BooleanVar(root, value=(int(settings['panicDisabled'])==1))
@@ -230,7 +232,7 @@ def show_window():
                             discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
                             promptMistakeVar, mitosisVar, onlyVidVar, popupWebVar,
                             rotateWallpaperVar, wallpaperDelayVar, wpVarianceVar,
-                            timeoutPopupsVar, popupTimeoutVar, mitosisStrenVar, mitosisProbVar,
+                            timeoutPopupsVar, popupTimeoutVar, hideSubmitVar, mitosisStrenVar, mitosisProbVar,
                             downloadEnabledVar, downloadModeVar, useWebResourceVar, fillPathVar, rosVar,
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
@@ -243,7 +245,7 @@ def show_window():
                             'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
                             'promptMistakes', 'mitosisMode', 'onlyVid', 'webPopup',
                             'rotateWallpaper', 'wallpaperTimer', 'wallpaperVariance',
-                            'timeoutPopups', 'popupTimeout', 'mitosisStrength', 'mitosisProb',
+                            'timeoutPopups', 'popupTimeout', 'hideSubmit', 'mitosisStrength', 'mitosisProb',
                             'downloadEnabled', 'downloadMode', 'useWebResource', 'drivePath', 'runOnSaveQuit',
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
@@ -592,6 +594,7 @@ def show_window():
     panicDisableButton      = Checkbutton(popupToggleFrame1, anchor='w', text='Disable Panic Hotkey', variable=panicVar)
     cthroughToggleButton    = Checkbutton(popupToggleFrame1, anchor='w', text='Enable Click Through', variable=cthroughVar)
     popupWebToggle          = Checkbutton(popupToggleFrame2, anchor='w', text='Popup close opens web page', variable=popupWebVar)
+    hideSubmitToggle        = Checkbutton(popupToggleFrame2, anchor='w', text='Hide Submit Button', variable=hideSubmitVar)
     toggleCaptionsButton    = Checkbutton(popupToggleFrame3, anchor='w', text='Popup Captions', variable=captionVar)
     toggleSubliminalButton  = Checkbutton(popupToggleFrame3, anchor='w', text='Popup Subliminals', variable=popupSublim)
     
@@ -603,6 +606,7 @@ def show_window():
 
     popupToggleFrame2.pack(fill='both', side='left', expand=1)
     popupWebToggle.pack(fill='x')
+    hideSubmitToggle.pack(fill='x')
 
     popupToggleFrame3.pack(fill='both', side='right', expand=1)
     toggleSubliminalButton.pack(fill='x')

@@ -786,7 +786,7 @@ def rotate_wallpapers():
         selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
         while(selectedWallpaper == prv):
             selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
-        ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(PATH, 'resource', settings['wallpaperDat'][selectedWallpaper]), 0)
+        ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(PATH, 'resource\\wallpapers', settings['wallpaperDat'][selectedWallpaper]), 0)
         prv = selectedWallpaper
 
 def do_timer():
