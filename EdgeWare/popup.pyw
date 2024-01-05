@@ -1,4 +1,5 @@
 import hashlib
+import sounddevice
 import os
 import sys
 import random as rand
@@ -9,8 +10,14 @@ import pathlib
 import webbrowser
 import ctypes
 import threading as thread
+import imageio
 import logging
-from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED
+import win32gui
+import win32con
+from types import NoneType
+from moviepy.editor import AudioFileClip
+from videoprops import get_video_properties
+from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, Canvas
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 
@@ -83,12 +90,13 @@ PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
 ALLOW_SCREAM = True
-SHOW_CAPTIONS = False
+SHOW_CAPTIONS = True
 PANIC_DISABLED = False
 EXTREME_MODE = False
 WEB_OPEN = False
 HAS_LIFESPAN = False
 LIFESPAN = 0
+HIDE_SUBMIT = False
 WEB_PROB = 0
 MITOSIS_STRENGTH = 2
 SUBMISSION_TEXT = 'I Submit <3'
@@ -116,7 +124,9 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     PANIC_KEY = settings['panicButton']
     HAS_LIFESPAN = check_setting('timeoutPopups')
     LIFESPAN = int(settings['popupTimeout'])
+    HIDE_SUBMIT = check_setting('hideSubmit')
     MITOSIS_STRENGTH = int(settings['mitosisStrength'])
+    MITOSIS_PROB = int(settings['mitosisProb'])
     PANIC_REQUIRES_VALIDATION = check_setting('timerMode')
     LOWKEY_MODE = check_setting('lkToggle')
     LOWKEY_CORNER = int(settings['lkCorner'])
@@ -200,10 +210,6 @@ class GifLabel(tk.Label):
 #video label class
 class VideoLabel(tk.Label):
     def load(self, path:str, resized_width:int, resized_height:int):
-        import imageio
-        from moviepy.editor import AudioFileClip
-        from videoprops import get_video_properties
-        
         self.path = path
         self.configure(background='black')
         self.wid = resized_width
@@ -223,10 +229,8 @@ class VideoLabel(tk.Label):
         self.delay = 1 / self.fps
         
     def play(self):
-        from types import NoneType
         if not isinstance(self.audio_track, NoneType):
             try:
-                import sounddevice
                 sounddevice.play(self.audio_track, samplerate=len(self.audio_track) / self.duration, loop=True)
             except Exception as e:
                 print(f'failed to play sound, reason:\n\t{e}')
@@ -238,7 +242,6 @@ class VideoLabel(tk.Label):
                 self.image = self.video_frame_image
                 self.time_offset_end = time.perf_counter()
                 time.sleep(max(0, self.delay - (self.time_offset_end - self.time_offset_start)))
-
 
 def run():
     #var things
@@ -261,7 +264,6 @@ def run():
             except:
                 item = arr[rand.randrange(len(arr))]
     else:
-        from videoprops import get_video_properties
         video_path = os.path.join(PATH, 'resource', 'vid', item)
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
@@ -281,14 +283,18 @@ def run():
     root.overrideredirect(1)
     root.frame = Frame(root)
     root.wm_attributes('-topmost', 1)
+    # config for clickthrough video, gif and images. Buttons are not included
+    root.attributes('-transparentcolor', 'black', '-topmost', 1)
+    bg = Canvas(root, width=0, height=0, bg='black')
+    bg.pack()
+    setClickthrough(bg.winfo_id())
 
     #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img:Image.Image) -> Image.Image:
         size_source = max(img.width, img.height) / min(screen_width, screen_height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
-        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
-
+        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.Resampling.LANCZOS)
     resized_image = resize(image)
 
     do_deny = check_deny()
@@ -300,27 +306,26 @@ def run():
         resized_image = resized_image.filter(blur_modes.pop())
 
     photoimage_image = ImageTk.PhotoImage(resized_image)
-    image.close()
 
     #different handling for videos vs gifs vs normal images
     if video_mode:
         #video mode
-        label = VideoLabel(root)
+        label = VideoLabel(bg)
         label.load(path = video_path, resized_width = resized_image.width, resized_height = resized_image.height)
         label.pack()
         thread.Thread(target=lambda: label.play(), daemon=True).start()
     elif gif_bool:
         #gif mode
-        label = GifLabel(root)
+        label = GifLabel(bg)
         label.load(path=os.path.abspath(f'{os.getcwd()}\\resource\\img\\{item}'), resized_width = resized_image.width, resized_height = resized_image.height)
         label.pack()
     else:
         #standard image mode
         if not SUBLIMINAL_MODE:
-            label = Label(root, image=photoimage_image, bg='black')
+            label = Label(bg, image=photoimage_image, bg='black')
             label.pack()
         else:
-            label = GifLabel(root)
+            label = GifLabel(bg)
             subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
 
             if os.path.exists(os.path.join(PATH, 'resource', 'subliminals')):
@@ -377,11 +382,25 @@ def run():
             captionLabel = Label(root, text=caption_text, wraplength=resized_image.width - border_wid_const)
             captionLabel.place(x=5, y=5)
 
-    submit_button = Button(root, text=SUBMISSION_TEXT, command=die)
-    submit_button.place(x=resized_image.width - 5 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
+    # Select and display submit text on popup screen
+    if not HIDE_SUBMIT:
+        submit_text = select_submit()
+        submit_button = Button(root, text=submit_text, command=die)
+        submit_button.place(x=(resized_image.width - submit_button.winfo_reqwidth()) / 2, y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
+    
+# clickthrough function, on by default
+def setClickthrough(hwnd):
+    print("setting window properties")
+    try:
+        styles = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+        styles = win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT
+        win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, styles)
+        win32gui.SetLayeredWindowAttributes(hwnd, 0, 255, win32con.LWA_ALPHA)
+    except Exception as e:
+        print(e)
 
 def check_deny() -> bool:
     return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
@@ -391,7 +410,7 @@ def live_life(parent:tk, length:int):
     for i in range(100-OPACITY, 100):
         parent.attributes('-alpha', 1-i/100)
         time.sleep(FADE_OUT_TIME / 100)
-    if LOWKEY_MODE:
+    if MITOSIS_MODE:
         os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
@@ -405,9 +424,15 @@ def die():
     if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:
         urlPath = select_url(rand.randrange(len(web_dict['urls'])))
         webbrowser.open_new(urlPath)
-    if MITOSIS_MODE or LOWKEY_MODE:
-        for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
-            os.startfile('popup.pyw')
+    #if MITOSIS_MODE or LOWKEY_MODE:
+    #    for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
+    #        os.startfile('popup.pyw')
+    if LOWKEY_MODE:
+        os.startfile('popup.pyw')
+    if MITOSIS_MODE:
+        for i in (range(0, MITOSIS_STRENGTH + 1) if not LOWKEY_MODE else [1]):
+            if rand.randint(1, 100) > MITOSIS_PROB:
+                os.startfile('popup.pyw')
     os.kill(os.getpid(), 9)
 
 def select_caption(filename:str) -> str:
@@ -417,6 +442,12 @@ def select_caption(filename:str) -> str:
             ls.extend(CAPTIONS['default'])
             return ls[rand.randrange(0, len(CAPTIONS[obj]))]
     return CAPTIONS['default'][rand.randrange(0, len(CAPTIONS['default']))] if (len(CAPTIONS['default']) > 0) else None
+
+def select_submit() -> str:
+    submit_text = 'I obey'
+    if len(CAPTIONS['subtext']) > 0:
+        submit_text = CAPTIONS['subtext'][rand.randrange(0, len(CAPTIONS['subtext']))]
+    return submit_text
 
 def panic(key):
     key_condition = (key.keysym == PANIC_KEY or key.keycode == PANIC_KEY)

@@ -15,6 +15,9 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
+import pyautogui as auto
+import winsound
+import utils
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 
@@ -22,10 +25,7 @@ PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
 #starting logging
-if not os.path.exists(os.path.join(PATH, 'logs')):
-    os.mkdir(os.path.join(PATH, 'logs'))
-logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-ew_start.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.info('Started start logging successfully.')
+logging = utils.start_logging('start')
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -215,6 +215,8 @@ AUDIO_CHANCE = int(settings['audioMod'])
 PROMPT_CHANCE = int(settings['promptMod'])
 VIDEO_CHANCE = int(settings['vidMod'])
 WEB_CHANCE = int(settings['webMod'])
+MOUSE_ACTIONS = int(settings['mouseMoveMod'])
+KEYPRESS_ACTION = int(settings['keyPressMod'])
 
 VIDEOS_ONLY = int(settings['onlyVid']) == 1
 
@@ -243,8 +245,13 @@ ROTATE_WALLPAPER = int(settings['rotateWallpaper']) == 1
 
 MITOSIS_MODE = int(settings['mitosisMode']) == 1
 LOWKEY_MODE = int(settings['lkToggle']) == 1
+MOUSE_MODE = int(settings['mouseMod']) == 1
+KEYPRESS_MODE = int(settings['keyMod']) == 1
 
 TIMER_MODE = int(settings['timerMode']) == 1
+TIMER_SETUP = int(settings['timerSetupTime']) * 60
+
+SAFEWORD = settings['safeword']
 
 DRIVE_PATH = settings['drivePath']
 
@@ -368,6 +375,7 @@ try:
     for aud in os.listdir(PATH + '\\resource\\aud\\'):
         AUDIO.append(PATH + '\\resource\\aud\\' + aud)
     logging.info('audio resources found')
+    logging.info(AUDIO)
 except:
     logging.warning(f'no audio resource folder found\n\tReason: {e}')
     print('no audio folder found')
@@ -412,15 +420,38 @@ class TrayHandler:
         self.root.title('Edgeware')
         self.timer_mode = settings['timerMode'] == 1
         
-        self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
+        self.option_list = [pystray.MenuItem('Config', self.start_config), pystray.MenuItem('Panic', self.try_panic)]
+
         self.tray_icon = pystray.Icon('Edgeware',
                                     Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
                                     'Edgeware',
                                     self.option_list)
 
         self.root.withdraw()
-
+        self.timer_setup()
         self.password_setup()
+
+    def config_from_tray(self):
+        os.startfile('config.pyw')
+
+    def timer_setup(self):
+        if self.timer_mode:
+            try:
+                timeObjPath = os.path.join(PATH, 'hid_time.dat')
+            except:
+                logging.info('Cannot initialize hid_time.dat')
+            try:
+                HIDDEN_ATTR = 0x02
+                SHOWN_ATTR = 0x08
+                ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
+                with open(timeObjPath, 'w') as file:
+                    file.write(str(TIMER_SETUP))
+                ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
+                logging.info('hid_time.dat file set up successfully')
+            except:
+                #no timerSetupTime found
+                logging.info('Cannot set up hid_time.dat file')
+
 
     def password_setup(self):
         if self.timer_mode:
@@ -429,38 +460,27 @@ class TrayHandler:
                 HIDDEN_ATTR = 0x02
                 SHOWN_ATTR = 0x08
                 ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-                with open(hashObjPath, 'r') as file:
-                    self.hashedPass = file.readline()
+                with open(hashObjPath, 'w') as file:
+                    file.write(SAFEWORD)
                 ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, HIDDEN_ATTR)
+                self.hashedPass = hashlib.sha256(SAFEWORD.encode(encoding='ascii', errors='ignore')).hexdigest()
+                logging.info('pass.hash file set up successfully')
             except:
                 #no hash found
                 self.hashedPass = None
 
+    def start_config(self):
+        try:
+            os.startfile('config.pyw')
+            logging.info('Starting config from tray command')
+        except:
+            logging.warning(f'fail to start config from tray command')
+            print('fail to start config from tray command')
+
     def try_panic(self):
-        logging.info('attempting tray panic')
         if not PANIC_DISABLED:
-            if self.timer_mode:
-                hashObjPath = os.path.join(PATH, 'pass.hash')
-                timeObjPath = os.path.join(PATH, 'hid_time.dat')
-                pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
-                t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
-                if t_hash == self.hashedPass:
-                    #revealing hidden files
-                    try:
-                        SHOWN_ATTR = 0x08
-                        ctypes.windll.kernel32.SetFileAttributesW(hashObjPath, SHOWN_ATTR)
-                        ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
-                        os.remove(hashObjPath)
-                        os.remove(timeObjPath)
-                        os.startfile('panic.pyw')
-                    except:
-                        logging.critical('panic initiated due to failed pass/timer check')
-                        self.tray_icon.stop()
-                        os.startfile('panic.pyw')
-            else:
-                logging.warning('panic initiated from tray command')
-                self.tray_icon.stop()
-                os.startfile('panic.pyw')
+            logging.info(f'Panic not disabled, attempt tray panic')
+            os.startfile('panic.pyw')
 
     def move_to_tray(self):
         self.tray_icon.run(tray_setup)
@@ -512,7 +532,7 @@ def main():
             waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
             time.sleep(float(waitTime))
             ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
-            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
+            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY) * 10):
                 roll_for_initiative()
     else:
         logging.info('starting annoyance loop')
@@ -550,14 +570,22 @@ class BooruDownloader:
 
     def download(self, page_start:int = 0, page_end:int = 1, min_score:int = None) -> None:
         self._page_start = max(page_start, 0)
-        self._page_start = min(self._page_start, self.page_count)
-        self._page_end   = min(page_end, self.max_page+1) if page_end >= self._page_start else self._page_start + 1
+        #self._page_start = min(self._page_start, self.page_count)
+        self._page_end   = min(page_end, self.max_page+1) if page_end > self._page_start else self._page_start + 1
+        logging.info(f'Page_start={self._page_start}')
+        logging.info(f'Page_end={self._page_end}')
+
 
         for page_index in range(self._page_start, self._page_end):
-            self._page_url = f'{self.booru_scheme.booru_search_url.format(booru_name=self.booru)}{self.tags}&pid={page_index*self.post_per_page}'
+            self._page_url = f'{self.booru_scheme.booru_search_url.format(booru_name=self.booru)}{self.tags}&pid={(page_index)*self.post_per_page}'
             logging.info(f'downloadpageurl={self._page_url}')
+            logging.info(f'Page_index={page_index}')
+            logging.info(f'Post_per_page={self.post_per_page}')
             self._html = requests.get(self._page_url).text
             self._soup = BeautifulSoup(self._html, 'html.parser')
+            
+            #if page_index > self._page_start and page_index < self._page_end:
+                #self.post_per_page += 20
 
             for image in self._soup.find_all('img'):
                 try:
@@ -577,6 +605,7 @@ class BooruDownloader:
                     if min_score is not None and self._score < min_score:
                         print(f'(score {self._score} too low) skipped {self._src}')
                         continue
+                    
                 except Exception as e:
                     print(f'skipped: {e}')
                     continue
@@ -670,10 +699,17 @@ def annoyance():
 
 #independently attempt to do all active settings with probability equal to their freq value     
 def roll_for_initiative():
-    if do_roll(WEB_CHANCE) and HAS_WEB:
+    if do_roll(WEB_CHANCE/10) and HAS_WEB:
         try:
+            # auto.hotkey('ctrl', 'w')  # Attempt auto close tab with hot key (unused for now)
+            
+            # get chrome path
+            chrome_path = r'"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %s'
+
+            # Close current browser to avoid stacking up browser tabs
+            subprocess.call('taskkill /F /IM chrome.exe', shell=True)
             url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
-            webbrowser.open_new(url)
+            webbrowser.get(chrome_path).open_new(url)
         except Exception as e:
             messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
             logging.critical(f'failed to open website {url}\n\tReason: {e}')
@@ -702,6 +738,44 @@ def roll_for_initiative():
         except:
             messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
             logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
+    if MOUSE_MODE:
+        # get screen width and height for random mouse action
+        screenWidth, screenHeight = auto.size()
+        
+        # random number of actions between 1 and maximum actions
+        for action in range(1, MOUSE_ACTIONS):
+            time.sleep(0.1)
+
+            # random to choose mouse movement or click
+            act = rand.randint(0, 1)
+            if act:
+                try:
+                    # Random mouse movement on the screen with step of action
+                    auto.moveTo(rand.randrange(0, screenWidth, action), rand.randrange(0, screenHeight, action))
+                except:
+                    messagebox.showerror('Mouse movement Error','\n[' + str(e) + ']')
+                    logging.critical(f'failed to move mouse\n\tReason: {e}')
+            else:
+                try:
+                    # Random mouse movement and click on the screen
+                    auto.click(rand.randrange(0,screenWidth, action), rand.randrange(0, screenHeight,action))
+                except:
+                    messagebox.showerror('Mouse clicking Error', '\n[' +str(e) + ']')
+                    logging.critical(f'failed to execute mouse clicking\n\tReason: {e}')
+    if KEYPRESS_MODE:
+        # random key list
+        key_list = ['a', 'b', 'c', 'd', 'e','f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', 'esc']
+        
+        # random number of actions between 1 and maximum key press actions
+        for action in range(1, KEYPRESS_ACTION):
+            time.sleep(0.1)
+
+            try:
+                auto.press(rand.choice(key_list))
+            except:
+                messagebox.showerror('Key press Error', '\n[' + str(e) + ']')
+                logging.critical(f'failed to execute random key press\n\tReason: {e}')
+
 
 def rotate_wallpapers():
     prv = 'default'
@@ -712,7 +786,7 @@ def rotate_wallpapers():
         selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
         while(selectedWallpaper == prv):
             selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
-        ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(PATH, 'resource', settings['wallpaperDat'][selectedWallpaper]), 0)
+        ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(PATH, 'resource\\wallpapers', settings['wallpaperDat'][selectedWallpaper]), 0)
         prv = selectedWallpaper
 
 def do_timer():
@@ -740,6 +814,7 @@ def do_timer():
         os.remove(hashObjPath)
         os.remove(timeObjPath)
         os.startfile('panic.pyw')
+        logging.info('Timer run out successfully executed Panic')
     except:
         os.startfile('panic.pyw')
 
@@ -752,9 +827,30 @@ def play_audio():
     logging.info('starting audio playback')
     PLAYING_AUDIO = True
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
-    playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
+    try:
+        playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
+        logging.info('number of audios found: %d',len(AUDIO))
+    except:
+        logging.warning('cannot initiate play_audio')
     PLAYING_AUDIO = False
     logging.info('finished audio playback')
+#import queue
+#def play_audio():
+#    global PLAYING_AUDIO
+#    AUDIO_Q = queue.Queue()
+#    for audio in AUDIO:
+#        AUDIO_Q.put(audio)
+#        logging.info('Queued '+ audio +' for playing')
+#    while True:
+#        sound = AUDIO_Q.get()
+#        PLAYING_AUDIO = True
+#        logging.info('Playing ' + sound)
+#        if sound is None:
+#            logging.info('No more sound to play')
+#            PLAYING_AUDIO = False
+#            break
+#        playsound.playsound(sound)
+
 
 #fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
